@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Settings — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Settings</h1>
+          <p class="adm-page-subtitle">Store configuration, admin credentials and data management.</p>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;align-items:start;">
+
+        <!-- ── STORE INFORMATION ── -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title"><i class="fa-regular fa-store" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Store Information</span>
+          </div>
+          <div class="adm-card-body">
+            <div class="adm-form-grid" style="gap:1.1rem;">
+              <div class="adm-field">
+                <label class="adm-label">Store Name</label>
+                <input class="adm-input" type="text" id="s-store-name" placeholder="FKA Atelier">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Store Tagline</label>
+                <input class="adm-input" type="text" id="s-tagline" placeholder="Timeless. Modest. Elegant.">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Contact Email</label>
+                <input class="adm-input" type="email" id="s-email" placeholder="hello@fkaatelier.com">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">WhatsApp Number</label>
+                <input class="adm-input" type="tel" id="s-whatsapp" placeholder="+2340000000000">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Instagram Handle</label>
+                <input class="adm-input" type="text" id="s-instagram" placeholder="@fkaatelier">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">TikTok Handle</label>
+                <input class="adm-input" type="text" id="s-tiktok" placeholder="@fkaatelier">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Location</label>
+                <input class="adm-input" type="text" id="s-location" placeholder="Lagos, Nigeria">
+              </div>
+            </div>
+            <button class="adm-btn adm-btn-primary" style="margin-top:1.5rem;width:100%;" onclick="saveStoreSettings()">
+              <i class="fa-regular fa-check"></i> Save Store Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- ── ADMIN CREDENTIALS + ANNOUNCEMENT ── -->
+        <div style="display:flex;flex-direction:column;gap:1.5rem;">
+
+          <!-- Announcement Bar -->
+          <div class="adm-card">
+            <div class="adm-card-header">
+              <span class="adm-card-title"><i class="fa-regular fa-megaphone" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Announcement Bar</span>
+            </div>
+            <div class="adm-card-body">
+              <div class="adm-form-grid" style="gap:1.1rem;">
+                <div class="adm-field">
+                  <label class="adm-label">Announcement Text</label>
+                  <input class="adm-input" type="text" id="s-announcement"
+                    placeholder="FREE DELIVERY ON ORDERS OVER ₦70,000 | CUSTOM MEASUREMENTS ACCEPTED">
+                  <span class="adm-field-hint">Displayed in the top bar across the website.</span>
+                </div>
+                <label class="adm-toggle-wrap">
+                  <input type="checkbox" class="adm-toggle-input" id="s-announcement-active" checked>
+                  <span class="adm-toggle-track"></span>
+                  <span class="adm-toggle-label">Show Announcement Bar</span>
+                </label>
+              </div>
+              <button class="adm-btn adm-btn-primary" style="margin-top:1.25rem;width:100%;" onclick="saveAnnouncementSettings()">
+                Save Announcement
+              </button>
+            </div>
+          </div>
+
+          <!-- Admin Credentials -->
+          <div class="adm-card">
+            <div class="adm-card-header">
+              <span class="adm-card-title"><i class="fa-regular fa-lock" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Admin Credentials</span>
+            </div>
+            <div class="adm-card-body">
+              <div class="adm-form-grid" style="gap:1.1rem;">
+                <div class="adm-field">
+                  <label class="adm-label">Admin Username</label>
+                  <input class="adm-input" type="text" id="s-admin-username" placeholder="admin">
+                </div>
+                <div class="adm-field">
+                  <label class="adm-label">Current Password</label>
+                  <input class="adm-input" type="password" id="s-current-password" placeholder="Enter current password to confirm">
+                </div>
+                <div class="adm-field">
+                  <label class="adm-label">New Password</label>
+                  <input class="adm-input" type="password" id="s-new-password" placeholder="New password (leave blank to keep current)">
+                </div>
+                <div class="adm-field">
+                  <label class="adm-label">Confirm New Password</label>
+                  <input class="adm-input" type="password" id="s-confirm-password" placeholder="Re-enter new password">
+                </div>
+              </div>
+              <div class="adm-field-err" id="err-credentials" style="margin-top:0.5rem;"></div>
+              <button class="adm-btn adm-btn-primary" style="margin-top:1.25rem;width:100%;" onclick="saveCredentials()">
+                Update Credentials
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── ORDER SETTINGS ── -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title"><i class="fa-regular fa-bag-shopping" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Order Settings</span>
+          </div>
+          <div class="adm-card-body">
+            <div class="adm-form-grid" style="gap:1.1rem;">
+              <div class="adm-field">
+                <label class="adm-label">Free Delivery Threshold (₦)</label>
+                <input class="adm-input" type="number" id="s-free-threshold" placeholder="70000">
+                <span class="adm-field-hint">Applied as the default when no zone-specific threshold is set.</span>
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Default Delivery Fee (₦)</label>
+                <input class="adm-input" type="number" id="s-default-fee" placeholder="4500">
+              </div>
+              <div class="adm-field">
+                <label class="adm-label">Order Confirmation Message</label>
+                <textarea class="adm-textarea" id="s-order-message" rows="3"
+                  placeholder="Thank you for your order! We'll be in touch shortly via WhatsApp to confirm payment."></textarea>
+              </div>
+            </div>
+            <button class="adm-btn adm-btn-primary" style="margin-top:1.5rem;width:100%;" onclick="saveOrderSettings()">
+              Save Order Settings
+            </button>
+          </div>
+        </div>
+
+        <!-- ── DATA MANAGEMENT ── -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title"><i class="fa-regular fa-database" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Data Management</span>
+          </div>
+          <div class="adm-card-body">
+            <div style="display:flex;flex-direction:column;gap:1rem;">
+
+              <div style="padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+                <div style="font-weight:600;font-size:0.82rem;margin-bottom:0.3rem;">Seed Demo Data</div>
+                <div style="font-size:0.75rem;color:var(--adm-text-light);margin-bottom:0.75rem;">Load sample orders and customers to test the admin dashboard.</div>
+                <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="seedAndRefresh()">
+                  <i class="fa-regular fa-database"></i> Seed Demo Orders
+                </button>
+              </div>
+
+              <div style="padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+                <div style="font-weight:600;font-size:0.82rem;margin-bottom:0.3rem;">Export All Data</div>
+                <div style="font-size:0.75rem;color:var(--adm-text-light);margin-bottom:0.75rem;">Download a JSON backup of all orders, customers and settings.</div>
+                <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="exportAllData()">
+                  <i class="fa-regular fa-download"></i> Export Backup JSON
+                </button>
+              </div>
+
+              <div style="padding:1rem;background:#FEF2F2;border-radius:var(--adm-radius);border:1px solid #FCA5A5;">
+                <div style="font-weight:600;font-size:0.82rem;color:#991B1B;margin-bottom:0.3rem;">Danger Zone</div>
+                <div style="font-size:0.75rem;color:#B91C1C;margin-bottom:0.75rem;">Permanently delete all orders and customers. This cannot be undone.</div>
+                <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+                  <button class="adm-btn adm-btn-danger adm-btn-sm" onclick="clearAllOrders()">
+                    <i class="fa-regular fa-trash"></i> Clear All Orders
+                  </button>
+                  <button class="adm-btn adm-btn-danger adm-btn-sm" onclick="clearAllCustomers()">
+                    <i class="fa-regular fa-trash"></i> Clear All Customers
+                  </button>
+                </div>
+              </div>
+
+              <!-- Storage Usage -->
+              <div style="padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+                <div style="font-weight:600;font-size:0.82rem;margin-bottom:0.5rem;">Storage Usage</div>
+                <div id="storage-info" style="font-size:0.78rem;color:var(--adm-text-mid);"></div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="../assets/js/products.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/delivery.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("settings");
+adminSetPageTitle("Settings");
+
+// Load all settings into fields
+function loadSettings() {
+  const s = adminSettingsLoad();
+  document.getElementById("s-store-name").value         = s.storeName     || "FKA Atelier";
+  document.getElementById("s-tagline").value            = s.tagline       || "Timeless. Modest. Elegant.";
+  document.getElementById("s-email").value              = s.email         || "hello@fkaatelier.com";
+  document.getElementById("s-whatsapp").value           = s.whatsapp      || "+2340000000000";
+  document.getElementById("s-instagram").value          = s.instagram     || "@fkaatelier";
+  document.getElementById("s-tiktok").value             = s.tiktok        || "@fkaatelier";
+  document.getElementById("s-location").value           = s.location      || "Lagos, Nigeria";
+  document.getElementById("s-announcement").value       = s.announcement  || "FREE DELIVERY ON ORDERS OVER ₦70,000  |  CUSTOM MEASUREMENTS ACCEPTED";
+  document.getElementById("s-announcement-active").checked = s.announcementActive !== false;
+  document.getElementById("s-free-threshold").value     = s.freeThreshold || 70000;
+  document.getElementById("s-default-fee").value        = s.defaultFee    || 4500;
+  document.getElementById("s-order-message").value      = s.orderMessage  || "Thank you for your order! We'll be in touch shortly.";
+  document.getElementById("s-admin-username").value     = s.adminUsername || "admin";
+
+  // Storage info
+  const keys    = ["fka_orders","fka_customers","fka_delivery_zones","fka_admin_settings","fka_admin_products_overrides"];
+  const sizes   = keys.map(k => {
+    const val = localStorage.getItem(k) || "";
+    return { key: k, size: Math.round(new Blob([val]).size / 1024 * 10) / 10 };
+  });
+  const total   = sizes.reduce((s,x) => s + x.size, 0);
+  document.getElementById("storage-info").innerHTML =
+    sizes.map(x => `<div style="display:flex;justify-content:space-between;padding:0.2rem 0;border-bottom:1px solid var(--adm-border);">
+      <span>${x.key}</span><span style="font-weight:500;">${x.size} KB</span></div>`).join("")
+    + `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-weight:700;">
+        <span>Total</span><span>${Math.round(total * 10)/10} KB / ~5,000 KB</span></div>`;
+}
+
+function saveStoreSettings() {
+  adminSettingsSave({
+    storeName:  document.getElementById("s-store-name").value.trim(),
+    tagline:    document.getElementById("s-tagline").value.trim(),
+    email:      document.getElementById("s-email").value.trim(),
+    whatsapp:   document.getElementById("s-whatsapp").value.trim(),
+    instagram:  document.getElementById("s-instagram").value.trim(),
+    tiktok:     document.getElementById("s-tiktok").value.trim(),
+    location:   document.getElementById("s-location").value.trim()
+  });
+  adminToast("Store settings saved.");
+}
+
+function saveAnnouncementSettings() {
+  adminSettingsSave({
+    announcement:       document.getElementById("s-announcement").value.trim(),
+    announcementActive: document.getElementById("s-announcement-active").checked
+  });
+  adminToast("Announcement settings saved.");
+}
+
+function saveOrderSettings() {
+  adminSettingsSave({
+    freeThreshold: parseFloat(document.getElementById("s-free-threshold").value) || 70000,
+    defaultFee:    parseFloat(document.getElementById("s-default-fee").value)    || 4500,
+    orderMessage:  document.getElementById("s-order-message").value.trim()
+  });
+  adminToast("Order settings saved.");
+}
+
+function saveCredentials() {
+  const errEl   = document.getElementById("err-credentials");
+  const current = document.getElementById("s-current-password").value;
+  const newPw   = document.getElementById("s-new-password").value;
+  const confirm = document.getElementById("s-confirm-password").value;
+  const uname   = document.getElementById("s-admin-username").value.trim();
+
+  errEl.textContent = "";
+  const storedPw = adminSettingsGet("adminPassword", "fka_atelier_admin_2024");
+
+  if (current !== storedPw) {
+    errEl.textContent = "Current password is incorrect.";
+    return;
+  }
+  if (newPw && newPw !== confirm) {
+    errEl.textContent = "New passwords do not match.";
+    return;
+  }
+  if (newPw && newPw.length < 8) {
+    errEl.textContent = "New password must be at least 8 characters.";
+    return;
+  }
+  if (!uname) {
+    errEl.textContent = "Username cannot be empty.";
+    return;
+  }
+
+  const update = { adminUsername: uname };
+  if (newPw) update.adminPassword = newPw;
+  adminSettingsSave(update);
+
+  document.getElementById("s-current-password").value = "";
+  document.getElementById("s-new-password").value     = "";
+  document.getElementById("s-confirm-password").value = "";
+  adminToast("Credentials updated. You may need to log in again.");
+}
+
+function seedAndRefresh() {
+  seedDemoOrders();
+  adminToast("Demo data seeded successfully.");
+  setTimeout(() => loadSettings(), 500);
+}
+
+function exportAllData() {
+  const data = {
+    exportedAt: new Date().toISOString(),
+    orders:    ordersGetAll(),
+    customers: customersGetAll(),
+    settings:  adminSettingsLoad(),
+    zones:     deliveryZonesLoad()
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json" });
+  const a    = Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(blob),
+    download: `fka-backup-${new Date().toISOString().slice(0,10)}.json`
+  });
+  a.click();
+  adminToast("Backup exported.");
+}
+
+async function clearAllOrders() {
+  const confirmed = await adminConfirm("Delete ALL orders permanently? This cannot be undone.");
+  if (!confirmed) return;
+  localStorage.removeItem("fka_orders");
+  adminToast("All orders cleared.", "error");
+  loadSettings();
+}
+
+async function clearAllCustomers() {
+  const confirmed = await adminConfirm("Delete ALL customer records permanently? This cannot be undone.");
+  if (!confirmed) return;
+  localStorage.removeItem("fka_customers");
+  adminToast("All customers cleared.", "error");
+  loadSettings();
+}
+
+loadSettings();
+</script>
+</body>
+</html>

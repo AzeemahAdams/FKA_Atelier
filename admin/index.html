@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Login — FKA Atelier</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+
+<div class="adm-login-page">
+  <div class="adm-login-box">
+    <div class="adm-login-brand">
+      <span class="adm-login-brand-name">FKA Atelier</span>
+      <span class="adm-login-brand-sub">Store Administration</span>
+    </div>
+    <p class="adm-login-title">Sign in to your dashboard</p>
+
+    <div class="adm-login-error" id="login-error">
+      <i class="fa-regular fa-circle-xmark"></i>
+      <span id="login-error-msg">Invalid username or password.</span>
+    </div>x
+
+    <div id="session-notice" class="adm-login-error" style="background:#FEF3C7;border-color:#FCD34D;color:#92400E;display:none;">
+      <i class="fa-regular fa-clock"></i> Your session expired. Please sign in again.
+    </div>
+
+    <form id="login-form" novalidate>
+      <div class="adm-field" style="margin-bottom:1.1rem;">
+        <label class="adm-label" for="adm-username">Username</label>
+        <input class="adm-input" type="text" id="adm-username" placeholder="admin"
+          autocomplete="username" required autofocus>
+      </div>
+      <div class="adm-field" style="margin-bottom:0.5rem;">
+        <label class="adm-label" for="adm-password">Password</label>
+        <div style="position:relative;">
+          <input class="adm-input" type="password" id="adm-password" placeholder="••••••••"
+            autocomplete="current-password" required style="padding-right:2.75rem;">
+          <button type="button" id="toggle-pw" aria-label="Show password"
+            style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;color:#9A9A9A;cursor:pointer;font-size:0.9rem;">
+            <i class="fa-regular fa-eye" id="pw-icon"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="adm-login-btn" id="login-btn">
+        <i class="fa-regular fa-right-to-bracket"></i> Sign In
+      </button>
+    </form>
+
+    <p class="adm-login-hint">
+      Default credentials: <strong>admin</strong> / <strong>fka_atelier_admin_2024</strong><br>
+      Change these in <em>Settings</em> after first login.
+    </p>
+  </div>
+</div>
+
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+  "use strict";
+  // Already logged in? Go straight to dashboard
+  if (adminIsLoggedIn()) window.location.href = "dashboard.html";
+
+  // Show session-expired notice
+  const params = new URLSearchParams(window.location.search);
+  if (params.get("reason") === "session") {
+    document.getElementById("session-notice").style.display = "block";
+  }
+
+  // Password toggle
+  document.getElementById("toggle-pw").addEventListener("click", () => {
+    const pw   = document.getElementById("adm-password");
+    const icon = document.getElementById("pw-icon");
+    if (pw.type === "password") {
+      pw.type = "text";
+      icon.className = "fa-regular fa-eye-slash";
+    } else {
+      pw.type = "password";
+      icon.className = "fa-regular fa-eye";
+    }
+  });
+
+  // Form submit
+  document.getElementById("login-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const username = document.getElementById("adm-username").value.trim();
+    const password = document.getElementById("adm-password").value;
+    const errEl    = document.getElementById("login-error");
+    const btn      = document.getElementById("login-btn");
+
+    errEl.classList.remove("show");
+    btn.disabled    = true;
+    btn.textContent = "Signing in…";
+
+    // Slight delay to prevent brute-force timing attacks
+    setTimeout(() => {
+      if (adminLogin(username, password)) {
+        window.location.href = "dashboard.html";
+      } else {
+        errEl.classList.add("show");
+        document.getElementById("login-error-msg").textContent = "Invalid username or password. Please try again.";
+        btn.disabled    = false;
+        btn.innerHTML   = '<i class="fa-regular fa-right-to-bracket"></i> Sign In';
+        document.getElementById("adm-password").value = "";
+        document.getElementById("adm-password").focus();
+      }
+    }, 400);
+  });
+</script>
+</body>
+</html>

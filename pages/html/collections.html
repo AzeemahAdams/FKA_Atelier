@@ -1,0 +1,270 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collections — FKA Atelier</title>
+  <meta name="description" content="Browse FKA Atelier's curated collections — New Arrivals, Everyday Elegance, Occasion Wear and Signature pieces.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<div class="announcement-bar">
+  FREE DELIVERY ON ORDERS OVER ₦70,000 <span>|</span> CUSTOM MEASUREMENTS ACCEPTED
+</div>
+
+<nav class="fka-navbar" role="navigation" aria-label="Main navigation">
+  <div class="navbar-inner">
+    <button class="navbar-toggler" id="navbar-toggler" aria-label="Open menu"><i class="fa-regular fa-bars"></i></button>
+    <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
+    <ul class="navbar-nav-links" role="list">
+      <li><a href="../../index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collections.html" class="active">Collections</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="measurements.html">Measurements</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn search-open-btn" aria-label="Search"><i class="fa-regular fa-magnifying-glass"></i></button>
+      <a href="wishlist.html" class="navbar-icon-btn" aria-label="Wishlist" style="position:relative;">
+        <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
+      </a>
+      <a href="cart.html" class="navbar-icon-btn" aria-label="Shopping bag" style="position:relative;">
+        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
+      </a>
+      <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My Account" title="Sign In / Register" style="position:relative;">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
+      <button class="ask-fka-nav-btn" aria-label="Ask FKA"><span class="sparkle">✨</span> Ask FKA</button>
+    </div>
+  </div>
+</nav>
+
+<div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+<nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-label="Mobile navigation">
+  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu"><i class="fa-regular fa-xmark"></i></button>
+  <div class="mobile-nav-brand">FKA Atelier</div>
+  <ul class="mobile-nav-links" role="list">
+    <li><a href="../../index.html">Home</a></li>
+    <li><a href="shop.html">Shop</a></li>
+    <li><a href="collections.html">Collections</a></li>
+    <li><a href="about.html">About</a></li>
+    <li><a href="measurements.html">Measurements</a></li>
+    <li><a href="faq.html">FAQ</a></li>
+    <li><a href="contact.html">Contact</a></li>
+    <li><a href="cart.html">Shopping Bag</a></li>
+    <li><a href="wishlist.html">Wishlist</a></li>
+  </ul>
+</nav>
+
+<div id="search-overlay" class="search-overlay" role="search" aria-label="Search">
+  <div class="search-overlay-inner">
+    <div class="search-overlay-input-row">
+      <i class="fa-regular fa-magnifying-glass" style="color:var(--taupe);font-size:1rem;flex-shrink:0;"></i>
+      <input id="search-input" class="search-overlay-input" type="search"
+        placeholder="Search pieces, colours, styles&#x2026;" autocomplete="off" aria-label="Search products">
+      <button id="search-overlay-close" class="search-overlay-close" aria-label="Close search">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div id="search-results-preview" class="search-results-preview"></div>
+  </div>
+</div>
+
+<!-- COLLECTIONS HERO -->
+<div class="collection-hero-band" aria-label="Collections hero">
+  <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1400&q=85" alt="FKA Atelier Collections" aria-hidden="true">
+  <div class="collection-hero-band-overlay" aria-hidden="true"></div>
+  <div class="collection-hero-band-text fka-container">
+    <span style="font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;color:rgba(255,255,255,0.6);display:block;margin-bottom:0.75rem;">Curated For You</span>
+    <h1 class="collection-hero-band-title">Our Collections</h1>
+  </div>
+</div>
+
+<!-- NEW COLLECTION -->
+<section id="new-collection" class="collection-section" aria-label="New Collection">
+  <div class="fka-container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-bottom:2.5rem;" class="fade-in">
+      <div>
+        <span class="section-label">2026</span>
+        <h2 class="section-title">New Collection</h2>
+        <p class="section-subtitle">Fresh pieces from FKA Atelier — thoughtfully designed for women who move through the world with grace and intention.</p>
+        <a href="shop.html?cat=all" class="view-all-link" style="margin-top:1.5rem;display:inline-flex;">Shop New Arrivals <i class="fa-regular fa-arrow-right"></i></a>
+      </div>
+      <div style="aspect-ratio:4/3;overflow:hidden;background:var(--beige);" class="fade-in fade-in-delay-1">
+        <img src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?w=800&q=80" alt="New Collection" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+    </div>
+    <div class="collection-products-preview" id="col-new-collection" data-collection-grid="new-collection"></div>
+  </div>
+</section>
+
+<!-- EVERYDAY ELEGANCE -->
+<section id="everyday-elegance" class="collection-section alt-bg" aria-label="Everyday Elegance">
+  <div class="fka-container">
+    <div style="text-align:center;max-width:600px;margin:0 auto 2.5rem;" class="fade-in">
+      <span class="section-label">Daily Wear</span>
+      <h2 class="section-title">Everyday Elegance</h2>
+      <p class="section-subtitle">Effortless modest pieces for everyday wear. Comfortable enough for all-day dressing, refined enough for any occasion.</p>
+    </div>
+    <div class="collection-products-preview" id="col-everyday-elegance" data-collection-grid="everyday-elegance"></div>
+    <div style="text-align:center;margin-top:2rem;" class="fade-in">
+      <a href="shop.html" class="view-all-link">View All Everyday Pieces <i class="fa-regular fa-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- OCCASION WEAR -->
+<section id="occasion-wear" class="collection-section" aria-label="Occasion Wear">
+  <div class="fka-container">
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:center;margin-bottom:2.5rem;">
+      <div style="aspect-ratio:4/3;overflow:hidden;background:var(--beige);" class="fade-in">
+        <img src="https://images.unsplash.com/photo-1548549557-dbe9946621da?w=800&q=80" alt="Occasion Wear" style="width:100%;height:100%;object-fit:cover;">
+      </div>
+      <div class="fade-in fade-in-delay-1">
+        <span class="section-label">Special Occasions</span>
+        <h2 class="section-title">Occasion Wear</h2>
+        <p class="section-subtitle">Elegant pieces for special occasions. From weddings to celebrations — dressed modestly, beautifully.</p>
+        <a href="shop.html" class="view-all-link" style="margin-top:1.5rem;display:inline-flex;">Explore Occasion Wear <i class="fa-regular fa-arrow-right"></i></a>
+      </div>
+    </div>
+    <div class="collection-products-preview" id="col-occasion-wear" data-collection-grid="occasion-wear"></div>
+  </div>
+</section>
+
+<!-- SIGNATURE COLLECTION -->
+<section id="signature" class="collection-section alt-bg" aria-label="Signature Collection">
+  <div class="fka-container">
+    <div style="text-align:center;max-width:600px;margin:0 auto 2.5rem;" class="fade-in">
+      <span class="section-label">FKA Atelier</span>
+      <h2 class="section-title">Signature Collection</h2>
+      <p class="section-subtitle">Distinctive FKA Atelier designs — pieces that carry the unmistakable spirit of the brand. Crafted for women who know exactly who they are.</p>
+    </div>
+    <div class="collection-products-preview" id="col-signature" data-collection-grid="signature"></div>
+    <div style="text-align:center;margin-top:2rem;" class="fade-in">
+      <a href="shop.html" class="view-all-link">View Signature Pieces <i class="fa-regular fa-arrow-right"></i></a>
+    </div>
+  </div>
+</section>
+
+<!-- PHILOSOPHY STRIP -->
+<section style="background:var(--black);padding:5rem 1.5rem;text-align:center;" aria-label="Brand philosophy">
+  <div class="fka-container" style="max-width:700px;">
+    <span class="section-label fade-in" style="color:var(--taupe);">Our Philosophy</span>
+    <h2 style="font-family:var(--font-serif);font-size:clamp(1.6rem,3vw,2.4rem);color:var(--cream);font-weight:300;font-style:italic;line-height:1.5;margin-bottom:1.5rem;" class="fade-in fade-in-delay-1">
+      "Modesty and elegance, beautifully together."
+    </h2>
+    <a href="about.html" class="btn-fka-ghost fade-in fade-in-delay-2">Discover Our Story</a>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="fka-footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-brand">FKA Atelier</div>
+      <div class="footer-tagline">Timeless. Modest. Elegant.</div>
+      <div class="footer-social">
+        <a href="#" class="footer-social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="footer-social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://wa.me/2347019243312" class="footer-social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="mailto:omotolaazeemah7@gmail.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+      </div>
+    </div>
+    <div><div class="footer-col-title">Shop</div>
+      <ul class="footer-links">
+        <li><a href="shop.html">All Pieces</a></li>
+        <li><a href="shop.html?cat=abayas">Abayas</a></li>
+        <li><a href="shop.html?cat=dresses">Dresses</a></li>
+        <li><a href="shop.html?cat=coord-sets">Co-ord Sets</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">Customer Care</div>
+      <ul class="footer-links">
+        <li><a href="measurements.html">Measurements</a></li>
+        <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+        <li><a href="returns.html">Returns &amp; Exchanges</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">About</div>
+      <ul class="footer-links">
+        <li><a href="about.html">Our Story</a></li>
+        <li><a href="about.html#values">Our Values</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">Connect</div>
+      <ul class="footer-links">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="https://wa.me/2347019243312">WhatsApp</a></li>
+        <li><a href="mailto:omotolaazeemah7@gmail.com">Email Us</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span>
+  </div>
+</footer>
+
+<!-- ASK FKA -->
+<div class="ask-fka-fab" id="ask-fka-fab">
+  <div class="ask-fka-panel" id="ask-fka-panel" role="dialog" aria-label="Ask FKA" aria-modal="true">
+    <div class="ask-fka-panel-header">
+      <div><div class="ask-fka-panel-title">✨ Ask FKA</div><div class="ask-fka-panel-sub">Your FKA Atelier fashion concierge</div></div>
+      <button class="ask-fka-close" id="ask-fka-close" aria-label="Close"><i class="fa-regular fa-xmark"></i></button>
+    </div>
+    <div class="ask-fka-panel-body">
+      <div class="ask-fka-greeting">
+        <div class="ask-fka-avatar">F</div>
+        <div class="ask-fka-bubble">Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I help you today?</div>
+      </div>
+      <div class="ask-fka-suggestions">
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-shirt"></i> Find me a dress</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler"></i> Help me choose my size</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler-combined"></i> How do custom measurements work?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-naira-sign"></i> What's in my budget?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-truck"></i> How much is delivery?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-brands fa-whatsapp"></i> Talk to a human</button>
+      </div>
+      <div id="fka-chat-thread" class="fka-chat-thread" aria-live="polite" aria-label="Chat messages"></div>
+    </div>
+      <div class="ask-fka-greeting">
+        <div class="ask-fka-avatar">F</div>
+        <div class="ask-fka-bubble">Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I help you today?</div>
+      </div>
+      <div class="ask-fka-suggestions">
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-shirt"></i> Find me a dress</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler"></i> Help me choose my size</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-message"></i> Talk to a human</button>
+      </div>
+      
+    </div>
+    <div class="ask-fka-panel-footer">
+      <input class="ask-fka-input" id="ask-fka-input" type="text" placeholder="Ask me anything about FKA Atelier…" aria-label="Message" autocomplete="off" maxlength="400">
+      <button class="ask-fka-send" id="ask-fka-send" aria-label="Send"><i class="fa-regular fa-paper-plane-top"></i></button>
+    </div>
+    <div class="ask-fka-disclaimer">Powered by Groq AI &nbsp;·&nbsp; <a href="contact.html" style="color:var(--warm-brown);">Contact our team</a></div>
+  </div>
+  <button class="ask-fka-btn" id="ask-fka-fab-btn" aria-label="Open Ask FKA" aria-expanded="false">
+    <span class="sparkle">✨</span> Ask FKA
+  </button>
+</div>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<script src="../../assets/js/products.js"></script>
+<script src="../../assets/js/cart.js"></script>
+<script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); });</script>
+<script src="../../assets/js/askfka.js"></script>
+</body>
+</html>

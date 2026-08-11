@@ -1,0 +1,1003 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Account — FKA Atelier</title>
+  <meta name="description" content="Sign in or create your FKA Atelier account to track orders and save your details.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/auth.css">
+</head>
+<body>
+
+<div class="announcement-bar">FREE DELIVERY ON ORDERS OVER ₦85,000, <span>|</span> CUSTOM MEASUREMENTS ACCEPTED</div>
+
+<nav class="fka-navbar" role="navigation" aria-label="Main navigation">
+  <div class="navbar-inner">
+    <button class="navbar-toggler" id="navbar-toggler" aria-label="Open menu"><i class="fa-regular fa-bars"></i></button>
+    <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
+    <ul class="navbar-nav-links" role="list">
+      <li><a href="../../index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collections.html">Collections</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="measurements.html">Measurements</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn search-open-btn" aria-label="Search"><i class="fa-regular fa-magnifying-glass"></i></button>
+      <a href="wishlist.html" class="navbar-icon-btn" aria-label="Wishlist" style="position:relative;">
+        <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
+      </a>
+      <a href="cart.html" class="navbar-icon-btn" aria-label="Shopping bag" style="position:relative;">
+        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
+      </a>
+      <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My account" style="position:relative;color:var(--warm-brown);">
+        <i class="fa-solid fa-circle-user"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+<nav id="mobile-nav-drawer" class="mobile-nav-drawer">
+  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu"><i class="fa-regular fa-xmark"></i></button>
+  <div class="mobile-nav-brand">FKA Atelier</div>
+  <ul class="mobile-nav-links">
+    <li><a href="../../index.html">Home</a></li><li><a href="shop.html">Shop</a></li>
+    <li><a href="collections.html">Collections</a></li><li><a href="about.html">About</a></li>
+    <li><a href="measurements.html">Measurements</a></li><li><a href="faq.html">FAQ</a></li>
+    <li><a href="contact.html">Contact</a></li><li><a href="cart.html">Shopping Bag</a></li>
+    <li><a href="wishlist.html">Wishlist</a></li>
+  </ul>
+</nav>
+
+<div id="search-overlay" class="search-overlay" role="search">
+  <button id="search-overlay-close" class="search-overlay-close" aria-label="Close search"><i class="fa-regular fa-xmark"></i></button>
+  <div class="search-overlay-inner">
+    <p class="search-overlay-label">What are you looking for?</p>
+    <input id="search-input" class="search-overlay-input" type="search" placeholder="Search pieces, colours, styles…" autocomplete="off">
+    <div id="search-results-preview" class="search-results-preview"></div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     AUTH PANELS  (shown when NOT logged in)
+     ═══════════════════════════════════════════════════════ -->
+<div id="auth-panels" style="display:none;">
+
+  <div class="auth-page-wrap">
+    <!-- TABS -->
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tab-login"    role="tab" onclick="authShowTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" role="tab" onclick="authShowTab('register')">Create Account</button>
+    </div>
+
+    <!-- ── LOGIN PANEL ────────────────────────────────── -->
+    <div id="panel-login" class="auth-panel" role="tabpanel">
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">FKA Atelier</span>
+        <span class="auth-brand-sub">Welcome back</span>
+      </div>
+
+      <div class="auth-error" id="login-error" role="alert"></div>
+
+      <form id="form-login" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="login-email">Email Address</label>
+          <input class="auth-input" type="email" id="login-email" autocomplete="email" placeholder="you@example.com" required>
+          <span class="auth-field-err" id="err-login-email"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="login-password">Password</label>
+          <div class="auth-input-reveal-wrap">
+            <input class="auth-input" type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" required>
+            <button type="button" class="auth-reveal-btn" onclick="authTogglePw('login-password',this)" aria-label="Show password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <span class="auth-field-err" id="err-login-password"></span>
+        </div>
+        <div class="auth-remember-row">
+          <label class="auth-check-label">
+            <input type="checkbox" id="login-remember">
+            <span class="auth-check-box"></span>
+            Keep me signed in
+          </label>
+          <button type="button" class="auth-text-link" onclick="authShowForgot()">Forgot password?</button>
+        </div>
+        <button type="submit" class="auth-submit-btn" id="login-submit">
+          <i class="fa-regular fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+
+      <p class="auth-switch-text">
+        New to FKA Atelier?
+        <button class="auth-text-link" onclick="authShowTab('register')">Create an account</button>
+      </p>
+    </div>
+
+    <!-- ── REGISTER PANEL ─────────────────────────────── -->
+    <div id="panel-register" class="auth-panel" role="tabpanel" style="display:none;">
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">FKA Atelier</span>
+        <span class="auth-brand-sub">Create your account</span>
+      </div>
+
+      <div class="auth-error" id="register-error" role="alert"></div>
+
+      <form id="form-register" novalidate>
+        <div class="auth-form-two">
+          <div class="auth-field">
+            <label class="auth-label" for="reg-first">First Name</label>
+            <input class="auth-input" type="text" id="reg-first" autocomplete="given-name" placeholder="Amina" required>
+            <span class="auth-field-err" id="err-reg-first"></span>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="reg-last">Last Name</label>
+            <input class="auth-input" type="text" id="reg-last" autocomplete="family-name" placeholder="Hassan" required>
+            <span class="auth-field-err" id="err-reg-last"></span>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-email">Email Address</label>
+          <input class="auth-input" type="email" id="reg-email" autocomplete="email" placeholder="you@example.com" required>
+          <span class="auth-field-err" id="err-reg-email"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-phone">Phone / WhatsApp <span class="auth-hint-sm">(Nigerian number)</span></label>
+          <div class="auth-phone-wrap">
+            <span class="auth-phone-prefix"><i class="fa-brands fa-whatsapp"></i> +234</span>
+            <input class="auth-input auth-input-phone" type="tel" id="reg-phone" autocomplete="tel" placeholder="08012345678" required>
+          </div>
+          <span class="auth-field-err" id="err-reg-phone"></span>
+          <span class="auth-hint">We'll use this to update you on your orders.</span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-password">Password</label>
+          <div class="auth-input-reveal-wrap">
+            <input class="auth-input" type="password" id="reg-password" autocomplete="new-password" placeholder="At least 6 characters" required>
+            <button type="button" class="auth-reveal-btn" onclick="authTogglePw('reg-password',this)" aria-label="Show password">
+              <i class="fa-regular fa-eye"></i>
+            </button>
+          </div>
+          <span class="auth-field-err" id="err-reg-password"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-confirm">Confirm Password</label>
+          <input class="auth-input" type="password" id="reg-confirm" autocomplete="new-password" placeholder="Repeat password" required>
+          <span class="auth-field-err" id="err-reg-confirm"></span>
+        </div>
+        <button type="submit" class="auth-submit-btn" id="register-submit">
+          <i class="fa-regular fa-user-plus"></i> Create Account
+        </button>
+      </form>
+
+      <p class="auth-switch-text">
+        Already have an account?
+        <button class="auth-text-link" onclick="authShowTab('login')">Sign in</button>
+      </p>
+    </div>
+
+    <!-- ── FORGOT PASSWORD (inline) ───────────────────── -->
+    <div id="panel-forgot" class="auth-panel" style="display:none;">
+      <button class="auth-back-link" onclick="authShowTab('login')">
+        <i class="fa-regular fa-arrow-left"></i> Back to Sign In
+      </button>
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">Forgot Password?</span>
+        <span class="auth-brand-sub">Enter your email and we'll send reset instructions.</span>
+      </div>
+      <div class="auth-error" id="forgot-error" role="alert"></div>
+      <div class="auth-success" id="forgot-success" role="status" style="display:none;">
+        <i class="fa-regular fa-circle-check"></i>
+        If that email is registered, you'll receive instructions shortly. For immediate help, <a href="contact.html">contact us</a>.
+      </div>
+      <form id="form-forgot" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="forgot-email">Email Address</label>
+          <input class="auth-input" type="email" id="forgot-email" autocomplete="email" placeholder="you@example.com">
+          <span class="auth-field-err" id="err-forgot-email"></span>
+        </div>
+        <button type="submit" class="auth-submit-btn">
+          <i class="fa-regular fa-envelope"></i> Send Instructions
+        </button>
+      </form>
+    </div>
+
+  </div><!-- /.auth-page-wrap -->
+</div><!-- /#auth-panels -->
+
+<!-- ═══════════════════════════════════════════════════════
+     ACCOUNT DASHBOARD  (shown when logged in)
+     ═══════════════════════════════════════════════════════ -->
+<div id="account-dashboard" style="display:none;">
+  <div class="acc-page-header">
+    <div class="fka-container">
+      <div class="acc-header-inner">
+        <div>
+          <span class="section-label">My Account</span>
+          <h1 class="acc-welcome">Hello, <span id="acc-name">there</span> 🤍</h1>
+          <p class="acc-email-display" id="acc-email-display"></p>
+        </div>
+        <button class="acc-logout-btn" onclick="authLogout()">
+          <i class="fa-regular fa-right-from-bracket"></i> Sign Out
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="fka-container" style="padding-top:2.5rem;padding-bottom:4rem;">
+    <div class="acc-layout">
+
+      <!-- LEFT: TAB NAV -->
+      <nav class="acc-sidenav">
+        <button class="acc-sidenav-btn active" onclick="accShowTab('orders')" id="acc-nav-orders">
+          <i class="fa-regular fa-bag-shopping"></i> My Orders
+        </button>
+        <button class="acc-sidenav-btn" onclick="accShowTab('profile')" id="acc-nav-profile">
+          <i class="fa-regular fa-user"></i> Profile
+        </button>
+        <button class="acc-sidenav-btn" onclick="accShowTab('addresses')" id="acc-nav-addresses">
+          <i class="fa-regular fa-location-dot"></i> Addresses
+        </button>
+        <button class="acc-sidenav-btn" onclick="accShowTab('password')" id="acc-nav-password">
+          <i class="fa-regular fa-lock"></i> Password
+        </button>
+      </nav>
+
+      <!-- RIGHT: TAB CONTENT -->
+      <div class="acc-content">
+
+        <!-- ORDERS TAB -->
+        <div id="acc-tab-orders" class="acc-tab-panel">
+          <h2 class="acc-tab-title">My Orders</h2>
+          <div id="acc-orders-list"></div>
+        </div>
+
+        <!-- PROFILE TAB -->
+        <div id="acc-tab-profile" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Profile Details</h2>
+          <div class="auth-success" id="profile-saved" style="display:none;">
+            <i class="fa-regular fa-circle-check"></i> Profile updated successfully.
+          </div>
+          <div class="auth-error" id="profile-error" role="alert"></div>
+          <form id="form-profile" novalidate>
+            <div class="auth-form-two">
+              <div class="auth-field">
+                <label class="auth-label" for="prof-first">First Name</label>
+                <input class="auth-input" type="text" id="prof-first" autocomplete="given-name">
+                <span class="auth-field-err" id="err-prof-first"></span>
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="prof-last">Last Name</label>
+                <input class="auth-input" type="text" id="prof-last" autocomplete="family-name">
+                <span class="auth-field-err" id="err-prof-last"></span>
+              </div>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Email Address</label>
+              <input class="auth-input" type="email" id="prof-email" disabled style="opacity:0.6;">
+              <span class="auth-hint">Email address cannot be changed.</span>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="prof-phone">Phone / WhatsApp</label>
+              <input class="auth-input" type="tel" id="prof-phone" autocomplete="tel">
+              <span class="auth-field-err" id="err-prof-phone"></span>
+            </div>
+            <button type="submit" class="auth-submit-btn" style="max-width:240px;">
+              <i class="fa-regular fa-check"></i> Save Profile
+            </button>
+          </form>
+        </div>
+
+        <!-- ADDRESSES TAB -->
+        <div id="acc-tab-addresses" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Saved Addresses</h2>
+          <div id="acc-addresses-list"></div>
+          <div style="margin-top:1.5rem;">
+            <button class="acc-add-addr-btn" onclick="accToggleAddAddr()">
+              <i class="fa-regular fa-plus"></i> Add New Address
+            </button>
+          </div>
+          <div id="add-addr-form-wrap" style="display:none;margin-top:1.25rem;">
+            <div class="acc-addr-form-card">
+              <h4 style="font-family:var(--font-serif);font-size:1.1rem;margin-bottom:1rem;">New Address</h4>
+              <div class="auth-field">
+                <label class="auth-label" for="addr-line1">Street Address</label>
+                <input class="auth-input" type="text" id="addr-line1" placeholder="14 Ajose Adeogun Street">
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="addr-line2">Apartment / Floor <span class="auth-hint-sm">(optional)</span></label>
+                <input class="auth-input" type="text" id="addr-line2" placeholder="Flat 4B">
+              </div>
+              <div class="auth-form-two">
+                <div class="auth-field">
+                  <label class="auth-label" for="addr-city">City / Area</label>
+                  <input class="auth-input" type="text" id="addr-city" placeholder="Abeokuta">
+                </div>
+                <div class="auth-field">
+                  <label class="auth-label" for="addr-state">State</label>
+                  <input class="auth-input" type="text" id="addr-state" placeholder="Ogun">
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;">
+                <button class="auth-submit-btn" style="max-width:160px;" onclick="accSaveAddress()">
+                  <i class="fa-regular fa-check"></i> Save
+                </button>
+                <button class="acc-cancel-btn" onclick="accToggleAddAddr()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSWORD TAB -->
+        <div id="acc-tab-password" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Change Password</h2>
+          <div class="auth-success" id="pw-saved" style="display:none;">
+            <i class="fa-regular fa-circle-check"></i> Password updated successfully.
+          </div>
+          <div class="auth-error" id="pw-error" role="alert"></div>
+          <form id="form-password" novalidate style="max-width:420px;">
+            <div class="auth-field">
+              <label class="auth-label" for="pw-current">Current Password</label>
+              <div class="auth-input-reveal-wrap">
+                <input class="auth-input" type="password" id="pw-current" autocomplete="current-password" placeholder="Your current password">
+                <button type="button" class="auth-reveal-btn" onclick="authTogglePw('pw-current',this)"><i class="fa-regular fa-eye"></i></button>
+              </div>
+              <span class="auth-field-err" id="err-pw-current"></span>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="pw-new">New Password</label>
+              <div class="auth-input-reveal-wrap">
+                <input class="auth-input" type="password" id="pw-new" autocomplete="new-password" placeholder="At least 6 characters">
+                <button type="button" class="auth-reveal-btn" onclick="authTogglePw('pw-new',this)"><i class="fa-regular fa-eye"></i></button>
+              </div>
+              <span class="auth-field-err" id="err-pw-new"></span>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="pw-confirm">Confirm New Password</label>
+              <input class="auth-input" type="password" id="pw-confirm" autocomplete="new-password" placeholder="Repeat new password">
+              <span class="auth-field-err" id="err-pw-confirm"></span>
+            </div>
+            <button type="submit" class="auth-submit-btn" style="max-width:240px;">
+              <i class="fa-regular fa-lock"></i> Update Password
+            </button>
+          </form>
+        </div>
+
+      </div><!-- /.acc-content -->
+    </div><!-- /.acc-layout -->
+  </div>
+</div><!-- /#account-dashboard -->
+
+<!-- PAGE HERO (shown for auth panels) -->
+<div class="page-hero" id="auth-page-hero" style="display:none;">
+  <span class="page-hero-eyebrow">Your Account</span>
+  <h1 class="page-hero-title" id="auth-page-title">Sign In</h1>
+  <p class="page-hero-sub">Save your details, track orders and check out faster.</p>
+</div>
+
+<!-- AUTH PANELS -->
+<div id="auth-panels" style="display:none;">
+  <div class="auth-page-wrap">
+    <div class="auth-tabs" role="tablist">
+      <button class="auth-tab active" id="tab-login"    role="tab" onclick="authShowTab('login')">Sign In</button>
+      <button class="auth-tab"        id="tab-register" role="tab" onclick="authShowTab('register')">Create Account</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="panel-login" class="auth-panel" role="tabpanel">
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">FKA Atelier</span>
+        <span class="auth-brand-sub">Welcome back</span>
+      </div>
+      <div class="auth-error" id="login-error" role="alert" style="display:none;"></div>
+      <form id="form-login" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="login-email">Email Address</label>
+          <input class="auth-input" type="email" id="login-email" autocomplete="email" placeholder="you@example.com" required>
+          <span class="auth-field-err" id="err-login-email"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="login-password">Password</label>
+          <div class="auth-input-reveal-wrap">
+            <input class="auth-input" type="password" id="login-password" autocomplete="current-password" placeholder="••••••••" required>
+            <button type="button" class="auth-reveal-btn" onclick="authTogglePw('login-password',this)" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <span class="auth-field-err" id="err-login-password"></span>
+        </div>
+        <div class="auth-remember-row">
+          <label class="auth-check-label">
+            <input type="checkbox" id="login-remember">
+            <span class="auth-check-box"></span>
+            Keep me signed in
+          </label>
+          <button type="button" class="auth-text-link" onclick="authShowTab('forgot')">Forgot password?</button>
+        </div>
+        <button type="submit" class="auth-submit-btn" id="login-submit">
+          <i class="fa-regular fa-right-to-bracket"></i> Sign In
+        </button>
+      </form>
+      <p class="auth-switch-text">New to FKA Atelier? <button class="auth-text-link" onclick="authShowTab('register')">Create an account</button></p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="panel-register" class="auth-panel" role="tabpanel" style="display:none;">
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">FKA Atelier</span>
+        <span class="auth-brand-sub">Create your account</span>
+      </div>
+      <div class="auth-error" id="register-error" role="alert" style="display:none;"></div>
+      <form id="form-register" novalidate>
+        <div class="auth-form-two">
+          <div class="auth-field">
+            <label class="auth-label" for="reg-first">First Name</label>
+            <input class="auth-input" type="text" id="reg-first" autocomplete="given-name" placeholder="Amina" required>
+            <span class="auth-field-err" id="err-reg-first"></span>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="reg-last">Last Name</label>
+            <input class="auth-input" type="text" id="reg-last" autocomplete="family-name" placeholder="Hassan" required>
+            <span class="auth-field-err" id="err-reg-last"></span>
+          </div>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-email">Email Address</label>
+          <input class="auth-input" type="email" id="reg-email" autocomplete="email" placeholder="you@example.com" required>
+          <span class="auth-field-err" id="err-reg-email"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-phone">Phone / WhatsApp <span class="auth-hint-sm">(Nigerian number)</span></label>
+          <div class="auth-phone-wrap">
+            <span class="auth-phone-prefix"><i class="fa-brands fa-whatsapp"></i> +234</span>
+            <input class="auth-input auth-input-phone" type="tel" id="reg-phone" autocomplete="tel" placeholder="08012345678" required>
+          </div>
+          <span class="auth-field-err" id="err-reg-phone"></span>
+          <span class="auth-hint">We use this to contact you about your orders.</span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-password">Password</label>
+          <div class="auth-input-reveal-wrap">
+            <input class="auth-input" type="password" id="reg-password" autocomplete="new-password" placeholder="At least 6 characters" required>
+            <button type="button" class="auth-reveal-btn" onclick="authTogglePw('reg-password',this)" aria-label="Show password"><i class="fa-regular fa-eye"></i></button>
+          </div>
+          <span class="auth-field-err" id="err-reg-password"></span>
+        </div>
+        <div class="auth-field">
+          <label class="auth-label" for="reg-confirm">Confirm Password</label>
+          <input class="auth-input" type="password" id="reg-confirm" autocomplete="new-password" placeholder="Repeat password" required>
+          <span class="auth-field-err" id="err-reg-confirm"></span>
+        </div>
+        <button type="submit" class="auth-submit-btn" id="register-submit">
+          <i class="fa-regular fa-user-plus"></i> Create Account
+        </button>
+      </form>
+      <p class="auth-switch-text">Already have an account? <button class="auth-text-link" onclick="authShowTab('login')">Sign in</button></p>
+    </div>
+
+    <!-- FORGOT -->
+    <div id="panel-forgot" class="auth-panel" style="display:none;">
+      <button class="auth-back-link" onclick="authShowTab('login')"><i class="fa-regular fa-arrow-left"></i> Back to Sign In</button>
+      <div class="auth-brand-mark">
+        <span class="auth-brand-name">Reset Password</span>
+        <span class="auth-brand-sub">We'll help you get back in.</span>
+      </div>
+      <div class="auth-error" id="forgot-error" style="display:none;" role="alert"></div>
+      <div class="auth-success" id="forgot-success" style="display:none;">
+        <i class="fa-regular fa-circle-check"></i>
+        For now, please <a href="contact.html">contact us via WhatsApp or email</a> to reset your password — we'll sort it right away.
+      </div>
+      <form id="form-forgot" novalidate>
+        <div class="auth-field">
+          <label class="auth-label" for="forgot-email">Email Address</label>
+          <input class="auth-input" type="email" id="forgot-email" autocomplete="email" placeholder="you@example.com">
+          <span class="auth-field-err" id="err-forgot-email"></span>
+        </div>
+        <button type="submit" class="auth-submit-btn"><i class="fa-regular fa-envelope"></i> Request Reset</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- ACCOUNT DASHBOARD (logged in) -->
+<div id="account-dashboard" style="display:none;">
+  <div class="acc-page-header">
+    <div class="fka-container">
+      <div class="acc-header-inner">
+        <div>
+          <span class="section-label">My Account</span>
+          <h1 class="acc-welcome">Hello, <span id="acc-name">there</span> 🤍</h1>
+          <p class="acc-email-display" id="acc-email-display"></p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
+          <a href="shop.html" class="btn-fka-outline" style="font-size:0.72rem;padding:0.6rem 1.4rem;">
+            <i class="fa-regular fa-shirt"></i> Browse Shop
+          </a>
+          <button class="acc-logout-btn" onclick="authLogout()">
+            <i class="fa-regular fa-right-from-bracket"></i> Sign Out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="fka-container" style="padding-top:2.5rem;padding-bottom:5rem;">
+    <div class="acc-layout">
+      <nav class="acc-sidenav">
+        <button class="acc-sidenav-btn active" onclick="accShowTab('orders')"    id="acc-nav-orders"><i class="fa-regular fa-bag-shopping"></i> My Orders</button>
+        <button class="acc-sidenav-btn"         onclick="accShowTab('profile')"   id="acc-nav-profile"><i class="fa-regular fa-user"></i> Profile</button>
+        <button class="acc-sidenav-btn"         onclick="accShowTab('addresses')" id="acc-nav-addresses"><i class="fa-regular fa-location-dot"></i> Addresses</button>
+        <button class="acc-sidenav-btn"         onclick="accShowTab('password')"  id="acc-nav-password"><i class="fa-regular fa-lock"></i> Password</button>
+      </nav>
+
+      <div class="acc-content">
+        <!-- ORDERS -->
+        <div id="acc-tab-orders" class="acc-tab-panel">
+          <h2 class="acc-tab-title">My Orders</h2>
+          <div id="acc-orders-list"></div>
+        </div>
+
+        <!-- PROFILE -->
+        <div id="acc-tab-profile" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Profile Details</h2>
+          <div class="auth-success" id="profile-saved" style="display:none;"><i class="fa-regular fa-circle-check"></i> Profile updated successfully.</div>
+          <div class="auth-error"   id="profile-error" style="display:none;" role="alert"></div>
+          <form id="form-profile" novalidate>
+            <div class="auth-form-two">
+              <div class="auth-field">
+                <label class="auth-label" for="prof-first">First Name</label>
+                <input class="auth-input" type="text" id="prof-first" autocomplete="given-name">
+                <span class="auth-field-err" id="err-prof-first"></span>
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="prof-last">Last Name</label>
+                <input class="auth-input" type="text" id="prof-last" autocomplete="family-name">
+              </div>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label">Email Address <span class="auth-hint-sm">(cannot be changed)</span></label>
+              <input class="auth-input" type="email" id="prof-email" disabled style="opacity:0.6;">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="prof-phone">Phone / WhatsApp</label>
+              <input class="auth-input" type="tel" id="prof-phone" autocomplete="tel">
+              <span class="auth-field-err" id="err-prof-phone"></span>
+            </div>
+            <button type="submit" class="auth-submit-btn" style="max-width:220px;"><i class="fa-regular fa-check"></i> Save Profile</button>
+          </form>
+        </div>
+
+        <!-- ADDRESSES -->
+        <div id="acc-tab-addresses" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Saved Addresses</h2>
+          <div id="acc-addresses-list"></div>
+          <div style="margin-top:1.5rem;">
+            <button class="acc-add-addr-btn" onclick="accToggleAddAddr()"><i class="fa-regular fa-plus"></i> Add New Address</button>
+          </div>
+          <div id="add-addr-form-wrap" style="display:none;margin-top:1.25rem;">
+            <div class="acc-addr-form-card">
+              <h4 style="font-family:var(--font-serif);font-size:1.1rem;margin-bottom:1rem;">New Address</h4>
+              <div class="auth-field">
+                <label class="auth-label" for="addr-line1">Street Address</label>
+                <input class="auth-input" type="text" id="addr-line1" placeholder="14 Ajose Adeogun Street">
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="addr-line2">Apartment / Floor <span class="auth-hint-sm">(optional)</span></label>
+                <input class="auth-input" type="text" id="addr-line2" placeholder="Flat 4B">
+              </div>
+              <div class="auth-form-two">
+                <div class="auth-field">
+                  <label class="auth-label" for="addr-city">City / Area</label>
+                  <input class="auth-input" type="text" id="addr-city" placeholder="Abeokuta">
+                </div>
+                <div class="auth-field">
+                  <label class="auth-label" for="addr-state">State</label>
+                  <input class="auth-input" type="text" id="addr-state" placeholder="Ogun">
+                </div>
+              </div>
+              <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+                <button class="auth-submit-btn" style="max-width:160px;" onclick="accSaveAddress()"><i class="fa-regular fa-check"></i> Save</button>
+                <button class="acc-cancel-btn" onclick="accToggleAddAddr()">Cancel</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PASSWORD -->
+        <div id="acc-tab-password" class="acc-tab-panel" style="display:none;">
+          <h2 class="acc-tab-title">Change Password</h2>
+          <div class="auth-success" id="pw-saved" style="display:none;"><i class="fa-regular fa-circle-check"></i> Password updated.</div>
+          <div class="auth-error"   id="pw-error" style="display:none;" role="alert"></div>
+          <form id="form-password" novalidate style="max-width:420px;">
+            <div class="auth-field">
+              <label class="auth-label" for="pw-current">Current Password</label>
+              <div class="auth-input-reveal-wrap">
+                <input class="auth-input" type="password" id="pw-current" autocomplete="current-password" placeholder="Current password">
+                <button type="button" class="auth-reveal-btn" onclick="authTogglePw('pw-current',this)"><i class="fa-regular fa-eye"></i></button>
+              </div>
+              <span class="auth-field-err" id="err-pw-current"></span>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="pw-new">New Password</label>
+              <div class="auth-input-reveal-wrap">
+                <input class="auth-input" type="password" id="pw-new" autocomplete="new-password" placeholder="At least 6 characters">
+                <button type="button" class="auth-reveal-btn" onclick="authTogglePw('pw-new',this)"><i class="fa-regular fa-eye"></i></button>
+              </div>
+              <span class="auth-field-err" id="err-pw-new"></span>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="pw-confirm">Confirm New Password</label>
+              <input class="auth-input" type="password" id="pw-confirm" autocomplete="new-password" placeholder="Repeat new password">
+              <span class="auth-field-err" id="err-pw-confirm"></span>
+            </div>
+            <button type="submit" class="auth-submit-btn" style="max-width:220px;"><i class="fa-regular fa-lock"></i> Update Password</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer class="fka-footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-brand">FKA Atelier</div>
+      <div class="footer-tagline">Timeless. Modest. Elegant.</div>
+      <div class="footer-social">
+        <a href="https://www.instagram.com/justzee_xo/" target="_blank" class="footer-social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="https://www.tiktok.com/justzee_1/" target="_blank" class="footer-social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://wa.me/2347019243312" class="footer-social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="mailto:hello@fkaatelier.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+      </div>
+    </div>
+    <div><div class="footer-col-title">Shop</div><ul class="footer-links"><li><a href="shop.html">All Pieces</a></li><li><a href="shop.html?cat=abayas">Abayas</a></li><li><a href="shop.html?cat=dresses">Dresses</a></li></ul></div>
+    <div><div class="footer-col-title">Customer Care</div><ul class="footer-links"><li><a href="measurements.html">Measurements</a></li><li><a href="shipping.html">Shipping</a></li><li><a href="returns.html">Returns</a></li><li><a href="faq.html">FAQ</a></li></ul></div>
+    <div><div class="footer-col-title">About</div><ul class="footer-links"><li><a href="about.html">Our Story</a></li><li><a href="collections.html">Collections</a></li></ul></div>
+    <div><div class="footer-col-title">Connect</div><ul class="footer-links"><li><a href="https://www.instagram.com/justzee_xo/" target="_blank">Instagram</a></li><li><a href="https://www.tiktok.com/justzee_1/" target="_blank">TikTok</a></li><li><a href="https://wa.me/2347019243312">WhatsApp</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span></div>
+</footer>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<script src="../../assets/js/products.js"></script>
+<script src="../../assets/js/cart.js"></script>
+<script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/delivery.js"></script>
+<script src="../../assets/js/orders.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+"use strict";
+
+/* ── Page Init ─────────────────────────────────────────────── */
+document.addEventListener("DOMContentLoaded", () => {
+  const session = authGetSession();
+  const params  = new URLSearchParams(window.location.search);
+  const mode    = params.get("mode") || (session ? "dashboard" : "login");
+
+  if (session) {
+    showDashboard(session);
+  } else {
+    showAuthPanels(mode === "register" ? "register" : "login");
+  }
+
+  authSyncNavbar();
+  cartUpdateBadge && cartUpdateBadge();
+  wishlistUpdateBadge && wishlistUpdateBadge();
+});
+
+/* ── Auth panel switching ─────────────────────────────── */
+function showAuthPanels(tab) {
+  document.getElementById("auth-page-hero").style.display   = "block";
+  document.getElementById("auth-panels").style.display      = "block";
+  document.getElementById("account-dashboard").style.display= "none";
+  authShowTab(tab);
+}
+
+function authShowTab(tab) {
+  ["login","register","forgot"].forEach(t => {
+    const p = document.getElementById("panel-" + t);
+    const b = document.getElementById("tab-" + t);
+    if (p) p.style.display = (t === tab) ? "block" : "none";
+    if (b) b.classList.toggle("active", t === tab);
+  });
+  const titles = { login:"Sign In", register:"Create Account", forgot:"Reset Password" };
+  const titleEl = document.getElementById("auth-page-title");
+  if (titleEl) titleEl.textContent = titles[tab] || "Account";
+}
+
+function authTogglePw(inputId, btn) {
+  const input = document.getElementById(inputId);
+  const icon  = btn.querySelector("i");
+  if (!input) return;
+  if (input.type === "password") {
+    input.type = "text";
+    icon.className = "fa-regular fa-eye-slash";
+  } else {
+    input.type = "password";
+    icon.className = "fa-regular fa-eye";
+  }
+}
+
+function authShowForgot() { authShowTab("forgot"); }
+
+/* ── Auth error helpers ──────────────────────────────── */
+function showAuthError(id, msg) {
+  const el = document.getElementById(id);
+  if (!el) return;
+  el.textContent = msg;
+  el.style.display = "flex";
+}
+function hideAuthError(id) {
+  const el = document.getElementById(id);
+  if (el) { el.textContent = ""; el.style.display = "none"; }
+}
+function showFieldErr(id, msg) {
+  const el = document.getElementById("err-" + id);
+  const inp= document.getElementById(id);
+  if (el)  { el.textContent = msg; el.style.display = "block"; }
+  if (inp) inp.classList.add("auth-input-error");
+}
+function clearFieldErrs() {
+  document.querySelectorAll(".auth-field-err").forEach(e => { e.textContent=""; e.style.display="none"; });
+  document.querySelectorAll(".auth-input-error").forEach(e => e.classList.remove("auth-input-error"));
+}
+
+/* ── Login form ──────────────────────────────────────── */
+document.getElementById("form-login").addEventListener("submit", e => {
+  e.preventDefault();
+  clearFieldErrs();
+  hideAuthError("login-error");
+  const email    = document.getElementById("login-email").value.trim();
+  const password = document.getElementById("login-password").value;
+  const remember = document.getElementById("login-remember").checked;
+  const btn      = document.getElementById("login-submit");
+  let ok = true;
+  if (!email)    { showFieldErr("login-email",    "Email is required.");    ok=false; }
+  if (!password) { showFieldErr("login-password", "Password is required."); ok=false; }
+  if (!ok) return;
+  btn.disabled = true; btn.textContent = "Signing in…";
+  setTimeout(() => {
+    const result = authLogin(email, password, remember);
+    if (result.ok) {
+      const ret = sessionStorage.getItem("fka_auth_return");
+      sessionStorage.removeItem("fka_auth_return");
+      if (ret && ret !== window.location.pathname) { window.location.href = ret; return; }
+      showDashboard(authGetSession());
+    } else {
+      showAuthError("login-error", result.error);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-regular fa-right-to-bracket"></i> Sign In';
+    }
+  }, 350);
+});
+
+/* ── Register form ────────────────────────────────────── */
+document.getElementById("form-register").addEventListener("submit", e => {
+  e.preventDefault();
+  clearFieldErrs();
+  hideAuthError("register-error");
+  const first   = document.getElementById("reg-first").value.trim();
+  const last    = document.getElementById("reg-last").value.trim();
+  const email   = document.getElementById("reg-email").value.trim();
+  const phone   = document.getElementById("reg-phone").value.trim();
+  const pw      = document.getElementById("reg-password").value;
+  const confirm = document.getElementById("reg-confirm").value;
+  const btn     = document.getElementById("register-submit");
+  let ok = true;
+  if (first.length < 2) { showFieldErr("reg-first",    "First name must be at least 2 characters."); ok=false; }
+  if (last.length  < 2) { showFieldErr("reg-last",     "Last name must be at least 2 characters.");  ok=false; }
+  if (!email)            { showFieldErr("reg-email",    "Email is required.");                        ok=false; }
+  if (!phone)            { showFieldErr("reg-phone",    "Phone number is required.");                 ok=false; }
+  if (pw.length < 6)     { showFieldErr("reg-password", "Password must be at least 6 characters.");  ok=false; }
+  if (pw !== confirm)    { showFieldErr("reg-confirm",  "Passwords do not match.");                   ok=false; }
+  if (!ok) return;
+  btn.disabled = true; btn.textContent = "Creating account…";
+  setTimeout(() => {
+    const result = authRegister({ firstName:first, lastName:last, email, phone, password:pw });
+    if (result.ok) {
+      authLogin(email, pw, false);
+      showToast && showToast('<i class="fa-regular fa-circle-check"></i> Account created — welcome to FKA Atelier!');
+      const ret = sessionStorage.getItem("fka_auth_return");
+      sessionStorage.removeItem("fka_auth_return");
+      if (ret && ret !== window.location.pathname) { window.location.href = ret; return; }
+      showDashboard(authGetSession());
+    } else {
+      showAuthError("register-error", result.error);
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-regular fa-user-plus"></i> Create Account';
+    }
+  }, 350);
+});
+
+/* ── Forgot form ────────────────────────────────────── */
+document.getElementById("form-forgot").addEventListener("submit", e => {
+  e.preventDefault();
+  document.getElementById("forgot-success").style.display = "block";
+  document.getElementById("form-forgot").style.display    = "none";
+});
+
+/* ── Dashboard ────────────────────────────────────────── */
+function showDashboard(session) {
+  document.getElementById("auth-page-hero").style.display   = "none";
+  document.getElementById("auth-panels").style.display      = "none";
+  document.getElementById("account-dashboard").style.display= "block";
+  document.getElementById("acc-name").textContent         = session.firstName;
+  document.getElementById("acc-email-display").textContent = session.email;
+  document.title = `My Account — FKA Atelier`;
+  accShowTab("orders");
+  accLoadOrders(session);
+  accLoadProfile(session);
+  accLoadAddresses(session);
+}
+
+function accShowTab(tab) {
+  ["orders","profile","addresses","password"].forEach(t => {
+    const p = document.getElementById("acc-tab-" + t);
+    const b = document.getElementById("acc-nav-" + t);
+    if (p) p.style.display = (t === tab) ? "block" : "none";
+    if (b) b.classList.toggle("active", t === tab);
+  });
+}
+
+function accLoadOrders(session) {
+  const list = typeof ordersGetByCustomer === "function"
+    ? ordersGetByCustomer(session.accountId).concat(
+        // also match by email in case order was placed before registration
+        ordersGetAll().filter(o => o.customer.email === session.email && o.customerId !== session.accountId)
+      )
+    : [];
+  // Deduplicate
+  const seen = new Set();
+  const orders = list.filter(o => seen.has(o.id) ? false : (seen.add(o.id), true));
+
+  const el = document.getElementById("acc-orders-list");
+  if (!el) return;
+  if (orders.length === 0) {
+    el.innerHTML = `
+      <div class="acc-empty-state">
+        <i class="fa-regular fa-bag-shopping"></i>
+        <h3>No orders yet</h3>
+        <p>Your orders will appear here once you've placed one.</p>
+        <a href="shop.html" class="btn-fka-primary" style="font-size:0.75rem;">Browse All Pieces</a>
+      </div>`;
+    return;
+  }
+  el.innerHTML = orders.map(o => `
+    <div class="acc-order-card">
+      <div class="acc-order-header">
+        <div>
+          <span class="acc-order-id">${o.id}</span>
+          <span class="acc-order-date">${typeof adminFormatDate === "function" ? adminFormatDate(o.createdAt) : new Date(o.createdAt).toLocaleDateString("en-NG")}</span>
+        </div>
+        <span class="acc-order-status acc-status-${o.status}">${o.status.charAt(0).toUpperCase()+o.status.slice(1)}</span>
+      </div>
+      <div class="acc-order-items">
+        ${o.items.map(i => `<span class="acc-order-item-chip">${i.name}${i.size ? " ("+i.size+")" : ""} ×${i.qty}</span>`).join("")}
+      </div>
+      <div class="acc-order-footer">
+        <strong class="acc-order-total">₦${o.total.toLocaleString("en-NG")}</strong>
+        <div class="acc-order-actions">
+          <a href="https://wa.me/2347019243312?text=${encodeURIComponent("Hi FKA Atelier! I'm following up on order "+o.id+". Thank you.")}"
+             target="_blank" class="acc-contact-btn acc-wa-btn">
+            <i class="fa-brands fa-whatsapp"></i> WhatsApp
+          </a>
+          <a href="mailto:hello@fkaatelier.com?subject=Order ${o.id}&body=Hi FKA Atelier, I'm following up on order ${o.id}."
+             class="acc-contact-btn acc-email-btn">
+            <i class="fa-regular fa-envelope"></i> Email
+          </a>
+        </div>
+      </div>
+    </div>`).join("");
+}
+
+function accLoadProfile(session) {
+  const account = typeof authGetAccount === "function" ? authGetAccount(session.accountId) : null;
+  const data    = account || session;
+  const set     = (id, val) => { const el = document.getElementById(id); if (el) el.value = val || ""; };
+  set("prof-first", data.firstName || "");
+  set("prof-last",  data.lastName  || "");
+  set("prof-email", data.email     || session.email);
+  set("prof-phone", data.phone     || session.phone || "");
+}
+
+function accLoadAddresses(session) {
+  const account = typeof authGetAccount === "function" ? authGetAccount(session.accountId) : null;
+  const addrs   = (account && account.addresses) || [];
+  const el      = document.getElementById("acc-addresses-list");
+  if (!el) return;
+  el.innerHTML = addrs.length
+    ? addrs.map((a, i) => `
+        <div class="acc-addr-card">
+          <div class="acc-addr-text">${[a.line1, a.line2, a.city, a.state, "Nigeria"].filter(Boolean).join(", ")}</div>
+          <button class="acc-addr-delete" onclick="accDeleteAddress(${i})" title="Remove address">
+            <i class="fa-regular fa-trash"></i>
+          </button>
+        </div>`).join("")
+    : `<p class="acc-no-data">No saved addresses yet.</p>`;
+}
+
+document.getElementById("form-profile").addEventListener("submit", e => {
+  e.preventDefault();
+  clearFieldErrs();
+  hideAuthError("profile-error");
+  document.getElementById("profile-saved").style.display = "none";
+  const first = document.getElementById("prof-first").value.trim();
+  const last  = document.getElementById("prof-last").value.trim();
+  const phone = document.getElementById("prof-phone").value.trim();
+  let ok = true;
+  if (first.length < 2) { showFieldErr("prof-first", "First name too short."); ok=false; }
+  if (!ok) return;
+  const result = authUpdateProfile({ firstName:first, lastName:last, phone });
+  if (result.ok) {
+    document.getElementById("profile-saved").style.display = "flex";
+    document.getElementById("acc-name").textContent = result.account.firstName;
+    setTimeout(() => document.getElementById("profile-saved").style.display = "none", 4000);
+  } else {
+    showAuthError("profile-error", result.error);
+  }
+});
+
+document.getElementById("form-password").addEventListener("submit", e => {
+  e.preventDefault();
+  clearFieldErrs();
+  document.getElementById("pw-saved").style.display = "none";
+  hideAuthError("pw-error");
+  const cur  = document.getElementById("pw-current").value;
+  const nw   = document.getElementById("pw-new").value;
+  const conf = document.getElementById("pw-confirm").value;
+  if (!cur)          { showFieldErr("pw-current", "Enter your current password."); return; }
+  if (nw.length < 6) { showFieldErr("pw-new",     "New password must be at least 6 characters."); return; }
+  if (nw !== conf)   { showFieldErr("pw-confirm",  "Passwords do not match."); return; }
+  const result = authUpdateProfile({ currentPassword:cur, newPassword:nw });
+  if (result.ok) {
+    document.getElementById("pw-saved").style.display = "flex";
+    document.getElementById("form-password").reset();
+    setTimeout(() => document.getElementById("pw-saved").style.display = "none", 4000);
+  } else {
+    showAuthError("pw-error", result.error);
+  }
+});
+
+function accToggleAddAddr() {
+  const wrap = document.getElementById("add-addr-form-wrap");
+  wrap.style.display = wrap.style.display === "none" ? "block" : "none";
+}
+
+function accSaveAddress() {
+  const line1 = document.getElementById("addr-line1").value.trim();
+  const line2 = document.getElementById("addr-line2").value.trim();
+  const city  = document.getElementById("addr-city").value.trim();
+  const state = document.getElementById("addr-state").value.trim();
+  if (!line1 || !city || !state) { showToast && showToast("Please fill in all address fields.", 3000); return; }
+  const addr = { line1, line2, city, state, fullText:[line1,line2,city,state,"Nigeria"].filter(Boolean).join(", ") };
+  const result = authUpdateProfile({ address: addr });
+  if (result.ok) {
+    accToggleAddAddr();
+    accLoadAddresses(authGetSession());
+    showToast && showToast('<i class="fa-regular fa-check"></i> Address saved.');
+    ["addr-line1","addr-line2","addr-city","addr-state"].forEach(id => document.getElementById(id).value = "");
+  }
+}
+
+function accDeleteAddress(index) {
+  const session = authGetSession();
+  if (!session) return;
+  const accounts = JSON.parse(localStorage.getItem("fka_accounts") || "[]");
+  const acc = accounts.find(a => a.id === session.accountId);
+  if (!acc) return;
+  acc.addresses.splice(index, 1);
+  localStorage.setItem("fka_accounts", JSON.stringify(accounts));
+  accLoadAddresses(session);
+  showToast && showToast("Address removed.");
+}
+</script>
+</body>
+</html>

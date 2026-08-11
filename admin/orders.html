@@ -1,0 +1,811 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Orders — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+  <style>
+    /* Tab nav */
+    .adm-tab-nav { display:flex; gap:0; border-bottom:1.5px solid var(--adm-border); margin-bottom:1.5rem; }
+    .adm-tab-btn {
+      padding:0.7rem 1.4rem; font-size:0.75rem; font-weight:600;
+      letter-spacing:0.1em; text-transform:uppercase;
+      background:none; border:none; cursor:pointer;
+      color:var(--adm-text-light); border-bottom:2.5px solid transparent;
+      margin-bottom:-1.5px; transition:all 0.2s; font-family:var(--adm-font);
+      display:flex; align-items:center; gap:0.5rem;
+    }
+    .adm-tab-btn:hover  { color:var(--adm-text); }
+    .adm-tab-btn.active { color:var(--adm-accent); border-bottom-color:var(--adm-accent); }
+    .adm-tab-badge {
+      background:var(--adm-warning); color:#fff;
+      font-size:0.6rem; font-weight:700; padding:1px 6px;
+      border-radius:999px; animation:adm-pulse 1.6s infinite;
+    }
+    /* Confirm payment highlight */
+    .adm-confirm-payment-btn {
+      display:inline-flex; align-items:center; gap:0.4rem;
+      padding:0.5rem 1rem; background:#059669; color:#fff;
+      font-size:0.72rem; font-weight:700; letter-spacing:0.1em;
+      text-transform:uppercase; border:none; cursor:pointer;
+      border-radius:var(--adm-radius); transition:opacity 0.2s;
+      font-family:var(--adm-font);
+    }
+    .adm-confirm-payment-btn:hover { opacity:0.85; }
+    /* Booking row highlight */
+    tr.booking-awaiting { background:#FFFBEB; }
+    tr.booking-awaiting:hover td { background:#FEF3C7 !important; }
+  </style>
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Orders</h1>
+          <p class="adm-page-subtitle" id="orders-count-label"
+            style="display:flex;align-items:center;gap:0.75rem;">
+            Loading… <span class="adm-live-dot">Live</span>
+          </p>
+        </div>
+        <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="ordersExportCSV()">
+          <i class="fa-regular fa-download"></i> Export CSV
+        </button>
+      </div>
+
+      <!-- TAB NAV -->
+      <div class="adm-tab-nav">
+        <button class="adm-tab-btn active" id="tab-btn-bookings" onclick="switchTab('bookings')">
+          <i class="fa-regular fa-clock"></i> Pending Payment
+          <span class="adm-tab-badge" id="bookings-badge" style="display:none;">0</span>
+        </button>
+        <button class="adm-tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
+          <i class="fa-regular fa-bag-shopping"></i> Confirmed Orders
+        </button>
+      </div>
+
+      <!-- ══ TAB 1: PENDING BOOKINGS ══════════════════════ -->
+      <div id="tab-bookings">
+
+        <div style="background:#FFFBEB;border:1px solid #FCD34D;padding:0.85rem 1.25rem;
+                    border-radius:var(--adm-radius);margin-bottom:1.25rem;font-size:0.85rem;
+                    display:flex;align-items:flex-start;gap:0.75rem;">
+          <i class="fa-regular fa-triangle-exclamation" style="color:#D97706;margin-top:1px;flex-shrink:0;"></i>
+          <div>
+            <strong style="color:#92400E;">Payment Verification Required</strong><br>
+            <span style="color:#78350F;">These customers have placed orders and are awaiting payment.
+            Once you receive and verify their bank transfer, click
+            <strong>Confirm Payment</strong> to generate their Order ID and begin processing.</span>
+          </div>
+        </div>
+
+        <!-- Bookings search -->
+        <div class="adm-filters" style="margin-bottom:1.25rem;">
+          <div class="adm-search-wrap">
+            <i class="fa-regular fa-magnifying-glass adm-search-icon"></i>
+            <input class="adm-input adm-search" type="search" id="bookings-search"
+              placeholder="Search reference, name, email, phone…" autocomplete="off">
+          </div>
+          <select class="adm-select adm-filter-select" id="bookings-status-filter">
+            <option value="all">All</option>
+            <option value="awaiting_payment">Awaiting Payment</option>
+            <option value="converted">Payment Confirmed</option>
+          </select>
+        </div>
+
+        <div class="adm-card">
+          <div class="adm-card-body no-pad">
+            <div class="adm-table-wrap">
+              <table class="adm-table">
+                <thead>
+                  <tr>
+                    <th>Booking Ref</th><th>Customer</th><th>Phone</th>
+                    <th>Items</th><th>Total</th><th>Status</th>
+                    <th>Date</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="bookings-tbody"></tbody>
+              </table>
+            </div>
+            <div id="bookings-pager"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ══ TAB 2: CONFIRMED ORDERS ══════════════════════ -->
+      <div id="tab-orders" style="display:none;">
+
+        <div class="adm-filters">
+          <div class="adm-search-wrap">
+            <i class="fa-regular fa-magnifying-glass adm-search-icon"></i>
+            <input class="adm-input adm-search" type="search" id="orders-search"
+              placeholder="Search order ID, name, email, phone…" autocomplete="off">
+          </div>
+          <select class="adm-select adm-filter-select" id="orders-status-filter">
+            <option value="all">All Statuses</option>
+            <option value="confirmed">Confirmed</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
+          </select>
+          <select class="adm-select adm-filter-select" id="orders-sort">
+            <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
+            <option value="highest">Highest Total</option>
+            <option value="lowest">Lowest Total</option>
+          </select>
+        </div>
+
+        <div class="adm-card">
+          <div class="adm-card-body no-pad">
+            <div class="adm-table-wrap">
+              <table class="adm-table">
+                <thead>
+                  <tr>
+                    <th>Order ID</th><th>Customer</th><th>Phone</th>
+                    <th>Items</th><th>Zone</th><th>Total</th>
+                    <th>Status</th><th>Date</th><th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="orders-tbody"></tbody>
+              </table>
+            </div>
+            <div id="orders-pager"></div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ══ CONFIRM PAYMENT MODAL ══════════════════════════ -->
+<div class="adm-modal-overlay" id="modal-confirm-payment">
+  <div class="adm-modal" style="width:min(560px,100%);">
+    <div class="adm-modal-header">
+      <div>
+        <div class="adm-modal-title">Confirm Payment</div>
+        <div style="font-size:0.72rem;color:var(--adm-text-light);margin-top:2px;" id="modal-cp-ref-label"></div>
+      </div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-confirm-payment')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+      <!-- Booking summary -->
+      <div style="background:var(--adm-bg);border-radius:var(--adm-radius);padding:1rem;margin-bottom:1.25rem;">
+        <div id="modal-cp-summary"></div>
+      </div>
+      <!-- Payment note -->
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Payment Verification Note</label>
+        <input class="adm-input" type="text" id="modal-cp-note"
+          placeholder="e.g. Bank transfer confirmed — ₦65,000 received from Amina Hassan">
+        <span class="adm-field-hint">This note will be saved to the order history.</span>
+      </div>
+      <!-- WhatsApp to customer with Order ID -->
+      <div style="background:#F0FDF4;border:1px solid #86EFAC;border-radius:var(--adm-radius);
+                  padding:0.85rem 1rem;font-size:0.82rem;color:#166534;margin-bottom:0.5rem;">
+        <i class="fa-regular fa-circle-check" style="margin-right:0.4rem;"></i>
+        Confirming payment will generate a real <strong>Order ID</strong> and move this to the
+        Orders tab. A WhatsApp message will be pre-written so you can notify the customer instantly.
+      </div>
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-confirm-payment')">Cancel</button>
+      <button class="adm-confirm-payment-btn" id="btn-do-confirm-payment" onclick="doConfirmPayment()">
+        <i class="fa-regular fa-circle-check"></i> Confirm Payment &amp; Generate Order ID
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ BOOKING DETAIL MODAL ══════════════════════════ -->
+<div class="adm-modal-overlay" id="modal-booking-detail">
+  <div class="adm-modal" style="width:min(700px,100%);">
+    <div class="adm-modal-header">
+      <div>
+        <div class="adm-modal-title">Booking <span id="modal-bd-ref"></span></div>
+        <div style="font-size:0.72rem;color:var(--adm-text-light);margin-top:2px;" id="modal-bd-date"></div>
+      </div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-booking-detail')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+      <div id="modal-bd-contact-bar" style="display:flex;gap:0.6rem;flex-wrap:wrap;
+            margin-bottom:1.25rem;padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+      </div>
+      <div class="adm-detail-grid" style="margin-bottom:1.5rem;">
+        <div>
+          <div class="adm-section-label">Customer</div>
+          <div id="modal-bd-customer"></div>
+        </div>
+        <div>
+          <div class="adm-section-label">Delivery</div>
+          <div id="modal-bd-delivery"></div>
+        </div>
+      </div>
+      <div class="adm-section-label">Items</div>
+      <div class="adm-table-wrap" style="margin-bottom:1.25rem;">
+        <table class="adm-table">
+          <thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>Qty</th><th>Total</th></tr></thead>
+          <tbody id="modal-bd-items"></tbody>
+        </table>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem;">
+        <div style="min-width:240px;" id="modal-bd-totals"></div>
+      </div>
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-danger adm-btn-sm" onclick="cancelBooking()">
+        <i class="fa-regular fa-xmark-circle"></i> Cancel Booking
+      </button>
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-booking-detail')">Close</button>
+      <button class="adm-confirm-payment-btn" onclick="openConfirmPaymentModal(activeBookingRef)">
+        <i class="fa-regular fa-circle-check"></i> Confirm Payment
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ ORDER DETAIL MODAL ══════════════════════════════ -->
+<div class="adm-modal-overlay" id="modal-order">
+  <div class="adm-modal" style="width:min(820px,100%);">
+    <div class="adm-modal-header">
+      <div>
+        <div class="adm-modal-title">Order <span id="modal-order-id"></span></div>
+        <div style="font-size:0.72rem;color:var(--adm-text-light);margin-top:2px;" id="modal-order-date"></div>
+      </div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-order')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+      <div id="modal-order-contact-bar" style="display:flex;gap:0.6rem;flex-wrap:wrap;
+            margin-bottom:1.5rem;padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+      </div>
+      <!-- Status update -->
+      <div style="display:flex;gap:0.75rem;align-items:flex-end;margin-bottom:1.5rem;flex-wrap:wrap;">
+        <div class="adm-field" style="flex:1;min-width:160px;">
+          <label class="adm-label">Update Status</label>
+          <select class="adm-select" id="modal-status-select">
+            <option value="confirmed">Confirmed</option>
+            <option value="processing">Processing</option>
+            <option value="shipped">Shipped</option>
+            <option value="delivered">Delivered</option>
+            <option value="cancelled">Cancelled</option>
+            <option value="refunded">Refunded</option>
+          </select>
+        </div>
+        <div class="adm-field" style="flex:2;min-width:200px;">
+          <label class="adm-label">Status Note (optional)</label>
+          <input class="adm-input" type="text" id="modal-status-note"
+            placeholder="e.g. Dispatched via GIG Logistics">
+        </div>
+        <button class="adm-btn adm-btn-primary" onclick="modalUpdateStatus()">
+          <i class="fa-regular fa-check"></i> Update Status
+        </button>
+      </div>
+      <div class="adm-detail-grid" style="margin-bottom:1.5rem;">
+        <div>
+          <div class="adm-section-label">Customer Details</div>
+          <div id="modal-cust-detail"></div>
+        </div>
+        <div>
+          <div class="adm-section-label">Delivery Details</div>
+          <div id="modal-delivery-detail"></div>
+        </div>
+      </div>
+      <div style="margin-bottom:1.25rem;">
+        <div class="adm-section-label">Items Ordered</div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead>
+            <tbody id="modal-items-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;margin-bottom:1.5rem;">
+        <div style="min-width:260px;" id="modal-totals"></div>
+      </div>
+      <!-- Admin notes -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="adm-section-label">Admin Notes</div>
+        <div id="modal-admin-notes" style="margin-bottom:0.75rem;"></div>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;align-items:flex-start;">
+          <textarea class="adm-input adm-textarea" id="modal-note-input"
+            placeholder="Add a private note…" rows="2"
+            style="flex:1;min-width:200px;resize:none;"></textarea>
+          <button class="adm-btn adm-btn-primary adm-btn-sm" onclick="modalAddOrderNote()">
+            <i class="fa-regular fa-plus"></i> Add Note
+          </button>
+        </div>
+      </div>
+      <!-- Timeline -->
+      <div>
+        <div class="adm-section-label">Status History</div>
+        <div class="adm-timeline" id="modal-timeline"></div>
+      </div>
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-danger adm-btn-sm" onclick="modalDeleteOrder()">
+        <i class="fa-regular fa-trash"></i> Delete
+      </button>
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-order')">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SCRIPTS ══════════════════════════════════════════ -->
+<script src="../assets/js/products.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("orders");
+adminSetPageTitle("Orders");
+
+const PER_PAGE      = 15;
+let   ordersPage    = 1;
+let   bookingsPage  = 1;
+let   activeOrderId = null;
+let   activeBookingRef = null;
+let   pendingConfirmRef = null;
+
+/* ── TAB SWITCHING ──────────────────────────────────── */
+function switchTab(tab) {
+  document.getElementById("tab-bookings").style.display = tab === "bookings" ? "block" : "none";
+  document.getElementById("tab-orders").style.display   = tab === "orders"   ? "block" : "none";
+  document.getElementById("tab-btn-bookings").classList.toggle("active", tab === "bookings");
+  document.getElementById("tab-btn-orders").classList.toggle("active",   tab === "orders");
+  if (tab === "bookings") renderBookings();
+  if (tab === "orders")   renderOrders();
+}
+
+/* ── BOOKINGS TAB ────────────────────────────────────── */
+function getFilteredBookings() {
+  const q      = document.getElementById("bookings-search").value.trim();
+  const status = document.getElementById("bookings-status-filter").value;
+  let list = q ? bookingsSearch(q) : bookingsGetAll();
+  if (status !== "all") list = list.filter(b => b.status === status);
+  return list;
+}
+
+function renderBookings() {
+  const list  = getFilteredBookings();
+  const paged = adminPaginate(list, bookingsPage, PER_PAGE);
+  const awaiting = list.filter(b => b.status === "awaiting_payment").length;
+
+  document.getElementById("orders-count-label").innerHTML =
+    `${awaiting} awaiting payment &nbsp;·&nbsp; ${list.length} total bookings <span class="adm-live-dot" style="margin-left:0.5rem;">Live</span>`;
+
+  const badge = document.getElementById("bookings-badge");
+  if (badge) { badge.textContent = awaiting; badge.style.display = awaiting > 0 ? "inline-flex" : "none"; }
+
+  document.getElementById("bookings-tbody").innerHTML = paged.items.length
+    ? paged.items.map(b => {
+        const d  = b.orderData;
+        const wa = buildWhatsAppLink(d.customer.phone,
+          `Hi ${d.customer.fullName.split(" ")[0]}! 🤍 This is FKA Atelier. We received your booking (${b.ref}) for ₦${d.total.toLocaleString("en-NG")}. Please send your payment receipt to confirm your order. Thank you!`);
+        const isAwaiting = b.status === "awaiting_payment";
+        return `
+          <tr class="${isAwaiting ? "booking-awaiting" : ""}">
+            <td>
+              <div style="font-family:monospace;font-weight:700;font-size:0.85rem;color:var(--adm-text);">${b.ref}</div>
+              ${b.orderId ? `<div style="font-size:0.68rem;color:var(--adm-success);margin-top:2px;">→ ${b.orderId}</div>` : ""}
+            </td>
+            <td>
+              <div class="adm-td-name" style="cursor:pointer;" onclick="openBookingDetail('${b.ref}')">${d.customer.fullName}</div>
+              <div style="font-size:0.68rem;color:var(--adm-text-light);">${d.customer.email}</div>
+            </td>
+            <td>
+              <a href="${wa}" target="_blank" style="color:#16a34a;font-size:0.8rem;font-weight:500;">
+                <i class="fa-brands fa-whatsapp"></i> ${d.customer.phone}
+              </a>
+            </td>
+            <td style="font-size:0.78rem;">${d.items.length} item${d.items.length!==1?"s":""}</td>
+            <td><strong>${adminFormatMoney(d.total)}</strong></td>
+            <td>${bookingStatusBadge(b.status)}</td>
+            <td style="font-size:0.75rem;white-space:nowrap;">${adminFormatDate(b.createdAt)}</td>
+            <td>
+              <div style="display:flex;gap:0.35rem;flex-wrap:nowrap;">
+                <button class="adm-btn adm-btn-outline adm-btn-icon adm-btn-sm" title="View booking"
+                  onclick="openBookingDetail('${b.ref}')">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+                <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm" title="WhatsApp customer">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </a>
+                ${isAwaiting ? `
+                <button class="adm-confirm-payment-btn" style="padding:0.4rem 0.75rem;font-size:0.68rem;"
+                  onclick="openConfirmPaymentModal('${b.ref}')">
+                  <i class="fa-regular fa-circle-check"></i> Confirm Payment
+                </button>` : ""}
+              </div>
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="8" class="adm-empty-cell">No bookings yet. Orders placed by customers will appear here pending payment.</td></tr>`;
+
+  document.getElementById("bookings-pager").innerHTML =
+    adminRenderPager(paged, p => { bookingsPage = p; renderBookings(); });
+}
+
+/* ── Booking detail modal ─────────────────────────── */
+function openBookingDetail(ref) {
+  const b = bookingGetByRef(ref);
+  if (!b) return;
+  activeBookingRef = ref;
+  const d  = b.orderData;
+  const wa = buildWhatsAppLink(d.customer.phone,
+    `Hi ${d.customer.fullName.split(" ")[0]}! 🤍 FKA Atelier here. We're following up on your booking (${b.ref}) for ₦${d.total.toLocaleString("en-NG")}. Have you made payment? Please send your receipt so we can confirm your order!`);
+  const ml = buildEmailLink(d.customer.email, `Re: Booking ${b.ref} — Payment`,
+    `Hi ${d.customer.fullName},\n\nThank you for your booking (${b.ref}).\nTotal: ₦${d.total.toLocaleString("en-NG")}\n\nPlease send us your payment receipt to confirm your order.\n\nFKA Atelier Team`);
+
+  document.getElementById("modal-bd-ref").textContent  = b.ref;
+  document.getElementById("modal-bd-date").textContent = `Submitted ${adminFormatDateTime(b.createdAt)}`;
+
+  document.getElementById("modal-bd-contact-bar").innerHTML = `
+    <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-sm">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp ${d.customer.fullName.split(" ")[0]}
+    </a>
+    <a href="${ml}" class="adm-btn adm-btn-outline adm-btn-sm">
+      <i class="fa-regular fa-envelope"></i> Email
+    </a>
+    <span style="font-size:0.72rem;color:var(--adm-text-light);align-self:center;">
+      Status: ${bookingStatusBadge(b.status)}
+    </span>`;
+
+  const dr = (l,v) => `<div class="adm-detail-row"><span class="adm-detail-label">${l}</span><span class="adm-detail-value">${v}</span></div>`;
+  document.getElementById("modal-bd-customer").innerHTML =
+    dr("Name",  d.customer.fullName) +
+    dr("Email", `<a href="${ml}" style="color:var(--adm-accent);">${d.customer.email}</a>`) +
+    dr("Phone", `<a href="${wa}" target="_blank" style="color:#16a34a;">${d.customer.phone}</a>`);
+
+  document.getElementById("modal-bd-delivery").innerHTML =
+    dr("Ships To",    d.shippingAddress?.fullText||"—") +
+    dr("Zone",        d.deliveryZone?.name||"—") +
+    dr("Delivery Fee",adminFormatMoney(d.deliveryFee));
+
+  document.getElementById("modal-bd-items").innerHTML = d.items.map(i => `
+    <tr>
+      <td class="adm-td-name">${i.name}</td>
+      <td>${i.size||"—"}</td><td>${i.colour||"—"}</td><td>${i.qty}</td>
+      <td><strong>${adminFormatMoney(i.lineTotal)}</strong></td>
+    </tr>`).join("");
+
+  document.getElementById("modal-bd-totals").innerHTML =
+    dr("Subtotal",  adminFormatMoney(d.subtotal)) +
+    dr("Delivery",  d.deliveryFee===0?"FREE":adminFormatMoney(d.deliveryFee)) +
+    `<div class="adm-detail-row" style="font-size:1rem;font-weight:700;color:var(--adm-text);">
+      <span class="adm-detail-label">Total</span><span>${adminFormatMoney(d.total)}</span></div>`;
+
+  adminOpenModal("modal-booking-detail");
+}
+
+/* ── Confirm Payment modal ────────────────────────── */
+function openConfirmPaymentModal(ref) {
+  const b = bookingGetByRef(ref);
+  if (!b) return;
+  if (b.status === "converted") {
+    adminToast(`Booking ${ref} is already confirmed — Order ID: ${b.orderId}`, "info");
+    adminCloseModal("modal-booking-detail");
+    return;
+  }
+  pendingConfirmRef = ref;
+  const d = b.orderData;
+
+  document.getElementById("modal-cp-ref-label").textContent =
+    `Booking ${ref} · ${d.customer.fullName} · ${adminFormatMoney(d.total)}`;
+
+  const itemsList = d.items.map(i => `${i.name} ×${i.qty}${i.size?" ("+i.size+")":""}`).join(", ");
+  document.getElementById("modal-cp-summary").innerHTML = `
+    <div style="font-size:0.82rem;line-height:1.8;color:var(--adm-text-mid);">
+      <strong style="color:var(--adm-text);display:block;margin-bottom:0.35rem;">${d.customer.fullName}</strong>
+      ${d.customer.email} &nbsp;·&nbsp;
+      <a href="https://wa.me/${(d.customer.phone||"").replace(/^0/,"+234").replace(/\+/,"")}" target="_blank" style="color:#16a34a;">${d.customer.phone}</a><br>
+      <strong>Items:</strong> ${itemsList}<br>
+      <strong>Total:</strong> ${adminFormatMoney(d.total)} &nbsp;·&nbsp; ${d.deliveryZone?.name||"—"}
+    </div>`;
+
+  document.getElementById("modal-cp-note").value = "";
+  document.getElementById("modal-cp-note").focus();
+  adminCloseModal("modal-booking-detail");
+  adminOpenModal("modal-confirm-payment");
+}
+
+async function doConfirmPayment() {
+  const note = document.getElementById("modal-cp-note").value.trim();
+  if (!note) {
+    adminToast("Please enter a payment note before confirming.", "error");
+    document.getElementById("modal-cp-note").focus();
+    return;
+  }
+  const btn = document.getElementById("btn-do-confirm-payment");
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Confirming…';
+
+  try {
+    const order = orderConfirmPayment(pendingConfirmRef, note, "admin");
+    adminCloseModal("modal-confirm-payment");
+    adminToast(`✓ Payment confirmed. Order ID assigned: ${order.id}`, "success");
+
+    // Pre-open WhatsApp to notify customer
+    const d  = order;
+    const wa = buildWhatsAppLink(d.customer.phone,
+      `Hi ${d.customer.fullName.split(" ")[0]}! 🎉\n\nGreat news — your payment has been received and confirmed!\n\nYour Order ID is: *${d.id}*\n\nWe will begin processing your order now. You'll receive an update when your item is ready for delivery.\n\nThank you for shopping with FKA Atelier! 🤍`);
+    window.open(wa, "_blank");
+
+    renderBookings();
+    renderOrders();
+    adminUpdatePendingBadge();
+
+    // Switch to orders tab to see the new order
+    setTimeout(() => switchTab("orders"), 600);
+  } catch (err) {
+    adminToast(err.message || "Something went wrong.", "error");
+  } finally {
+    btn.disabled = false;
+    btn.innerHTML = '<i class="fa-regular fa-circle-check"></i> Confirm Payment &amp; Generate Order ID';
+  }
+}
+
+async function cancelBooking() {
+  const confirmed = await adminConfirm(`Cancel booking ${activeBookingRef}? This cannot be undone.`);
+  if (!confirmed) return;
+  const bookings = bookingsLoad();
+  const b = bookings.find(x => x.ref === activeBookingRef);
+  if (b) b.status = "cancelled";
+  bookingsSave(bookings);
+  adminCloseModal("modal-booking-detail");
+  adminToast("Booking cancelled.", "error");
+  renderBookings();
+}
+
+/* ── ORDERS TAB ──────────────────────────────────────── */
+function getFilteredOrders() {
+  const q      = document.getElementById("orders-search").value.trim();
+  const status = document.getElementById("orders-status-filter").value;
+  const sort   = document.getElementById("orders-sort").value;
+  let orders   = q ? ordersSearch(q) : ordersGetAll();
+  if (status !== "all") orders = orders.filter(o => o.status === status);
+  if (sort === "oldest")  orders = [...orders].sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt));
+  if (sort === "highest") orders = [...orders].sort((a,b) => b.total - a.total);
+  if (sort === "lowest")  orders = [...orders].sort((a,b) => a.total - b.total);
+  return orders;
+}
+
+function renderOrders() {
+  const orders = getFilteredOrders();
+  const paged  = adminPaginate(orders, ordersPage, PER_PAGE);
+  document.getElementById("orders-count-label").innerHTML =
+    `${orders.length} order${orders.length!==1?"s":""} <span class="adm-live-dot" style="margin-left:0.5rem;">Live</span>`;
+
+  document.getElementById("orders-tbody").innerHTML = paged.items.length
+    ? paged.items.map(o => {
+        const wa = typeof buildOrderWhatsAppLink === "function" ? buildOrderWhatsAppLink(o) : "#";
+        return `
+          <tr style="cursor:pointer;">
+            <td class="adm-td-id" onclick="openOrderModal(orderGetById('${o.id}'))">${o.id}</td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))">
+              <div class="adm-td-name">${o.customer.fullName}</div>
+              <div style="font-size:0.68rem;color:var(--adm-text-light);">${o.customer.email}</div>
+            </td>
+            <td>
+              <a href="https://wa.me/${(o.customer.phone||"").replace(/^0/,"+234").replace(/\+/,"")}" target="_blank"
+                style="color:#16a34a;font-size:0.8rem;font-weight:500;">
+                <i class="fa-brands fa-whatsapp"></i> ${o.customer.phone||"—"}
+              </a>
+            </td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))" style="font-size:0.78rem;">${o.items.length} item${o.items.length!==1?"s":""}</td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))" style="font-size:0.75rem;">${o.deliveryZone?.name||"—"}</td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))"><strong>${adminFormatMoney(o.total)}</strong></td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))">${adminStatusBadge(o.status)}</td>
+            <td onclick="openOrderModal(orderGetById('${o.id}'))" style="font-size:0.75rem;white-space:nowrap;">${adminFormatDate(o.createdAt)}</td>
+            <td>
+              <div style="display:flex;gap:0.35rem;">
+                <button class="adm-btn adm-btn-outline adm-btn-icon adm-btn-sm"
+                  onclick="openOrderModal(orderGetById('${o.id}'))">
+                  <i class="fa-regular fa-eye"></i>
+                </button>
+                <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </a>
+              </div>
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="9" class="adm-empty-cell">No confirmed orders yet. Confirm a payment to see orders here.</td></tr>`;
+
+  document.getElementById("orders-pager").innerHTML =
+    adminRenderPager(paged, p => { ordersPage = p; renderOrders(); });
+  adminUpdatePendingBadge();
+}
+
+/* ── Order detail modal ──────────────────────────── */
+function openOrderModal(order) {
+  if (!order) return;
+  activeOrderId = order.id;
+  document.getElementById("modal-order-id").textContent   = order.id;
+  document.getElementById("modal-order-date").textContent = adminFormatDateTime(order.createdAt);
+  document.getElementById("modal-status-select").value    = order.status;
+
+  const wa    = typeof buildOrderWhatsAppLink === "function" ? buildOrderWhatsAppLink(order) : "#";
+  const email = typeof buildOrderEmailLink    === "function" ? buildOrderEmailLink(order)    : `mailto:${order.customer.email}`;
+  document.getElementById("modal-order-contact-bar").innerHTML = `
+    <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-sm">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp ${order.customer.fullName.split(" ")[0]}
+    </a>
+    <a href="${email}" class="adm-btn adm-btn-outline adm-btn-sm">
+      <i class="fa-regular fa-envelope"></i> Email
+    </a>
+    ${order.bookingRef ? `<span style="font-size:0.72rem;color:var(--adm-text-light);align-self:center;">Booking: ${order.bookingRef}</span>` : ""}`;
+
+  const dr = (l,v) => `<div class="adm-detail-row"><span class="adm-detail-label">${l}</span><span class="adm-detail-value">${v}</span></div>`;
+  const phoneLink = `<a href="https://wa.me/${(order.customer.phone||"").replace(/^0/,"+234").replace(/\+/,"")}" target="_blank" style="color:#16a34a;">${order.customer.phone||"—"}</a>`;
+  document.getElementById("modal-cust-detail").innerHTML =
+    dr("Name",    order.customer.fullName) +
+    dr("Email",   `<a href="${email}" style="color:var(--adm-accent);">${order.customer.email}</a>`) +
+    dr("Phone",   phoneLink) +
+    dr("Billing", order.billingAddress?.fullText||"Same as shipping");
+
+  document.getElementById("modal-delivery-detail").innerHTML =
+    dr("Ships To",    order.shippingAddress?.fullText||"—") +
+    dr("Zone",        order.deliveryZone?.name||"—") +
+    dr("Delivery Fee",adminFormatMoney(order.deliveryFee)) +
+    dr("Payment",     `${order.paymentMethod||"bank_transfer"} — ${adminStatusBadge(order.paymentStatus)}`);
+
+  document.getElementById("modal-items-tbody").innerHTML = order.items.map(i => `
+    <tr>
+      <td class="adm-td-name">${i.name}</td>
+      <td>${i.size||"—"}</td><td>${i.colour||"—"}</td><td>${i.qty}</td>
+      <td>${adminFormatMoney(i.price)}</td>
+      <td><strong>${adminFormatMoney(i.lineTotal)}</strong></td>
+    </tr>`).join("");
+
+  document.getElementById("modal-totals").innerHTML =
+    dr("Subtotal",  adminFormatMoney(order.subtotal)) +
+    dr("Delivery",  order.deliveryFee===0?"FREE":adminFormatMoney(order.deliveryFee)) +
+    `<div class="adm-detail-row" style="font-size:1rem;font-weight:700;color:var(--adm-text);">
+      <span class="adm-detail-label">Total</span><span>${adminFormatMoney(order.total)}</span></div>`;
+
+  document.getElementById("modal-admin-notes").innerHTML = adminRenderOrderNotes(order.adminNotes||[]);
+  document.getElementById("modal-timeline").innerHTML = (order.statusHistory||[]).slice().reverse().map(h => `
+    <div class="adm-timeline-item">
+      <div class="adm-timeline-dot"><i class="fa-solid fa-check" style="font-size:0.55rem;"></i></div>
+      <div class="adm-timeline-content">
+        <div class="adm-timeline-status">${h.status.charAt(0).toUpperCase()+h.status.slice(1)}</div>
+        <div class="adm-timeline-time">${adminFormatDateTime(h.timestamp)}</div>
+        <div class="adm-timeline-note">${h.note||""}</div>
+      </div>
+    </div>`).join("") || "<p style='font-size:0.78rem;color:var(--adm-text-light);'>No history.</p>";
+
+  adminOpenModal("modal-order");
+}
+
+function modalUpdateStatus() {
+  const newStatus = document.getElementById("modal-status-select").value;
+  const note      = document.getElementById("modal-status-note").value.trim();
+  if (!activeOrderId) return;
+  const updated = orderUpdateStatus(activeOrderId, newStatus, note, "admin");
+  document.getElementById("modal-status-note").value = "";
+  adminToast(`Status updated to "${newStatus}".`);
+  renderOrders();
+  if (updated) openOrderModal(updated);
+}
+
+function modalAddOrderNote() {
+  const input = document.getElementById("modal-note-input");
+  const text  = input ? input.value.trim() : "";
+  if (!text || !activeOrderId) return;
+  const updated = orderAddAdminNote(activeOrderId, text, "admin");
+  if (updated) {
+    input.value = "";
+    document.getElementById("modal-admin-notes").innerHTML = adminRenderOrderNotes(updated.adminNotes||[]);
+    adminToast("Note saved.");
+  }
+}
+
+async function modalDeleteOrder() {
+  const confirmed = await adminConfirm("Delete this order permanently?");
+  if (!confirmed) return;
+  orderDelete(activeOrderId);
+  adminCloseModal("modal-order");
+  adminToast("Order deleted.", "error");
+  renderOrders();
+}
+
+function ordersExportCSV() {
+  const orders = getFilteredOrders();
+  const rows   = [["Order ID","Customer","Email","Phone","Items","Zone","Subtotal","Delivery","Total","Status","Date"]];
+  orders.forEach(o => rows.push([
+    o.id, o.customer.fullName, o.customer.email, o.customer.phone||"",
+    o.items.map(i=>`${i.name} x${i.qty}`).join("; "),
+    o.deliveryZone?.name||"", o.subtotal, o.deliveryFee, o.total,
+    o.status, adminFormatDate(o.createdAt)
+  ]));
+  const csv = rows.map(r => r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  Object.assign(document.createElement("a"), {
+    href: URL.createObjectURL(new Blob([csv],{type:"text/csv"})),
+    download: `fka-orders-${new Date().toISOString().slice(0,10)}.csv`
+  }).click();
+}
+
+/* ── URL param direct-open ───────────────────────── */
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get("id")) {
+  switchTab("orders");
+  setTimeout(() => { const o = orderGetById(urlParams.get("id")); if (o) openOrderModal(o); }, 300);
+} else if (urlParams.get("ref")) {
+  setTimeout(() => openBookingDetail(urlParams.get("ref")), 300);
+}
+
+/* ── Filter wire-up ──────────────────────────────── */
+["bookings-search","bookings-status-filter"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input",  ()=>{bookingsPage=1;renderBookings();});
+  document.getElementById(id)?.addEventListener("change", ()=>{bookingsPage=1;renderBookings();});
+});
+["orders-search","orders-status-filter","orders-sort"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input",  ()=>{ordersPage=1;renderOrders();});
+  document.getElementById(id)?.addEventListener("change", ()=>{ordersPage=1;renderOrders();});
+});
+
+/* Close modals on backdrop click */
+["modal-confirm-payment","modal-booking-detail","modal-order"].forEach(id => {
+  document.getElementById(id)?.addEventListener("click", e => {
+    if (e.target === document.getElementById(id)) adminCloseModal(id);
+  });
+});
+
+/* ── Real-time ────────────────────────────────────── */
+adminStartRealtime({
+  orders:   () => { renderOrders(); adminUpdatePendingBadge(); },
+  any: ({ channel }) => {
+    if (channel === "fka_bookings" || channel === "activity") renderBookings();
+  },
+  new_booking: ({ data }) => {
+    renderBookings();
+    adminNotify(
+      `New Booking — ${data?.bookingRef || ""}`,
+      `${data?.customer?.fullName||"A customer"} submitted an order for ${adminFormatMoney(data?.total||0)}. Awaiting payment.`,
+      "order",
+      `orders.html?ref=${data?.bookingRef||""}`
+    );
+    adminUpdatePendingBadge();
+  },
+  payment_confirmed: ({ data }) => {
+    renderBookings();
+    renderOrders();
+    adminNotify(
+      `Payment Confirmed — ${data?.orderId||""}`,
+      `Order confirmed for ${data?.customer?.fullName||""}. Order ID: ${data?.orderId||""}`,
+      "order",
+      `orders.html?id=${data?.orderId||""}`
+    );
+    adminUpdatePendingBadge();
+  }
+});
+
+/* Also listen to bookings storage changes */
+window.addEventListener("storage", e => {
+  if (e.key === "fka_bookings") { renderBookings(); adminUpdatePendingBadge(); }
+});
+
+/* ── Initial render ───────────────────────────────── */
+renderBookings();
+</script>
+</body>
+</html>

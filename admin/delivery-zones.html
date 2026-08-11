@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Delivery Zones — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Delivery Zones</h1>
+          <p class="adm-page-subtitle">Configure location-based delivery fees and estimated delivery times.</p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="resetZones()">
+            <i class="fa-regular fa-arrows-rotate"></i> Reset to Defaults
+          </button>
+          <button class="adm-btn adm-btn-primary" onclick="openZoneModal(null)">
+            <i class="fa-regular fa-plus"></i> Add Zone
+          </button>
+        </div>
+      </div>
+
+      <!-- Live Fee Tester -->
+      <div class="adm-card" style="margin-bottom:1.5rem;">
+        <div class="adm-card-header">
+          <span class="adm-card-title">
+            <i class="fa-regular fa-map-location-dot" style="color:var(--adm-accent);margin-right:0.4rem;"></i>
+            Live Delivery Fee Tester
+          </span>
+        </div>
+        <div class="adm-card-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr auto;gap:1rem;align-items:flex-end;flex-wrap:wrap;">
+            <div class="adm-field">
+              <label class="adm-label">Test Address</label>
+              <input class="adm-input" type="text" id="test-address" placeholder="e.g. Victoria Island, Lagos">
+            </div>
+            <div class="adm-field">
+              <label class="adm-label">Order Subtotal (₦)</label>
+              <input class="adm-input" type="number" id="test-subtotal" placeholder="65000" value="65000">
+            </div>
+            <button class="adm-btn adm-btn-primary" onclick="runFeeTest()">
+              <i class="fa-regular fa-calculator"></i> Test
+            </button>
+          </div>
+          <div id="fee-test-result" style="display:none;margin-top:1rem;padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);font-size:0.85rem;"></div>
+        </div>
+      </div>
+
+      <!-- Zone Cards Grid -->
+      <div class="adm-zone-grid" id="zones-grid"></div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ZONE EDIT MODAL -->
+<div class="adm-modal-overlay" id="modal-zone">
+  <div class="adm-modal">
+    <div class="adm-modal-header">
+      <div class="adm-modal-title" id="modal-zone-title">Add Delivery Zone</div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-zone')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+      <input type="hidden" id="zone-id">
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Zone Name *</label>
+          <input class="adm-input" type="text" id="zone-name" placeholder="Lagos Island">
+          <span class="adm-field-err" id="err-zone-name"></span>
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">State / Region</label>
+          <input class="adm-input" type="text" id="zone-state" placeholder="Lagos">
+        </div>
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Description</label>
+        <input class="adm-input" type="text" id="zone-description"
+          placeholder="Victoria Island, Ikoyi, Lekki Phase 1…">
+      </div>
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Delivery Fee (₦) *</label>
+          <input class="adm-input" type="number" id="zone-fee" placeholder="2500" min="0">
+          <span class="adm-field-err" id="err-zone-fee"></span>
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">Free Delivery Threshold (₦)</label>
+          <input class="adm-input" type="number" id="zone-threshold" placeholder="70000" min="0">
+          <span class="adm-field-hint">Orders above this get free delivery.</span>
+        </div>
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Estimated Delivery Time</label>
+        <input class="adm-input" type="text" id="zone-eta" placeholder="1–2 business days">
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">
+          Keywords for Auto-Detection
+          <span class="adm-field-hint" style="display:inline;font-size:0.68rem;"> — comma-separated, lowercase</span>
+        </label>
+        <textarea class="adm-textarea" id="zone-keywords" rows="3"
+          placeholder="victoria island, vi, ikoyi, lekki phase 1, lekki 1, oniru, eti-osa"></textarea>
+        <span class="adm-field-hint">The system matches customer addresses to zones using these keywords. More specific = longer strings = higher match score.</span>
+      </div>
+
+      <div style="display:flex;gap:1.5rem;flex-wrap:wrap;">
+        <label class="adm-toggle-wrap">
+          <input type="checkbox" class="adm-toggle-input" id="zone-active" checked>
+          <span class="adm-toggle-track"></span>
+          <span class="adm-toggle-label">Zone Active</span>
+        </label>
+        <label class="adm-toggle-wrap">
+          <input type="checkbox" class="adm-toggle-input" id="zone-default">
+          <span class="adm-toggle-track"></span>
+          <span class="adm-toggle-label">Default Fallback Zone</span>
+        </label>
+      </div>
+
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-danger adm-btn-sm" id="btn-zone-delete" style="display:none;"
+        onclick="deleteCurrentZone()"><i class="fa-regular fa-trash"></i> Delete</button>
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-zone')">Cancel</button>
+      <button class="adm-btn adm-btn-primary" onclick="saveZone()">
+        <i class="fa-regular fa-check"></i> Save Zone
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/delivery.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("delivery-zones");
+adminSetPageTitle("Delivery Zones");
+
+function renderZones() {
+  const zones = deliveryZonesLoad();
+  const grid  = document.getElementById("zones-grid");
+
+  if (!zones.length) {
+    grid.innerHTML = `<p style="color:var(--adm-text-light);font-size:0.85rem;">No zones configured. <button class="adm-btn adm-btn-primary adm-btn-sm" onclick="openZoneModal(null)">Add Zone</button></p>`;
+    return;
+  }
+
+  grid.innerHTML = zones.map(z => `
+    <div class="adm-zone-card ${z.active ? "" : "inactive"}">
+      <div class="adm-zone-header">
+        <div>
+          <div class="adm-zone-name">${z.name}</div>
+          <div class="adm-zone-state">${z.state || ""}${z.isDefault ? " · Default fallback" : ""}</div>
+        </div>
+        <div style="display:flex;gap:0.35rem;align-items:center;">
+          ${adminStatusBadge(z.active ? "active" : "inactive")}
+        </div>
+      </div>
+      <div class="adm-zone-fee">${adminFormatMoney(z.fee)}</div>
+      <div class="adm-zone-eta"><i class="fa-regular fa-clock" style="margin-right:0.3rem;color:var(--adm-text-light);"></i>${z.estimatedDays || "—"}</div>
+      <div class="adm-zone-desc">${z.description || ""}</div>
+      <div style="font-size:0.72rem;color:var(--adm-text-light);margin-bottom:0.75rem;">
+        Free delivery over ${adminFormatMoney(z.freeThreshold || 70000)}
+      </div>
+      <div class="adm-zone-actions">
+        <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="openZoneModal('${z.id}')">
+          <i class="fa-regular fa-pen"></i> Edit
+        </button>
+        <button class="adm-btn adm-btn-${z.active ? "outline" : "success"} adm-btn-sm"
+          onclick="toggleZone('${z.id}')">
+          <i class="fa-regular fa-${z.active ? "eye-slash" : "eye"}"></i>
+          ${z.active ? "Disable" : "Enable"}
+        </button>
+      </div>
+    </div>`).join("");
+}
+
+function openZoneModal(zoneId) {
+  const isNew = !zoneId;
+  document.getElementById("modal-zone-title").textContent  = isNew ? "Add Delivery Zone" : "Edit Zone";
+  document.getElementById("btn-zone-delete").style.display = isNew ? "none" : "inline-flex";
+  document.getElementById("err-zone-name").textContent = "";
+  document.getElementById("err-zone-fee").textContent  = "";
+
+  if (isNew) {
+    document.getElementById("zone-id").value          = "zone-" + Date.now();
+    document.getElementById("zone-name").value        = "";
+    document.getElementById("zone-state").value       = "";
+    document.getElementById("zone-description").value = "";
+    document.getElementById("zone-fee").value         = "";
+    document.getElementById("zone-threshold").value   = "70000";
+    document.getElementById("zone-eta").value         = "";
+    document.getElementById("zone-keywords").value    = "";
+    document.getElementById("zone-active").checked    = true;
+    document.getElementById("zone-default").checked   = false;
+  } else {
+    const zone = deliveryZonesLoad().find(z => z.id === zoneId);
+    if (!zone) return;
+    document.getElementById("zone-id").value          = zone.id;
+    document.getElementById("zone-name").value        = zone.name;
+    document.getElementById("zone-state").value       = zone.state || "";
+    document.getElementById("zone-description").value = zone.description || "";
+    document.getElementById("zone-fee").value         = zone.fee;
+    document.getElementById("zone-threshold").value   = zone.freeThreshold || 70000;
+    document.getElementById("zone-eta").value         = zone.estimatedDays || "";
+    document.getElementById("zone-keywords").value    = (zone.keywords || []).join(", ");
+    document.getElementById("zone-active").checked    = !!zone.active;
+    document.getElementById("zone-default").checked   = !!zone.isDefault;
+  }
+  adminOpenModal("modal-zone");
+}
+
+function saveZone() {
+  const name = document.getElementById("zone-name").value.trim();
+  const fee  = parseFloat(document.getElementById("zone-fee").value);
+  let valid  = true;
+  if (!name)       { document.getElementById("err-zone-name").textContent = "Zone name required."; valid = false; }
+  if (isNaN(fee))  { document.getElementById("err-zone-fee").textContent  = "Valid fee required.";  valid = false; }
+  if (!valid) return;
+
+  const kwRaw = document.getElementById("zone-keywords").value;
+  const keywords = kwRaw.split(",").map(s => s.trim().toLowerCase()).filter(Boolean);
+
+  const zone = {
+    id:            document.getElementById("zone-id").value,
+    name,
+    state:         document.getElementById("zone-state").value.trim(),
+    description:   document.getElementById("zone-description").value.trim(),
+    fee,
+    freeThreshold: parseFloat(document.getElementById("zone-threshold").value) || 70000,
+    estimatedDays: document.getElementById("zone-eta").value.trim(),
+    keywords,
+    active:        document.getElementById("zone-active").checked,
+    isDefault:     document.getElementById("zone-default").checked
+  };
+
+  deliveryZoneSave(zone);
+  adminCloseModal("modal-zone");
+  adminToast(`Zone "${zone.name}" saved.`);
+  renderZones();
+}
+
+async function deleteCurrentZone() {
+  const id = document.getElementById("zone-id").value;
+  const confirmed = await adminConfirm("Delete this delivery zone? Customers from this area will fall back to the default zone.");
+  if (!confirmed) return;
+  deliveryZoneDelete(id);
+  adminCloseModal("modal-zone");
+  adminToast("Zone deleted.", "error");
+  renderZones();
+}
+
+function toggleZone(id) {
+  const active = deliveryZoneToggle(id);
+  adminToast(`Zone ${active ? "enabled" : "disabled"}.`, active ? "success" : "info");
+  renderZones();
+}
+
+async function resetZones() {
+  const confirmed = await adminConfirm("Reset all delivery zones to factory defaults? All custom zones will be lost.");
+  if (!confirmed) return;
+  deliveryZonesReset();
+  adminToast("Zones reset to defaults.");
+  renderZones();
+}
+
+function runFeeTest() {
+  const address  = document.getElementById("test-address").value.trim();
+  const subtotal = parseFloat(document.getElementById("test-subtotal").value) || 0;
+  if (!address) { adminToast("Please enter a test address.", "error"); return; }
+
+  const result = calculateDeliveryFee(address, subtotal);
+  const el     = document.getElementById("fee-test-result");
+  el.style.display = "block";
+  el.innerHTML = result.zone
+    ? `<div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:1rem;">
+        <div><div style="font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--adm-text-light);margin-bottom:0.25rem;">Matched Zone</div>
+          <div style="font-weight:600;color:var(--adm-text);">${result.zone.name}</div></div>
+        <div><div style="font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--adm-text-light);margin-bottom:0.25rem;">Delivery Fee</div>
+          <div style="font-size:1.1rem;font-weight:700;color:${result.isFree ? "#059669" : "var(--adm-accent)"};">${result.isFree ? "FREE" : adminFormatMoney(result.fee)}</div></div>
+        <div><div style="font-size:0.65rem;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--adm-text-light);margin-bottom:0.25rem;">Estimated Delivery</div>
+          <div style="color:var(--adm-text);">${result.estimatedDays || "—"}</div></div>
+      </div>
+      <div style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--adm-border);font-size:0.78rem;color:var(--adm-text-mid);">${result.message}</div>`
+    : `<p style="color:var(--adm-text-light);">No zone matched. Check your keywords.</p>`;
+}
+
+document.getElementById("modal-zone").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal-zone")) adminCloseModal("modal-zone");
+});
+
+renderZones();
+</script>
+</body>
+</html>

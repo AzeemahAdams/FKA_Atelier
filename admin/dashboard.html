@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <!-- Page header -->
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Dashboard</h1>
+          <p class="adm-page-subtitle" id="dash-date-label" style="display:flex;align-items:center;gap:0.75rem;">
+            <span class="adm-live-dot">Live</span>
+            <span id="dash-last-refresh" style="font-size:0.7rem;color:var(--adm-text-light);"></span>
+          </p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="seedDemoOrders();renderDashboard();">
+            <i class="fa-regular fa-database"></i> Seed Demo Data
+          </button>
+          <a href="orders.html" class="adm-btn adm-btn-primary adm-btn-sm">
+            <i class="fa-regular fa-bag-shopping"></i> View All Orders
+          </a>
+        </div>
+      </div>
+
+      <!-- KPI cards -->
+      <div class="adm-stats-grid" id="dash-stats"></div>
+
+      <!-- Pending orders alert banner -->
+      <div id="dash-pending-alert" style="display:none;margin-bottom:1.5rem;"></div>
+
+      <!-- Main grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+
+        <!-- Revenue chart -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Revenue — Last 7 Days</span>
+          </div>
+          <div class="adm-card-body">
+            <div id="dash-chart"></div>
+          </div>
+        </div>
+
+        <!-- Status breakdown -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Orders by Status</span>
+            <a href="orders.html" class="adm-btn adm-btn-outline adm-btn-sm">Manage</a>
+          </div>
+          <div class="adm-card-body no-pad">
+            <table class="adm-table"><tbody id="dash-status-tbody"></tbody></table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Second row: recent orders + activity feed + top products -->
+      <div style="display:grid;grid-template-columns:1.6fr 1fr;gap:1.5rem;margin-bottom:1.5rem;">
+
+        <!-- Recent orders -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Recent Orders</span>
+            <a href="orders.html" class="adm-btn adm-btn-outline adm-btn-sm">View All</a>
+          </div>
+          <div class="adm-card-body no-pad">
+            <div class="adm-table-wrap">
+              <table class="adm-table">
+                <thead>
+                  <tr>
+                    <th>Order</th><th>Customer</th><th>Total</th>
+                    <th>Status</th><th>Date</th><th>Contact</th>
+                  </tr>
+                </thead>
+                <tbody id="dash-orders-tbody"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Live activity feed -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Live Activity Feed</span>
+            <span class="adm-live-dot">Live</span>
+          </div>
+          <div class="adm-card-body" style="max-height:340px;overflow-y:auto;padding:0.5rem 1rem;">
+            <div id="dash-activity-feed"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Third row: top products + recent customers -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+
+        <!-- Top products -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Top Products</span>
+          </div>
+          <div class="adm-card-body no-pad">
+            <table class="adm-table">
+              <thead><tr><th>#</th><th>Product</th><th>Units Sold</th></tr></thead>
+              <tbody id="dash-products-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Recent customers -->
+        <div class="adm-card">
+          <div class="adm-card-header">
+            <span class="adm-card-title">Recent Customers</span>
+            <a href="customers.html" class="adm-btn adm-btn-outline adm-btn-sm">View All</a>
+          </div>
+          <div class="adm-card-body no-pad">
+            <table class="adm-table">
+              <thead><tr><th>Name</th><th>Phone</th><th>Joined</th><th>Contact</th></tr></thead>
+              <tbody id="dash-customers-tbody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<script src="../assets/js/products.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("dashboard");
+adminSetPageTitle("Dashboard");
+
+/* ── Render ──────────────────────────────────────────── */
+function renderDashboard() {
+  const S = getDashboardStats();
+  const now = new Date();
+
+  /* date label */
+  const start = new Date(now); start.setDate(start.getDate()-30);
+  const fmt = d => d.toLocaleDateString("en-NG",{day:"numeric",month:"short"});
+  document.getElementById("dash-last-refresh").textContent =
+    `${fmt(start)} – ${fmt(now)} · Refreshed ${now.toLocaleTimeString("en-NG",{hour:"2-digit",minute:"2-digit"})}`;
+
+  /* pending alert banner */
+  const alertEl = document.getElementById("dash-pending-alert");
+  const pendingBookings = typeof bookingsGetAll === "function"
+    ? bookingsGetAll().filter(b => b.status === "awaiting_payment").length
+    : 0;
+  if (pendingBookings > 0) {
+    alertEl.style.display = "block";
+    alertEl.innerHTML = `
+      <div style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:0.85rem 1.25rem;
+                  border-radius:var(--adm-radius);display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;">
+        <i class="fa-regular fa-clock" style="font-size:1rem;flex-shrink:0;"></i>
+        <strong>${pendingBookings} booking${pendingBookings!==1?"s":""}</strong> awaiting payment verification.
+        <a href="orders.html" class="adm-btn adm-btn-primary adm-btn-sm" style="margin-left:auto;">
+          <i class="fa-regular fa-circle-check"></i> Verify Payments
+        </a>
+      </div>`;
+  } else if (S.pendingCount > 0) {
+    alertEl.style.display = "block";
+    alertEl.innerHTML = `
+      <div style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:0.85rem 1.25rem;
+                  border-radius:var(--adm-radius);display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;">
+        <i class="fa-regular fa-triangle-exclamation" style="font-size:1rem;flex-shrink:0;"></i>
+        <strong>${S.pendingCount} pending order${S.pendingCount!==1?"s":""}</strong> waiting for processing.
+        <a href="orders.html?tab=orders&status=confirmed" class="adm-btn adm-btn-primary adm-btn-sm" style="margin-left:auto;">
+          Process Now
+        </a>
+      </div>`;
+  } else {
+    alertEl.style.display = "none";
+  }
+
+  /* KPI cards */
+  const kpis = [
+    { label:"Total Revenue",    value:adminFormatMoney(S.totalRevenue),  icon:"fa-naira-sign",   sub:`+${adminFormatMoney(S.recentRevenue)} last 30d` },
+    { label:"Confirmed Orders", value:S.totalOrders,                     icon:"fa-bag-shopping",  sub:`${S.recentOrders} last 30d`,  link:"orders.html?tab=orders" },
+    { label:"Pending Payment",  value:bookingsGetAll().filter(b=>b.status==="awaiting_payment").length,
+      icon:"fa-clock", sub:"Awaiting payment confirmation", link:"orders.html" },
+    { label:"Customers",        value:S.totalCustomers,                  icon:"fa-users",         sub:"Total registered",           link:"customers.html" }
+  ];
+  document.getElementById("dash-stats").innerHTML = kpis.map(k => `
+    <div class="adm-stat-card" ${k.link ? `style="cursor:pointer;" onclick="window.location='${k.link}'"` : ""}>
+      <div class="adm-stat-icon"><i class="fa-regular ${k.icon}"></i></div>
+      <div class="adm-stat-label">${k.label}</div>
+      <div class="adm-stat-value">${k.value}</div>
+      <div class="adm-stat-change">${k.sub}</div>
+    </div>`).join("");
+
+  /* Revenue chart */
+  adminRenderMiniBar("dash-chart",
+    S.revenueByDay.map(d => d.date.slice(5)),
+    S.revenueByDay.map(d => d.revenue));
+
+  /* Status breakdown */
+  const STATUS_LABELS = { pending:"Pending",confirmed:"Confirmed",processing:"Processing",
+    shipped:"Shipped",delivered:"Delivered",cancelled:"Cancelled",refunded:"Refunded" };
+  document.getElementById("dash-status-tbody").innerHTML =
+    Object.entries(S.byStatus).map(([s,c]) => `
+      <tr style="cursor:pointer;" onclick="window.location='orders.html?status=${s}'">
+        <td>${adminStatusBadge(s)}</td>
+        <td style="font-weight:700;font-size:0.9rem;color:var(--adm-text);">${c}</td>
+        <td style="color:var(--adm-text-light);font-size:0.72rem;">
+          ${S.totalOrders ? Math.round(c/S.totalOrders*100) : 0}%
+        </td>
+      </tr>`).join("") || `<tr><td colspan="3" class="adm-empty-cell">No orders yet.</td></tr>`;
+
+  /* Recent orders with WhatsApp link */
+  document.getElementById("dash-orders-tbody").innerHTML = S.latestOrders.length
+    ? S.latestOrders.map(o => {
+        const wa = typeof buildOrderWhatsAppLink === "function" ? buildOrderWhatsAppLink(o) : "#";
+        return `
+          <tr style="cursor:pointer;">
+            <td onclick="window.location='orders.html?id=${o.id}'" class="adm-td-id">${o.id}</td>
+            <td onclick="window.location='orders.html?id=${o.id}'">
+              <div class="adm-td-name" style="font-size:0.82rem;">${o.customer.fullName}</div>
+              <div style="font-size:0.68rem;color:var(--adm-text-light);">${o.customer.email}</div>
+            </td>
+            <td onclick="window.location='orders.html?id=${o.id}'">${adminFormatMoney(o.total)}</td>
+            <td onclick="window.location='orders.html?id=${o.id}'">${adminStatusBadge(o.status)}</td>
+            <td onclick="window.location='orders.html?id=${o.id}'"
+              style="font-size:0.75rem;white-space:nowrap;">${adminFormatDate(o.createdAt)}</td>
+            <td>
+              <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm" title="WhatsApp customer">
+                <i class="fa-brands fa-whatsapp"></i>
+              </a>
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="6" class="adm-empty-cell">No orders yet.
+        <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="seedDemoOrders();renderDashboard();">Load demo data</button>
+       </td></tr>`;
+
+  /* Activity feed */
+  adminRenderActivityFeed("dash-activity-feed", 25);
+
+  /* Top products */
+  document.getElementById("dash-products-tbody").innerHTML = S.topProducts.length
+    ? S.topProducts.map((p,i) => `
+        <tr>
+          <td style="color:var(--adm-text-light);font-size:0.8rem;">${i+1}</td>
+          <td class="adm-td-name" style="font-size:0.82rem;">${p.name}</td>
+          <td><strong>${p.qty}</strong></td>
+        </tr>`).join("")
+    : `<tr><td colspan="3" class="adm-empty-cell">No data yet.</td></tr>`;
+
+  /* Recent customers */
+  const recentCustomers = customersGetAll().slice(0,6);
+  document.getElementById("dash-customers-tbody").innerHTML = recentCustomers.length
+    ? recentCustomers.map(c => {
+        const wa = typeof buildWhatsAppLink === "function"
+          ? buildWhatsAppLink(c.phone, `Hi ${c.firstName||c.fullName}! This is FKA Atelier.`)
+          : "#";
+        const ml = `mailto:${c.email}`;
+        return `
+          <tr>
+            <td>
+              <div class="adm-td-name" style="font-size:0.82rem;cursor:pointer;"
+                onclick="window.location='customers.html'">${c.fullName}</div>
+              <div style="font-size:0.68rem;color:var(--adm-text-light);">${c.email}</div>
+            </td>
+            <td>
+              <a href="${wa}" target="_blank" style="color:#16a34a;font-size:0.8rem;font-weight:500;">
+                <i class="fa-brands fa-whatsapp"></i> ${c.phone||"—"}
+              </a>
+            </td>
+            <td style="font-size:0.75rem;white-space:nowrap;">${adminFormatDate(c.createdAt)}</td>
+            <td>
+              <div style="display:flex;gap:0.3rem;">
+                <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </a>
+                <a href="${ml}" class="adm-btn adm-btn-outline adm-btn-icon adm-btn-sm">
+                  <i class="fa-regular fa-envelope"></i>
+                </a>
+              </div>
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="4" class="adm-empty-cell">No customers yet.</td></tr>`;
+
+  adminUpdatePendingBadge();
+}
+
+/* ── Real-time ───────────────────────────────────────── */
+adminStartRealtime({
+  orders: () => renderDashboard(),
+  customers: () => renderDashboard(),
+  activity: () => {
+    // Just refresh the activity feed, not the whole dashboard
+    adminRenderActivityFeed("dash-activity-feed", 25);
+    adminUpdatePendingBadge();
+  },
+  new_order: ({ data }) => {
+    renderDashboard();
+    adminNotify(
+      `New Order — ${data?.orderId || ""}`,
+      `${data?.customer?.fullName || "A customer"} placed an order for ${adminFormatMoney(data?.total || 0)}${data?.zone ? " · " + data.zone : ""}.`,
+      "order",
+      `orders.html?id=${data?.orderId || ""}`
+    );
+  },
+  new_customer: ({ data }) => {
+    renderDashboard();
+    adminNotify(
+      "New Customer",
+      `${data?.fullName || "Someone"} just registered — ${data?.phone || data?.email || ""}`,
+      "customer",
+      "customers.html"
+    );
+  },
+  new_account: ({ data }) => {
+    renderDashboard();
+    adminNotify(
+      "New Account Created",
+      `${data?.fullName || data?.email || "A new customer"} created an account on the store.`,
+      "customer",
+      "customers.html"
+    );
+  }
+});
+
+renderDashboard();
+</script>
+</body>
+</html>

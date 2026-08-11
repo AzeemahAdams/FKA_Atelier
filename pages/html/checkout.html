@@ -1,0 +1,512 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Checkout — FKA Atelier</title>
+  <meta name="description" content="Complete your FKA Atelier order securely.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+  <link rel="stylesheet" href="../../assets/css/checkout.css">
+</head>
+<body>
+
+<div class="announcement-bar">
+  FREE DELIVERY ON ORDERS OVER ₦70,000 <span>|</span> CUSTOM MEASUREMENTS ACCEPTED
+</div>
+
+<nav class="fka-navbar" role="navigation" aria-label="Main navigation">
+  <div class="navbar-inner">
+    <button class="navbar-toggler" id="navbar-toggler" aria-label="Open menu"><i class="fa-regular fa-bars"></i></button>
+    <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
+    <ul class="navbar-nav-links" role="list">
+      <li><a href="../../index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collections.html">Collections</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="measurements.html">Measurements</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <a href="wishlist.html" class="navbar-icon-btn" aria-label="Wishlist" style="position:relative;">
+        <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
+      </a>
+      <a href="cart.html" class="navbar-icon-btn" aria-label="Shopping bag" style="position:relative;">
+        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
+      </a>
+      <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My Account" title="Sign In / Register" style="position:relative;">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
+    </div>
+  </div>
+</nav>
+
+<div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+<nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-label="Mobile navigation">
+  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu"><i class="fa-regular fa-xmark"></i></button>
+  <div class="mobile-nav-brand">FKA Atelier</div>
+  <ul class="mobile-nav-links" role="list">
+    <li><a href="../../index.html">Home</a></li><li><a href="shop.html">Shop</a></li>
+    <li><a href="collections.html">Collections</a></li><li><a href="about.html">About</a></li>
+    <li><a href="measurements.html">Measurements</a></li><li><a href="contact.html">Contact</a></li>
+    <li><a href="cart.html">Shopping Bag</a></li><li><a href="wishlist.html">Wishlist</a></li>
+  </ul>
+</nav>
+
+<!-- PAGE HERO -->
+<div class="co-page-header">
+  <div class="breadcrumb" style="justify-content:center;padding-bottom:0.5rem;">
+    <a href="../../index.html">Home</a>
+    <span class="breadcrumb-sep"><i class="fa-regular fa-chevron-right"></i></span>
+    <a href="cart.html">Bag</a>
+    <span class="breadcrumb-sep"><i class="fa-regular fa-chevron-right"></i></span>
+    <span>Checkout</span>
+  </div>
+  <h1 class="co-page-title">Checkout</h1>
+
+  <!-- Step Progress Bar -->
+  <div class="co-progress-wrap">
+    <div class="co-progress-track">
+      <div class="co-progress-fill" id="checkout-progress-bar" style="width:0%"></div>
+    </div>
+    <div class="co-step-indicators">
+      <div class="checkout-step-indicator active" data-step="1">
+        <div class="co-step-circle"><span class="co-step-num">1</span><i class="fa-solid fa-check co-step-check"></i></div>
+        <span class="co-step-label">Your Details</span>
+      </div>
+      <div class="checkout-step-indicator upcoming" data-step="2">
+        <div class="co-step-circle"><span class="co-step-num">2</span><i class="fa-solid fa-check co-step-check"></i></div>
+        <span class="co-step-label">Delivery</span>
+      </div>
+      <div class="checkout-step-indicator upcoming" data-step="3">
+        <div class="co-step-circle"><span class="co-step-num">3</span><i class="fa-solid fa-check co-step-check"></i></div>
+        <span class="co-step-label">Review & Place</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CHECKOUT BODY -->
+<div class="co-body">
+
+  <!-- ── FORM WRAPPER ──────────────────────────────────── -->
+  <div id="checkout-form-wrapper" class="co-form-wrapper">
+
+    <!-- LEFT COL — steps -->
+    <div class="co-steps-col">
+
+      <!-- ══════════════════════════════════════════════
+           STEP 1 — CUSTOMER DETAILS
+           ══════════════════════════════════════════════ -->
+      <div class="checkout-step-panel" data-step="1">
+        <div class="co-panel-header">
+          <h2 class="co-panel-title">Your Details</h2>
+          <p class="co-panel-sub">We need this to process and deliver your order.</p>
+        </div>
+
+        <div class="co-form-grid co-two-col">
+          <div class="co-field-group">
+            <label class="co-label" for="co-first-name">First Name <span class="co-required">*</span></label>
+            <input class="co-input" type="text" id="co-first-name" name="firstName"
+              placeholder="Amina" autocomplete="given-name" required>
+            <span class="co-field-error" id="err-co-first-name"></span>
+          </div>
+          <div class="co-field-group">
+            <label class="co-label" for="co-last-name">Last Name <span class="co-required">*</span></label>
+            <input class="co-input" type="text" id="co-last-name" name="lastName"
+              placeholder="Hassan" autocomplete="family-name" required>
+            <span class="co-field-error" id="err-co-last-name"></span>
+          </div>
+        </div>
+
+        <div class="co-field-group">
+          <label class="co-label" for="co-email">Email Address <span class="co-required">*</span></label>
+          <input class="co-input" type="email" id="co-email" name="email"
+            placeholder="amina@example.com" autocomplete="email" required>
+          <span class="co-field-error" id="err-co-email"></span>
+          <span class="co-field-hint">Your order confirmation will be sent here.</span>
+        </div>
+
+        <div class="co-field-group">
+          <label class="co-label" for="co-phone">Phone / WhatsApp Number <span class="co-required">*</span></label>
+          <div class="co-input-prefix-wrap">
+            <span class="co-input-prefix"><i class="fa-brands fa-whatsapp"></i> +234</span>
+            <input class="co-input co-input-prefixed" type="tel" id="co-phone" name="phone"
+              placeholder="0801 234 5678" autocomplete="tel" required>
+          </div>
+          <span class="co-field-error" id="err-co-phone"></span>
+          <span class="co-field-hint">We'll contact you about your order via WhatsApp if needed.</span>
+        </div>
+
+        <div class="co-step-actions">
+          <a href="cart.html" class="co-btn-back">
+            <i class="fa-regular fa-arrow-left"></i> Back to Bag
+          </a>
+          <button class="co-btn-next" onclick="checkoutNext()">
+            Continue to Delivery <i class="fa-regular fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           STEP 2 — DELIVERY ADDRESS
+           ══════════════════════════════════════════════ -->
+      <div class="checkout-step-panel" data-step="2" style="display:none;">
+        <div class="co-panel-header">
+          <h2 class="co-panel-title">Delivery Address</h2>
+          <p class="co-panel-sub">Your delivery fee is calculated automatically based on your location.</p>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="co-section-label">Shipping Address</div>
+
+        <div class="co-field-group">
+          <label class="co-label" for="co-shipping-line1">Street Address <span class="co-required">*</span></label>
+          <input class="co-input" type="text" id="co-shipping-line1" name="shippingLine1"
+            placeholder="14 Ajose Adeogun Street" autocomplete="address-line1" required>
+          <span class="co-field-error" id="err-co-shipping-line1"></span>
+        </div>
+
+        <div class="co-field-group">
+          <label class="co-label" for="co-shipping-line2">Apartment / Floor / Suite <span class="co-optional">(optional)</span></label>
+          <input class="co-input" type="text" id="co-shipping-line2" name="shippingLine2"
+            placeholder="Flat 4B, Second Floor" autocomplete="address-line2">
+        </div>
+
+        <div class="co-form-grid co-two-col">
+          <div class="co-field-group">
+            <label class="co-label" for="co-shipping-city">City / Area <span class="co-required">*</span></label>
+            <input class="co-input" type="text" id="co-shipping-city" name="shippingCity"
+              placeholder="Victoria Island" autocomplete="address-level2" required>
+            <span class="co-field-error" id="err-co-shipping-city"></span>
+          </div>
+          <div class="co-field-group">
+            <label class="co-label" for="co-shipping-state">State <span class="co-required">*</span></label>
+            <select class="co-input co-select" id="co-shipping-state" name="shippingState" required autocomplete="address-level1">
+              <option value="">— Select State —</option>
+              <option>Abia</option><option>Adamawa</option><option>Akwa Ibom</option>
+              <option>Anambra</option><option>Bauchi</option><option>Bayelsa</option>
+              <option>Benue</option><option>Borno</option><option>Cross River</option>
+              <option>Delta</option><option>Ebonyi</option><option>Edo</option>
+              <option>Ekiti</option><option>Enugu</option><option>FCT Abuja</option>
+              <option>Gombe</option><option>Imo</option><option>Jigawa</option>
+              <option>Kaduna</option><option>Kano</option><option>Katsina</option>
+              <option>Kebbi</option><option>Kogi</option><option>Kwara</option>
+              <option selected>Lagos</option><option>Nasarawa</option><option>Niger</option>
+              <option>Ogun</option><option>Ondo</option><option>Osun</option>
+              <option>Oyo</option><option>Plateau</option><option>Rivers</option>
+              <option>Sokoto</option><option>Taraba</option><option>Yobe</option>
+              <option>Zamfara</option>
+            </select>
+            <span class="co-field-error" id="err-co-shipping-state"></span>
+          </div>
+        </div>
+
+        <!-- Live Delivery Fee Card -->
+        <div class="co-delivery-card" id="co-delivery-card">
+          <div class="co-delivery-card-inner">
+            <div class="co-delivery-icon"><i class="fa-regular fa-truck"></i></div>
+            <div class="co-delivery-details">
+              <div class="co-delivery-zone-row">
+                <span class="co-delivery-zone-label">Delivery Zone:</span>
+                <strong id="co-zone-name">—</strong>
+              </div>
+              <div class="co-delivery-fee-row">
+                <span>Delivery Fee:</span>
+                <strong id="co-delivery-fee-display" class="co-fee-value">—</strong>
+              </div>
+              <div class="co-delivery-eta-row">
+                <span>Estimated Delivery:</span>
+                <span id="co-delivery-eta">—</span>
+              </div>
+            </div>
+          </div>
+          <div class="co-delivery-message" id="co-delivery-message" style="display:none;"></div>
+        </div>
+
+        <!-- Billing Address Toggle -->
+        <div class="co-billing-toggle">
+          <label class="co-checkbox-label">
+            <input type="checkbox" id="co-billing-same" checked>
+            <span class="co-checkbox-box"></span>
+            Billing address is the same as shipping address
+          </label>
+        </div>
+
+        <div id="billing-address-block" style="display:none;">
+          <div class="co-section-label" style="margin-top:1.5rem;">Billing Address</div>
+          <div class="co-field-group">
+            <label class="co-label" for="co-billing-line1">Street Address <span class="co-required">*</span></label>
+            <input class="co-input" type="text" id="co-billing-line1" placeholder="Billing street address" autocomplete="billing address-line1">
+            <span class="co-field-error" id="err-co-billing-line1"></span>
+          </div>
+          <div class="co-field-group">
+            <label class="co-label" for="co-billing-line2">Apartment / Floor <span class="co-optional">(optional)</span></label>
+            <input class="co-input" type="text" id="co-billing-line2" placeholder="Flat / Suite" autocomplete="billing address-line2">
+          </div>
+          <div class="co-form-grid co-two-col">
+            <div class="co-field-group">
+              <label class="co-label" for="co-billing-city">City <span class="co-required">*</span></label>
+              <input class="co-input" type="text" id="co-billing-city" placeholder="City" autocomplete="billing address-level2">
+              <span class="co-field-error" id="err-co-billing-city"></span>
+            </div>
+            <div class="co-field-group">
+              <label class="co-label" for="co-billing-state">State <span class="co-required">*</span></label>
+              <select class="co-input co-select" id="co-billing-state" autocomplete="billing address-level1">
+                <option value="">— Select State —</option>
+                <option>FCT Abuja</option><option>Lagos</option><option>Rivers</option>
+                <option>Oyo</option><option>Kano</option><option>Kaduna</option>
+                <option>Delta</option><option>Enugu</option><option>Anambra</option>
+                <option>Edo</option><option>Ondo</option><option>Ogun</option>
+              </select>
+              <span class="co-field-error" id="err-co-billing-state"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="co-field-group" style="margin-top:1.5rem;">
+          <label class="co-label" for="co-notes">Order Notes <span class="co-optional">(optional)</span></label>
+          <textarea class="co-input co-textarea" id="co-notes" placeholder="Any special instructions, measurement notes, or requests for your order…" rows="3"></textarea>
+        </div>
+
+        <div class="co-step-actions">
+          <button class="co-btn-back" onclick="checkoutBack()">
+            <i class="fa-regular fa-arrow-left"></i> Back
+          </button>
+          <button class="co-btn-next" onclick="checkoutNext()">
+            Review Order <i class="fa-regular fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- ══════════════════════════════════════════════
+           STEP 3 — REVIEW & PLACE ORDER
+           ══════════════════════════════════════════════ -->
+      <div class="checkout-step-panel" data-step="3" style="display:none;">
+        <div class="co-panel-header">
+          <h2 class="co-panel-title">Review Your Order</h2>
+          <p class="co-panel-sub">Please confirm everything looks correct before placing your order.</p>
+        </div>
+
+        <!-- Customer Review -->
+        <div class="co-review-block">
+          <div class="co-review-block-header">
+            <span><i class="fa-regular fa-user"></i> Contact Details</span>
+            <button class="co-review-edit" onclick="checkoutGoToStep(1)">Edit</button>
+          </div>
+          <div id="review-customer" class="co-review-body"></div>
+        </div>
+
+        <!-- Address Review -->
+        <div class="co-review-block">
+          <div class="co-review-block-header">
+            <span><i class="fa-regular fa-location-dot"></i> Delivery Address</span>
+            <button class="co-review-edit" onclick="checkoutGoToStep(2)">Edit</button>
+          </div>
+          <div id="review-address" class="co-review-body"></div>
+        </div>
+
+        <!-- Items Review -->
+        <div class="co-review-block">
+          <div class="co-review-block-header">
+            <span><i class="fa-regular fa-bag-shopping"></i> Items</span>
+            <a href="cart.html" class="co-review-edit">Edit Bag</a>
+          </div>
+          <div id="review-items" class="co-review-body"></div>
+        </div>
+
+        <!-- Totals Review -->
+        <div class="co-review-totals">
+          <div class="co-review-total-row"><span>Subtotal</span><strong id="review-subtotal">—</strong></div>
+          <div class="co-review-total-row"><span>Delivery</span><strong id="review-delivery">—</strong></div>
+          <div class="co-review-total-row co-grand-total"><span>Total</span><strong id="review-total">—</strong></div>
+        </div>
+
+        <!-- Payment Notice -->
+        <div class="co-payment-notice">
+          <i class="fa-regular fa-circle-info"></i>
+          <div>
+            <strong>How Payment Works</strong><br>
+            After placing your order, we'll contact you via WhatsApp or email with payment details (bank transfer). Your order will be confirmed once payment is received.
+          </div>
+        </div>
+
+        <!-- Place Order CTA -->
+        <div class="co-step-actions">
+          <button class="co-btn-back" onclick="checkoutBack()">
+            <i class="fa-regular fa-arrow-left"></i> Back
+          </button>
+          <button class="co-btn-place" id="btn-place-order" onclick="checkoutPlaceOrder()">
+            <i class="fa-regular fa-check"></i> Place Order
+          </button>
+        </div>
+
+        <p class="co-terms-note">
+          By placing your order you agree to FKA Atelier's
+          <a href="returns.html">Returns Policy</a> and <a href="shipping.html">Delivery Terms</a>.
+        </p>
+      </div>
+
+    </div><!-- /.co-steps-col -->
+
+    <!-- RIGHT COL — order summary sidebar -->
+    <aside class="co-summary-col" aria-label="Order summary">
+      <div class="co-summary-sticky">
+        <div class="co-summary-header">
+          <span class="co-summary-title">Order Summary</span>
+          <a href="cart.html" class="co-summary-edit">Edit bag</a>
+        </div>
+        <div id="checkout-cart-summary"></div>
+        <div class="co-summary-secure">
+          <i class="fa-regular fa-lock"></i> Secure checkout
+        </div>
+      </div>
+    </aside>
+
+  </div><!-- /#checkout-form-wrapper -->
+
+  <!-- ── SUCCESS SCREEN ──────────────────────────────── -->
+  <div id="checkout-success" class="co-success" style="display:none;">
+    <div class="co-success-inner">
+
+      <!-- Booking confirmed icon -->
+      <div class="co-success-icon">
+        <i class="fa-regular fa-circle-check" style="color:var(--warm-brown);"></i>
+      </div>
+
+      <h2 class="co-success-title">Order Submitted!</h2>
+
+      <p class="co-success-msg">
+        Your booking reference is<br>
+        <strong id="success-order-id" class="co-order-id">—</strong>
+      </p>
+
+      <p class="co-success-sub" style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:0.85rem 1rem;font-size:0.82rem;text-align:left;margin-bottom:1.25rem;">
+        <i class="fa-regular fa-triangle-exclamation" style="margin-right:0.4rem;"></i>
+        <strong>Your Order ID will be assigned after payment verification.</strong><br>
+        Please complete payment and send proof to us — we'll confirm your order and send your Order ID within 24 hours.
+      </p>
+
+      <!-- Payment instructions (filled by checkout.js) -->
+      <div id="success-payment-instructions"></div>
+
+      <!-- Contact CTAs -->
+      <div class="co-success-actions">
+        <a href="https://wa.me/2347019243312" id="btn-whatsapp-order" class="btn-whatsapp" target="_blank" rel="noopener">
+          <i class="fa-brands fa-whatsapp"></i> Send Payment Proof via WhatsApp
+        </a>
+        <a href="mailto:hello@fkaatelier.com" id="btn-email-order" class="btn-email">
+          <i class="fa-regular fa-envelope"></i> Send by Email
+        </a>
+      </div>
+
+      <p style="font-size:0.75rem;color:var(--text-light);margin-top:1rem;line-height:1.6;">
+        Quote your booking reference <strong id="success-ref-repeat">—</strong> in all messages.<br>
+        Your Order ID will be sent to you once payment is verified.
+      </p>
+
+      <a href="shop.html" class="co-success-continue" style="margin-top:1.5rem;">
+        Continue Shopping <i class="fa-regular fa-arrow-right"></i>
+      </a>
+
+    </div>
+  </div>telier.com" class="btn-email">
+          <i class="fa-regular fa-envelope"></i> Confirm by Email
+        </a>
+      </div>
+      <a href="shop.html" class="co-success-continue">Continue Shopping <i class="fa-regular fa-arrow-right"></i></a>
+    </div>
+  </div>
+
+</div><!-- /.co-body -->
+
+<!-- FOOTER -->
+<footer class="fka-footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-brand">FKA Atelier</div>
+      <div class="footer-tagline">Timeless. Modest. Elegant.</div>
+      <div class="footer-social">
+        <a href="#" class="footer-social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="footer-social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://wa.me/2340000000000" class="footer-social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="mailto:hello@fkaatelier.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+      </div>
+    </div>
+    <div><div class="footer-col-title">Shop</div>
+      <ul class="footer-links">
+        <li><a href="shop.html">All Pieces</a></li>
+        <li><a href="shop.html?cat=abayas">Abayas</a></li>
+        <li><a href="shop.html?cat=dresses">Dresses</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">Help</div>
+      <ul class="footer-links">
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="shipping.html">Shipping</a></li>
+        <li><a href="returns.html">Returns</a></li>
+        <li><a href="contact.html">Contact</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">About</div>
+      <ul class="footer-links">
+        <li><a href="about.html">Our Story</a></li>
+        <li><a href="measurements.html">Measurements</a></li>
+      </ul>
+    </div>
+    <div><div class="footer-col-title">Connect</div>
+      <ul class="footer-links">
+        <li><a href="#">Instagram</a></li>
+        <li><a href="#">TikTok</a></li>
+        <li><a href="https://wa.me/2340000000000">WhatsApp</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span>
+  </div>
+</footer>
+
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<script src="../../assets/js/products.js"></script>
+<script src="../../assets/js/cart.js"></script>
+<script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/delivery.js"></script>
+<script src="../../assets/js/orders.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script src="../../assets/js/checkout.js"></script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); });</script>
+<script src="../../assets/js/askfka.js"></script>
+
+<!-- ASK FKA -->
+<div class="ask-fka-fab" id="ask-fka-fab">
+  <div class="ask-fka-panel" id="ask-fka-panel" role="dialog" aria-label="Ask FKA fashion concierge" aria-modal="true">
+    <div class="ask-fka-panel-header">
+      <div><div class="ask-fka-panel-title">✨ Ask FKA</div><div class="ask-fka-panel-sub">Your FKA Atelier fashion concierge</div></div>
+      <button class="ask-fka-close" id="ask-fka-close" aria-label="Close"><i class="fa-regular fa-xmark"></i></button>
+    </div>
+    <div class="ask-fka-panel-body">
+      <div class="ask-fka-greeting"><div class="ask-fka-avatar">F</div><div class="ask-fka-bubble">Hello 🤍 I am Ask FKA — your personal fashion concierge. How can I help?</div></div>
+      <div class="ask-fka-suggestions">
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-truck"></i> How much is delivery?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler-combined"></i> Custom measurements?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-brands fa-whatsapp"></i> Talk to a human</button>
+      </div>
+      <div id="fka-chat-thread" class="fka-chat-thread" aria-live="polite"></div>
+    </div>
+    <div class="ask-fka-panel-footer">
+      <input class="ask-fka-input" id="ask-fka-input" type="text" placeholder="Ask me anything…" aria-label="Ask FKA" autocomplete="off" maxlength="400">
+      <button class="ask-fka-send" id="ask-fka-send" aria-label="Send"><i class="fa-regular fa-paper-plane-top"></i></button>
+    </div>
+    <div class="ask-fka-disclaimer">Powered by Groq AI &nbsp;·&nbsp; <a href="contact.html" style="color:var(--warm-brown);">Contact our team</a></div>
+  </div>
+  <button class="ask-fka-btn" id="ask-fka-fab-btn" aria-expanded="false"><span class="sparkle">✨</span> Ask FKA</button>
+</div>
+</body>
+</html>

@@ -1,0 +1,280 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Shopping Bag — FKA Atelier</title>
+  <meta name="description" content="Your FKA Atelier shopping bag.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="../../assets/css/style.css">
+</head>
+<body>
+
+<div class="announcement-bar">FREE DELIVERY ON ORDERS OVER ₦70,000 <span>|</span> CUSTOM MEASUREMENTS ACCEPTED</div>
+
+<nav class="fka-navbar" role="navigation" aria-label="Main navigation">
+  <div class="navbar-inner">
+    <button class="navbar-toggler" id="navbar-toggler" aria-label="Open menu"><i class="fa-regular fa-bars"></i></button>
+    <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
+    <ul class="navbar-nav-links" role="list">
+      <li><a href="../../index.html">Home</a></li>
+      <li><a href="shop.html">Shop</a></li>
+      <li><a href="collections.html">Collections</a></li>
+      <li><a href="about.html">About</a></li>
+      <li><a href="measurements.html">Measurements</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+    <div class="navbar-actions">
+      <button class="navbar-icon-btn search-open-btn" aria-label="Search"><i class="fa-regular fa-magnifying-glass"></i></button>
+      <a href="wishlist.html" class="navbar-icon-btn" aria-label="Wishlist" style="position:relative;">
+        <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
+      </a>
+      <a href="cart.html" class="navbar-icon-btn active" aria-label="Shopping bag" style="position:relative;">
+        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
+      </a>
+      <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My Account" title="Sign In / Register" style="position:relative;">
+        <i class="fa-regular fa-circle-user"></i>
+      </a>
+      <button class="ask-fka-nav-btn" aria-label="Ask FKA"><span class="sparkle">✨</span> Ask FKA</button>
+    </div>
+  </div>
+</nav>
+
+<div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+<nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-label="Mobile navigation">
+  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu"><i class="fa-regular fa-xmark"></i></button>
+  <div class="mobile-nav-brand">FKA Atelier</div>
+  <ul class="mobile-nav-links" role="list">
+    <li><a href="../../index.html">Home</a></li><li><a href="shop.html">Shop</a></li>
+    <li><a href="collections.html">Collections</a></li><li><a href="about.html">About</a></li>
+    <li><a href="measurements.html">Measurements</a></li><li><a href="faq.html">FAQ</a></li>
+    <li><a href="contact.html">Contact</a></li><li><a href="cart.html">Shopping Bag</a></li>
+    <li><a href="wishlist.html">Wishlist</a></li>
+  </ul>
+</nav>
+
+<div id="search-overlay" class="search-overlay" role="search" aria-label="Search">
+  <div class="search-overlay-inner">
+    <div class="search-overlay-input-row">
+      <i class="fa-regular fa-magnifying-glass" style="color:var(--taupe);font-size:1rem;flex-shrink:0;"></i>
+      <input id="search-input" class="search-overlay-input" type="search"
+        placeholder="Search pieces, colours, styles&#x2026;" autocomplete="off" aria-label="Search products">
+      <button id="search-overlay-close" class="search-overlay-close" aria-label="Close search">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div id="search-results-preview" class="search-results-preview"></div>
+  </div>
+</div>
+
+<!-- PAGE HERO -->
+<div class="page-hero">
+  <div class="breadcrumb" style="justify-content:center;padding-bottom:0;">
+    <a href="../../index.html">Home</a>
+    <span class="breadcrumb-sep"><i class="fa-regular fa-chevron-right"></i></span>
+    <span>Shopping Bag</span>
+  </div>
+  <h1 class="page-hero-title">Your Shopping Bag</h1>
+</div>
+
+<!-- CART CONTENT -->
+<div class="cart-layout">
+
+  <!-- ITEMS -->
+  <div>
+    <!-- Empty state -->
+    <div id="cart-empty" class="cart-empty" style="display:none;">
+      <i class="fa-regular fa-bag-shopping"></i>
+      <h3>Your bag is empty</h3>
+      <p>Looks like you haven't added anything yet. Browse our collection and find something you love.</p>
+      <a href="shop.html" class="btn-fka-primary">Browse All Pieces</a>
+    </div>
+
+    <!-- Items list -->
+    <div id="cart-items-container"></div>
+
+    <!-- Continue shopping -->
+    <div style="padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+      <a href="shop.html" class="view-all-link" style="font-size:0.72rem;">
+        <i class="fa-regular fa-arrow-left"></i> Continue Shopping
+      </a>
+      <button onclick="if(confirm('Remove all items from your bag?')){cartClear();cartRenderPage();}"
+        style="font-size:0.72rem;color:var(--text-light);letter-spacing:0.06em;text-transform:uppercase;background:none;border:none;cursor:pointer;text-decoration:underline;">
+        Clear Bag
+      </button>
+    </div>
+  </div>
+
+  <!-- ORDER SUMMARY -->
+  <div id="cart-summary" style="display:none;">
+    <div class="cart-summary">
+      <div class="cart-summary-title">Order Summary</div>
+
+      <div id="cart-delivery-msg" style="font-size:0.75rem;color:var(--warm-brown);letter-spacing:0.04em;margin-bottom:1rem;line-height:1.5;"></div>
+
+      <div class="cart-summary-row">
+        <span>Subtotal</span><span id="cart-subtotal">₦0</span>
+      </div>
+      <div class="cart-summary-row">
+        <span>Delivery</span><span id="cart-delivery">₦4,500</span>
+      </div>
+      <div class="cart-summary-row total">
+        <span>Total</span><span id="cart-total">₦0</span>
+      </div>
+
+      <!-- ── PROCEED TO CHECKOUT CTA ── -->
+      <div style="margin:1.5rem 0 0;">
+        <a href="checkout.html" id="btn-proceed-checkout"
+          class="btn-fka-primary"
+          style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;padding:1rem 1.5rem;font-size:0.82rem;letter-spacing:0.16em;">
+          <i class="fa-regular fa-lock"></i> Proceed to Checkout
+        </a>
+      </div>
+
+      <!-- Estimated delivery note -->
+      <div id="cart-zone-preview" style="display:none;margin-top:0.75rem;background:var(--cream);border:1px solid var(--border);padding:0.75rem 1rem;font-size:0.75rem;color:var(--text-mid);line-height:1.6;text-align:center;">
+        <i class="fa-regular fa-truck" style="color:var(--warm-brown);margin-right:0.3rem;"></i>
+        <span id="cart-zone-preview-msg">Delivery fee calculated at checkout based on your address.</span>
+      </div>
+
+      <!-- WhatsApp / Email fallback -->
+      <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;">
+        <div style="text-align:center;font-size:0.7rem;color:var(--text-light);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.25rem;">Or order directly</div>
+        <a href="https://wa.me/2347019243312" class="btn-whatsapp" style="display:flex;justify-content:center;">
+          <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
+        </a>
+        <a href="mailto:omotolaazeemah7@gmail.com" class="btn-email" style="display:flex;justify-content:center;">
+          <i class="fa-regular fa-envelope"></i> Order via Email
+        </a>
+      </div>
+
+      <!-- Secure / policy links -->
+      <div style="margin-top:1.5rem;border-top:1px solid var(--border);padding-top:1rem;display:flex;justify-content:center;gap:1.5rem;flex-wrap:wrap;">
+        <a href="shipping.html" style="font-size:0.7rem;color:var(--text-light);text-decoration:underline;letter-spacing:0.04em;">Shipping Info</a>
+        <a href="returns.html" style="font-size:0.7rem;color:var(--text-light);text-decoration:underline;letter-spacing:0.04em;">Returns Policy</a>
+        <a href="faq.html" style="font-size:0.7rem;color:var(--text-light);text-decoration:underline;letter-spacing:0.04em;">FAQ</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- YOU MAY ALSO LIKE -->
+<section class="section-pad" style="background:var(--cream);" aria-label="Continue shopping">
+  <div class="fka-container">
+    <div class="section-header fade-in" style="margin-bottom:2rem;">
+      <span class="section-label">Keep Browsing</span>
+      <h2 class="section-title" style="font-size:1.8rem;">You May Also Like</h2>
+    </div>
+    <div class="products-grid" id="cart-suggestions-grid"></div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="fka-footer">
+  <div class="footer-grid">
+    <div class="footer-brand-col">
+      <div class="footer-brand">FKA Atelier</div><div class="footer-tagline">Timeless. Modest. Elegant.</div>
+      <div class="footer-social">
+        <a href="#" class="footer-social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+        <a href="#" class="footer-social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
+        <a href="https://wa.me/2347019243312" class="footer-social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+        <a href="mailto:omotolaazeemah7@gmail.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
+      </div>
+    </div>
+    <div><div class="footer-col-title">Shop</div><ul class="footer-links"><li><a href="shop.html">All Pieces</a></li><li><a href="shop.html?cat=abayas">Abayas</a></li><li><a href="shop.html?cat=dresses">Dresses</a></li><li><a href="shop.html?cat=coord-sets">Co-ord Sets</a></li></ul></div>
+    <div><div class="footer-col-title">Customer Care</div><ul class="footer-links"><li><a href="measurements.html">Measurements</a></li><li><a href="shipping.html">Shipping</a></li><li><a href="returns.html">Returns</a></li><li><a href="faq.html">FAQ</a></li><li><a href="contact.html">Contact</a></li></ul></div>
+    <div><div class="footer-col-title">About</div><ul class="footer-links"><li><a href="about.html">Our Story</a></li><li><a href="collections.html">Collections</a></li></ul></div>
+    <div><div class="footer-col-title">Connect</div><ul class="footer-links"><li><a href="#">Instagram</a></li><li><a href="#">TikTok</a></li><li><a href="https://wa.me/2347019243312">WhatsApp</a></li><li><a href="mailto:omotolaazeemah7@gmail.com">Email Us</a></li></ul></div>
+  </div>
+  <div class="footer-bottom"><span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span></div>
+</footer>
+
+<!-- ASK FKA -->
+<div class="ask-fka-fab" id="ask-fka-fab">
+  <div class="ask-fka-panel" id="ask-fka-panel" role="dialog" aria-label="Ask FKA" aria-modal="true">
+    <div class="ask-fka-panel-header">
+      <div><div class="ask-fka-panel-title">✨ Ask FKA</div><div class="ask-fka-panel-sub">Your FKA Atelier fashion concierge</div></div>
+      <button class="ask-fka-close" id="ask-fka-close" aria-label="Close"><i class="fa-regular fa-xmark"></i></button>
+    </div>
+    <div class="ask-fka-panel-body">
+      <div class="ask-fka-greeting">
+        <div class="ask-fka-avatar">F</div>
+        <div class="ask-fka-bubble">Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I help you today?</div>
+      </div>
+      <div class="ask-fka-suggestions">
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-shirt"></i> Find me a dress</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler"></i> Help me choose my size</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler-combined"></i> How do custom measurements work?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-naira-sign"></i> What's in my budget?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-truck"></i> How much is delivery?</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-brands fa-whatsapp"></i> Talk to a human</button>
+      </div>
+      <div id="fka-chat-thread" class="fka-chat-thread" aria-live="polite" aria-label="Chat messages"></div>
+    </div>
+      <div class="ask-fka-greeting"><div class="ask-fka-avatar">F</div><div class="ask-fka-bubble">Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I help you today?</div></div>
+      <div class="ask-fka-suggestions">
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-box"></i> Help me with an order</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-truck"></i> Delivery information</button>
+        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-message"></i> Talk to a human</button>
+      </div>
+      
+    </div>
+    <div class="ask-fka-panel-footer">
+      <input class="ask-fka-input" id="ask-fka-input" type="text" placeholder="Ask me anything about FKA Atelier…" aria-label="Message" autocomplete="off" maxlength="400">
+      <button class="ask-fka-send" id="ask-fka-send" aria-label="Send"><i class="fa-regular fa-paper-plane-top"></i></button>
+    </div>
+    <div class="ask-fka-disclaimer">Powered by Groq AI &nbsp;·&nbsp; <a href="contact.html" style="color:var(--warm-brown);">Contact our team</a></div>
+  </div>
+  <button class="ask-fka-btn" id="ask-fka-fab-btn" aria-label="Open Ask FKA" aria-expanded="false"><span class="sparkle">✨</span> Ask FKA</button>
+</div>
+<div id="toast-container" class="toast-container" aria-live="polite"></div>
+
+<script src="../../assets/js/products.js"></script>
+<script src="../../assets/js/cart.js"></script>
+<script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/delivery.js"></script>
+<script src="../../assets/js/orders.js"></script>
+<script src="../../assets/js/auth.js"></script>
+<script src="../../assets/js/main.js"></script>
+<script>
+  document.addEventListener("DOMContentLoaded", () => {
+  if (typeof authSyncNavbar === "function") authSyncNavbar();
+    // Render product suggestions (newest 4)
+    if (typeof getNewArrivals === "function") {
+      renderProductGrid("cart-suggestions-grid", getNewArrivals(4));
+    }
+
+    // Disable checkout button when cart is empty
+    const checkoutBtn = document.getElementById("btn-proceed-checkout");
+    function syncCheckoutBtn() {
+      const count = typeof cartGetCount === "function" ? cartGetCount() : 0;
+      if (checkoutBtn) {
+        checkoutBtn.style.opacity      = count > 0 ? "1"        : "0.45";
+        checkoutBtn.style.pointerEvents= count > 0 ? "auto"     : "none";
+        checkoutBtn.style.cursor       = count > 0 ? "pointer"  : "not-allowed";
+      }
+    }
+    syncCheckoutBtn();
+
+    // Show free delivery progress
+    const sub     = typeof cartGetSubtotal === "function" ? cartGetSubtotal() : 0;
+    const preview = document.getElementById("cart-zone-preview");
+    const msg     = document.getElementById("cart-zone-preview-msg");
+    if (preview && msg) {
+      preview.style.display = "block";
+      const THRESHOLD = 70000;
+      if (sub >= THRESHOLD) {
+        msg.innerHTML = `<strong style="color:var(--warm-brown);">✓ Free delivery</strong> qualifies on this order (over ₦${THRESHOLD.toLocaleString("en-NG")}).`;
+      } else {
+        const left = THRESHOLD - sub;
+        msg.innerHTML = `Add <strong>₦${left.toLocaleString("en-NG")}</strong> more to qualify for free delivery. Delivery fee calculated at checkout.`;
+      }
+    }
+  });
+</script>
+<script src="../../assets/js/askfka.js"></script>
+</body>
+</html>

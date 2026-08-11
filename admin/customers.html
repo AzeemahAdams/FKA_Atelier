@@ -1,0 +1,413 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Customers — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Customers</h1>
+          <p class="adm-page-subtitle" id="cust-count-label">Loading…
+            <span class="adm-live-dot" style="margin-left:0.75rem;">Live</span>
+          </p>
+        </div>
+        <div style="display:flex;gap:0.75rem;flex-wrap:wrap;">
+          <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="customersExportCSV()">
+            <i class="fa-regular fa-download"></i> Export CSV
+          </button>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="adm-filters">
+        <div class="adm-search-wrap">
+          <i class="fa-regular fa-magnifying-glass adm-search-icon"></i>
+          <input class="adm-input adm-search" type="search" id="cust-search"
+            placeholder="Search name, email, phone, ID…" autocomplete="off">
+        </div>
+        <select class="adm-select adm-filter-select" id="cust-sort">
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="most-orders">Most Orders</option>
+          <option value="highest-spend">Highest Spend</option>
+        </select>
+        <div class="adm-filters-right">
+          <span id="cust-last-updated" style="font-size:0.7rem;color:var(--adm-text-light);"></span>
+        </div>
+      </div>
+
+      <!-- Customer Table -->
+      <div class="adm-card">
+        <div class="adm-card-body no-pad">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>Customer</th>
+                  <th>Phone</th>
+                  <th>Orders</th>
+                  <th>Total Spend</th>
+                  <th>Last Order</th>
+                  <th>Joined</th>
+                  <th>Contact</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="cust-tbody"></tbody>
+            </table>
+          </div>
+          <div id="cust-pager"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- CUSTOMER DETAIL MODAL -->
+<div class="adm-modal-overlay" id="modal-customer">
+  <div class="adm-modal" style="width:min(780px,100%);">
+    <div class="adm-modal-header">
+      <div>
+        <div class="adm-modal-title" id="modal-cust-name">Customer</div>
+        <div style="font-size:0.72rem;color:var(--adm-text-light);margin-top:2px;" id="modal-cust-since"></div>
+      </div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-customer')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+
+      <!-- Quick contact bar -->
+      <div id="modal-cust-contact-bar"
+        style="display:flex;gap:0.6rem;flex-wrap:wrap;margin-bottom:1.5rem;padding:1rem;background:var(--adm-bg);border-radius:var(--adm-radius);">
+      </div>
+
+      <!-- Detail grid -->
+      <div class="adm-detail-grid" style="margin-bottom:1.5rem;">
+        <div>
+          <div class="adm-section-label">Contact Details</div>
+          <div id="modal-cust-contact"></div>
+        </div>
+        <div>
+          <div class="adm-section-label">Order Summary</div>
+          <div id="modal-cust-stats"></div>
+        </div>
+      </div>
+
+      <!-- Saved addresses -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="adm-section-label">Saved Addresses</div>
+        <div id="modal-cust-addresses"></div>
+      </div>
+
+      <!-- Admin note input -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="adm-section-label">Add Admin Note</div>
+        <div style="display:flex;gap:0.5rem;align-items:flex-start;flex-wrap:wrap;">
+          <textarea class="adm-input adm-textarea" id="modal-cust-note-input"
+            placeholder="Add a private note about this customer (visible only to you)…"
+            rows="2" style="flex:1;min-width:200px;resize:none;"></textarea>
+          <button class="adm-btn adm-btn-primary adm-btn-sm" onclick="modalAddCustomerNote()">
+            <i class="fa-regular fa-plus"></i> Save Note
+          </button>
+        </div>
+      </div>
+
+      <!-- Contact log -->
+      <div style="margin-bottom:1.5rem;">
+        <div class="adm-section-label">Contact History</div>
+        <div id="modal-cust-contact-log"></div>
+      </div>
+
+      <!-- Order history -->
+      <div>
+        <div class="adm-section-label">Order History</div>
+        <div class="adm-table-wrap">
+          <table class="adm-table">
+            <thead>
+              <tr><th>Order ID</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Contact</th></tr>
+            </thead>
+            <tbody id="modal-cust-orders"></tbody>
+          </table>
+        </div>
+      </div>
+
+    </div>
+    <div class="adm-modal-footer">
+      <div id="modal-cust-footer-contact" style="display:flex;gap:0.5rem;flex-wrap:wrap;margin-right:auto;"></div>
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-customer')">Close</button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/products.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("customers");
+adminSetPageTitle("Customers");
+
+const PER_PAGE    = 20;
+let   currentPage = 1;
+let   activeCustId= null;
+
+/* ── Filters ─────────────────────────────────────────── */
+function getFilteredCustomers() {
+  const q    = document.getElementById("cust-search").value.trim();
+  const sort = document.getElementById("cust-sort").value;
+  let list   = q ? customersSearch(q) : customersGetAll();
+  if (sort === "oldest")        list = [...list].sort((a,b) => new Date(a.createdAt)-new Date(b.createdAt));
+  if (sort === "most-orders")   list = [...list].sort((a,b) => (b.orderCount||0)-(a.orderCount||0));
+  if (sort === "highest-spend") list = [...list].sort((a,b) => (b.totalSpend||0)-(a.totalSpend||0));
+  return list;
+}
+
+/* ── Render table ────────────────────────────────────── */
+function renderCustomers() {
+  const list  = getFilteredCustomers();
+  const paged = adminPaginate(list, currentPage, PER_PAGE);
+
+  document.getElementById("cust-count-label").innerHTML =
+    `${list.length} customer${list.length!==1?"s":""} <span class="adm-live-dot" style="margin-left:0.75rem;">Live</span>`;
+
+  const lastUpd = document.getElementById("cust-last-updated");
+  if (lastUpd) lastUpd.textContent = "Updated " + new Date().toLocaleTimeString("en-NG",{hour:"2-digit",minute:"2-digit"});
+
+  document.getElementById("cust-tbody").innerHTML = paged.items.length
+    ? paged.items.map(c => {
+        const wa = buildWhatsAppLink ? buildWhatsAppLink(c.phone,
+          `Hi ${c.firstName||c.fullName}! This is FKA Atelier. How can we help you today?`) : "#";
+        const ml = buildEmailLink ? buildEmailLink(c.email, "Hello from FKA Atelier") : "#";
+        return `
+        <tr>
+          <td onclick="openCustomerModal('${c.id}')" style="cursor:pointer;">
+            <div class="adm-td-name">${c.fullName}</div>
+            <div style="font-size:0.7rem;color:var(--adm-text-light);">${c.email}</div>
+          </td>
+          <td style="font-size:0.82rem;">
+            <a href="${wa}" target="_blank" style="color:#16a34a;font-weight:500;" title="WhatsApp">
+              <i class="fa-brands fa-whatsapp"></i> ${c.phone||"—"}
+            </a>
+          </td>
+          <td style="text-align:center;font-weight:700;font-size:0.9rem;">${c.orderCount||0}</td>
+          <td><strong>${adminFormatMoney(c.totalSpend||0)}</strong></td>
+          <td style="font-size:0.78rem;white-space:nowrap;">${adminFormatDate(c.lastOrderAt)}</td>
+          <td style="font-size:0.75rem;">${adminFormatDate(c.createdAt)}</td>
+          <td>
+            <div style="display:flex;gap:0.35rem;">
+              <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm" title="WhatsApp"
+                onclick="logContact('${c.id}','whatsapp')">
+                <i class="fa-brands fa-whatsapp"></i>
+              </a>
+              <a href="${ml}" class="adm-btn adm-btn-outline adm-btn-icon adm-btn-sm" title="Email"
+                onclick="logContact('${c.id}','email')">
+                <i class="fa-regular fa-envelope"></i>
+              </a>
+            </div>
+          </td>
+          <td>
+            <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="openCustomerModal('${c.id}')">
+              <i class="fa-regular fa-eye"></i> View
+            </button>
+          </td>
+        </tr>`;
+      }).join("")
+    : `<tr><td colspan="8" class="adm-empty-cell">No customers found. ${
+        typeof seedDemoOrders==="function"
+          ? `<button class="adm-btn adm-btn-outline adm-btn-sm" onclick="seedDemoOrders();renderCustomers();">Load demo data</button>`
+          : ""
+      }</td></tr>`;
+
+  document.getElementById("cust-pager").innerHTML =
+    adminRenderPager(paged, p => { currentPage=p; renderCustomers(); });
+}
+
+/* ── Open customer modal ─────────────────────────────── */
+function openCustomerModal(customerId) {
+  const c = customerGetById(customerId);
+  if (!c) return;
+  activeCustId = customerId;
+  const orders = ordersGetByCustomer(customerId);
+
+  document.getElementById("modal-cust-name").textContent  = c.fullName;
+  document.getElementById("modal-cust-since").textContent = `ID: ${c.id} · Joined ${adminFormatDate(c.createdAt)}`;
+
+  /* quick contact bar */
+  const wa  = buildWhatsAppLink(c.phone,
+    `Hi ${c.firstName||c.fullName}! This is FKA Atelier. Just following up on your recent order. How can we help?`);
+  const ml  = buildEmailLink(c.email, "Following up — FKA Atelier", `Hi ${c.firstName||c.fullName},\n\nThank you for shopping with FKA Atelier. We just wanted to follow up to ensure everything is perfect.\n\nFKA Atelier Team`);
+
+  document.getElementById("modal-cust-contact-bar").innerHTML = `
+    <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-sm"
+       onclick="logContact('${c.id}','whatsapp','Follow-up message sent')">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp ${c.firstName||""}
+    </a>
+    <a href="${ml}" class="adm-btn adm-btn-outline adm-btn-sm"
+       onclick="logContact('${c.id}','email','Follow-up email sent')">
+      <i class="fa-regular fa-envelope"></i> Email ${c.firstName||""}
+    </a>
+    <span style="font-size:0.72rem;color:var(--adm-text-light);align-self:center;margin-left:0.25rem;">
+      All contact is logged below automatically.
+    </span>`;
+
+  /* details */
+  const detailRow = (l,v) => `<div class="adm-detail-row"><span class="adm-detail-label">${l}</span><span class="adm-detail-value">${v}</span></div>`;
+  document.getElementById("modal-cust-contact").innerHTML =
+    detailRow("Full Name", c.fullName) +
+    detailRow("Email",     `<a href="${ml}" style="color:var(--adm-accent);">${c.email}</a>`) +
+    detailRow("WhatsApp",  `<a href="${wa}" target="_blank" style="color:#16a34a;">${c.phone||"—"}</a>`) +
+    detailRow("Customer ID", `<code style="font-size:0.75rem;">${c.id}</code>`);
+
+  document.getElementById("modal-cust-stats").innerHTML =
+    detailRow("Total Orders",  c.orderCount||0) +
+    detailRow("Total Spend",   adminFormatMoney(c.totalSpend||0)) +
+    detailRow("Last Order",    adminFormatDate(c.lastOrderAt)) +
+    detailRow("Last Login",    adminFormatDate(c.lastLoginAt));
+
+  /* addresses */
+  const addrs = c.addresses||[];
+  document.getElementById("modal-cust-addresses").innerHTML = addrs.length
+    ? addrs.map(a => `<div style="font-size:0.82rem;color:var(--adm-text-mid);padding:0.35rem 0;border-bottom:1px solid var(--adm-border);">${a.fullText||[a.line1,a.city,a.state].filter(Boolean).join(", ")}</div>`).join("")
+    : `<p style="font-size:0.78rem;color:var(--adm-text-light);">No addresses saved.</p>`;
+
+  /* contact log */
+  document.getElementById("modal-cust-contact-log").innerHTML =
+    adminRenderContactLog(c.contactLog||[]);
+
+  /* order history */
+  document.getElementById("modal-cust-orders").innerHTML = orders.length
+    ? orders.map(o => {
+        const oWa = buildOrderWhatsAppLink(o);
+        const oMl = buildOrderEmailLink(o);
+        return `
+          <tr>
+            <td class="adm-td-id" style="cursor:pointer;" onclick="window.location='orders.html?id=${o.id}'">${o.id}</td>
+            <td style="font-size:0.75rem;max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">
+              ${o.items.map(i=>i.name).join(", ")}
+            </td>
+            <td><strong>${adminFormatMoney(o.total)}</strong></td>
+            <td>${adminStatusBadge(o.status)}</td>
+            <td style="font-size:0.75rem;">${adminFormatDate(o.createdAt)}</td>
+            <td>
+              <div style="display:flex;gap:0.3rem;">
+                <a href="${oWa}" target="_blank" class="adm-btn adm-btn-success adm-btn-icon adm-btn-sm" title="WhatsApp about order">
+                  <i class="fa-brands fa-whatsapp"></i>
+                </a>
+                <a href="${oMl}" class="adm-btn adm-btn-outline adm-btn-icon adm-btn-sm" title="Email about order">
+                  <i class="fa-regular fa-envelope"></i>
+                </a>
+              </div>
+            </td>
+          </tr>`;
+      }).join("")
+    : `<tr><td colspan="6" class="adm-empty-cell">No orders yet.</td></tr>`;
+
+  /* footer links */
+  document.getElementById("modal-cust-footer-contact").innerHTML = `
+    <a href="${wa}" target="_blank" class="adm-btn adm-btn-success adm-btn-sm"
+       onclick="logContact('${c.id}','whatsapp')">
+      <i class="fa-brands fa-whatsapp"></i> WhatsApp
+    </a>
+    <a href="${ml}" class="adm-btn adm-btn-outline adm-btn-sm"
+       onclick="logContact('${c.id}','email')">
+      <i class="fa-regular fa-envelope"></i> Email
+    </a>`;
+
+  adminOpenModal("modal-customer");
+}
+
+/* ── Log contact ─────────────────────────────────────── */
+function logContact(customerId, method, note = "") {
+  if (typeof customerLogContact === "function") {
+    customerLogContact(customerId, method, note, "admin");
+    /* Refresh log if modal is open for this customer */
+    if (activeCustId === customerId && document.getElementById("modal-customer").classList.contains("open")) {
+      const c = customerGetById(customerId);
+      if (c) document.getElementById("modal-cust-contact-log").innerHTML = adminRenderContactLog(c.contactLog||[]);
+    }
+  }
+}
+
+/* ── Add admin note ──────────────────────────────────── */
+function modalAddCustomerNote() {
+  const input = document.getElementById("modal-cust-note-input");
+  const note  = input ? input.value.trim() : "";
+  if (!note || !activeCustId) return;
+  customerAddNote(activeCustId, note, "admin");
+  input.value = "";
+  const c = customerGetById(activeCustId);
+  if (c) {
+    document.getElementById("modal-cust-contact-log").innerHTML = adminRenderContactLog(c.contactLog||[]);
+    adminToast("Note saved.");
+  }
+}
+
+/* ── CSV export ──────────────────────────────────────── */
+function customersExportCSV() {
+  const list = getFilteredCustomers();
+  const rows = [["ID","Name","Email","Phone","Orders","Total Spend","Last Order","Joined"]];
+  list.forEach(c => rows.push([
+    c.id, c.fullName, c.email, c.phone||"",
+    c.orderCount||0, c.totalSpend||0,
+    adminFormatDate(c.lastOrderAt), adminFormatDate(c.createdAt)
+  ]));
+  const csv = rows.map(r => r.map(v=>`"${String(v).replace(/"/g,'""')}"`).join(",")).join("\n");
+  Object.assign(document.createElement("a"),{
+    href: URL.createObjectURL(new Blob([csv],{type:"text/csv"})),
+    download: `fka-customers-${new Date().toISOString().slice(0,10)}.csv`
+  }).click();
+}
+
+/* ── Filters wire-up ─────────────────────────────────── */
+["cust-search","cust-sort"].forEach(id => {
+  const el = document.getElementById(id);
+  if (el) { el.addEventListener("input", ()=>{currentPage=1;renderCustomers();}); el.addEventListener("change", ()=>{currentPage=1;renderCustomers();}); }
+});
+document.getElementById("modal-customer").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal-customer")) adminCloseModal("modal-customer");
+});
+
+/* ── Real-time ───────────────────────────────────────── */
+adminStartRealtime({
+  customers: () => renderCustomers(),
+  new_customer: ({ data }) => {
+    renderCustomers();
+    adminNotify(
+      "New Customer",
+      `${data?.fullName||"Someone"} just created an account.`,
+      "customer",
+      "customers.html"
+    );
+    adminUpdatePendingBadge();
+  },
+  new_account: ({ data }) => {
+    renderCustomers();
+    adminNotify(
+      "New Account Registered",
+      `${data?.fullName||data?.email||"A new customer"} registered on the store.`,
+      "customer",
+      "customers.html"
+    );
+  }
+});
+
+renderCustomers();
+</script>
+</body>
+</html>

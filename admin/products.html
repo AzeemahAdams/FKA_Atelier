@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Products — FKA Atelier Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="css/admin.css">
+</head>
+<body>
+<div class="adm-shell">
+  <aside id="admin-sidebar"></aside>
+  <div style="flex:1;min-width:0;">
+    <header id="admin-topbar"></header>
+    <main class="adm-main">
+
+      <div class="adm-page-header">
+        <div>
+          <h1 class="adm-page-title">Products</h1>
+          <p class="adm-page-subtitle" id="prod-count-label">Loading…</p>
+        </div>
+        <button class="adm-btn adm-btn-primary" onclick="openProductModal(null)">
+          <i class="fa-regular fa-plus"></i> Add Product
+        </button>
+      </div>
+
+      <!-- Filters -->
+      <div class="adm-filters">
+        <div class="adm-search-wrap">
+          <i class="fa-regular fa-magnifying-glass adm-search-icon"></i>
+          <input class="adm-input adm-search" type="search" id="prod-search"
+            placeholder="Search products…">
+        </div>
+        <select class="adm-select adm-filter-select" id="prod-category-filter">
+          <option value="all">All Categories</option>
+          <option value="abayas">Abayas</option>
+          <option value="dresses">Dresses</option>
+          <option value="coord-sets">Co-ord Sets</option>
+          <option value="skirts">Skirts</option>
+          <option value="tops">Tops</option>
+          <option value="accessories">Accessories</option>
+        </select>
+        <select class="adm-select adm-filter-select" id="prod-status-filter">
+          <option value="all">All Items</option>
+          <option value="new">New Arrivals</option>
+          <option value="bestseller">Bestsellers</option>
+          <option value="available">Available</option>
+          <option value="unavailable">Out of Stock</option>
+        </select>
+      </div>
+
+      <!-- Product Grid / Table -->
+      <div class="adm-card">
+        <div class="adm-card-body no-pad">
+          <div class="adm-table-wrap">
+            <table class="adm-table">
+              <thead>
+                <tr>
+                  <th>Image</th>
+                  <th>Name</th>
+                  <th>Category</th>
+                  <th>Price</th>
+                  <th>Fabric</th>
+                  <th>Tags</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="prod-tbody"></tbody>
+            </table>
+          </div>
+          <div id="prod-pager"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- PRODUCT EDIT / ADD MODAL -->
+<div class="adm-modal-overlay" id="modal-product">
+  <div class="adm-modal" style="width:min(760px,100%);">
+    <div class="adm-modal-header">
+      <div class="adm-modal-title" id="modal-prod-title">Add Product</div>
+      <button class="adm-modal-close" onclick="adminCloseModal('modal-product')">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+    </div>
+    <div class="adm-modal-body">
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Product ID <span style="color:var(--adm-text-light);font-weight:400;">(auto on new)</span></label>
+          <input class="adm-input" type="text" id="prod-id" placeholder="fka-015">
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">Category *</label>
+          <select class="adm-select" id="prod-category">
+            <option value="abayas">Abayas</option>
+            <option value="dresses">Dresses</option>
+            <option value="coord-sets">Co-ord Sets</option>
+            <option value="skirts">Skirts</option>
+            <option value="tops">Tops</option>
+            <option value="accessories">Accessories</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Product Name *</label>
+        <input class="adm-input" type="text" id="prod-name" placeholder="Ivory Linen Abaya">
+        <span class="adm-field-err" id="err-prod-name"></span>
+      </div>
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Price (₦) *</label>
+          <input class="adm-input" type="number" id="prod-price" placeholder="65000" min="0">
+          <span class="adm-field-err" id="err-prod-price"></span>
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">Fabric</label>
+          <input class="adm-input" type="text" id="prod-fabric" placeholder="100% natural linen">
+        </div>
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Description *</label>
+        <textarea class="adm-textarea" id="prod-description" rows="3" placeholder="Product description…"></textarea>
+        <span class="adm-field-err" id="err-prod-description"></span>
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Care Instructions</label>
+        <input class="adm-input" type="text" id="prod-care" placeholder="Hand wash cold. Do not tumble dry.">
+      </div>
+
+      <div class="adm-field" style="margin-bottom:1.25rem;">
+        <label class="adm-label">Image URLs <span style="color:var(--adm-text-light);font-weight:400;">(one per line)</span></label>
+        <textarea class="adm-textarea" id="prod-images" rows="3"
+          placeholder="https://images.unsplash.com/…&#10;https://images.unsplash.com/…"></textarea>
+        <span class="adm-field-hint">Enter full image URLs, one per line. First image is the primary.</span>
+      </div>
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Available Sizes</label>
+          <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem;" id="prod-sizes-wrap">
+            <!-- Generated by JS -->
+          </div>
+        </div>
+        <div class="adm-field">
+          <label class="adm-label">Collections <span style="color:var(--adm-text-light);font-weight:400;">(comma-separated slugs)</span></label>
+          <input class="adm-input" type="text" id="prod-collections" placeholder="new-collection,everyday-elegance">
+        </div>
+      </div>
+
+      <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
+        <div class="adm-field">
+          <label class="adm-label">Colours <span style="color:var(--adm-text-light);font-weight:400;">(name:hex, one per line)</span></label>
+          <textarea class="adm-textarea" id="prod-colours" rows="3"
+            placeholder="Ivory:#FAF7F2&#10;Sand:#C4A882&#10;Black:#1A1A1A"></textarea>
+        </div>
+        <div>
+          <!-- Flags -->
+          <div class="adm-field" style="margin-bottom:1rem;">
+            <label class="adm-label">Flags</label>
+            <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.35rem;">
+              <label class="adm-toggle-wrap">
+                <input type="checkbox" class="adm-toggle-input" id="prod-available">
+                <span class="adm-toggle-track"></span>
+                <span class="adm-toggle-label">Available / In Stock</span>
+              </label>
+              <label class="adm-toggle-wrap">
+                <input type="checkbox" class="adm-toggle-input" id="prod-isnew">
+                <span class="adm-toggle-track"></span>
+                <span class="adm-toggle-label">New Arrival badge</span>
+              </label>
+              <label class="adm-toggle-wrap">
+                <input type="checkbox" class="adm-toggle-input" id="prod-bestseller">
+                <span class="adm-toggle-track"></span>
+                <span class="adm-toggle-label">Bestseller badge</span>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div class="adm-modal-footer">
+      <button class="adm-btn adm-btn-danger adm-btn-sm" id="btn-prod-delete" style="display:none;" onclick="deleteCurrentProduct()">
+        <i class="fa-regular fa-trash"></i> Delete
+      </button>
+      <button class="adm-btn adm-btn-outline" onclick="adminCloseModal('modal-product')">Cancel</button>
+      <button class="adm-btn adm-btn-primary" onclick="saveProduct()">
+        <i class="fa-regular fa-check"></i> Save Product
+      </button>
+    </div>
+  </div>
+</div>
+
+<script src="../assets/js/products.js"></script>
+<script src="../assets/js/orders.js"></script>
+<script src="../assets/js/admin.js"></script>
+<script>
+"use strict";
+if (!adminAuthGuard()) throw new Error("Unauthorized");
+adminRenderShell("products");
+adminSetPageTitle("Products");
+
+const PER_PAGE      = 20;
+let   currentPage   = 1;
+let   editingId     = null;
+const ADMIN_PROD_KEY = "fka_admin_products_overrides";
+
+// Load overrides from localStorage (admin edits/additions)
+function loadAdminProducts() {
+  try { return JSON.parse(localStorage.getItem(ADMIN_PROD_KEY)) || []; }
+  catch { return []; }
+}
+function saveAdminProducts(list) {
+  localStorage.setItem(ADMIN_PROD_KEY, JSON.stringify(list));
+}
+
+// Merge base products with admin overrides
+function getMergedProducts() {
+  const overrides = loadAdminProducts();
+  const base      = [...FKA_PRODUCTS];
+  const result    = [];
+
+  // Apply overrides to base
+  base.forEach(p => {
+    const ov = overrides.find(o => o.id === p.id);
+    result.push(ov ? { ...p, ...ov } : p);
+  });
+
+  // Add admin-created new products
+  overrides.filter(o => !base.find(p => p.id === o.id)).forEach(o => result.push(o));
+
+  return result;
+}
+
+function getFilteredProducts() {
+  const q    = document.getElementById("prod-search").value.trim().toLowerCase();
+  const cat  = document.getElementById("prod-category-filter").value;
+  const stat = document.getElementById("prod-status-filter").value;
+  let list   = getMergedProducts();
+
+  if (q)    list = list.filter(p => p.name.toLowerCase().includes(q) || p.description?.toLowerCase().includes(q));
+  if (cat !== "all") list = list.filter(p => p.category === cat);
+  if (stat === "new")         list = list.filter(p => p.isNew);
+  if (stat === "bestseller")  list = list.filter(p => p.isBestseller);
+  if (stat === "available")   list = list.filter(p => p.available);
+  if (stat === "unavailable") list = list.filter(p => !p.available);
+
+  return list;
+}
+
+function renderProducts() {
+  const list  = getFilteredProducts();
+  const paged = adminPaginate(list, currentPage, PER_PAGE);
+  document.getElementById("prod-count-label").textContent =
+    `${list.length} product${list.length !== 1 ? "s" : ""}`;
+
+  document.getElementById("prod-tbody").innerHTML = paged.items.length
+    ? paged.items.map(p => `
+        <tr>
+          <td>
+            <div class="adm-product-thumb">
+              ${p.images?.[0]
+                ? `<img src="${p.images[0]}" alt="${p.name}" onerror="this.parentElement.innerHTML='<i class=\\'fa-regular fa-shirt\\'></i>'">`
+                : `<i class="fa-regular fa-shirt"></i>`}
+            </div>
+          </td>
+          <td>
+            <div class="adm-td-name">${p.name}</div>
+            <div class="adm-td-id">${p.id}</div>
+          </td>
+          <td style="font-size:0.78rem;">${p.categoryLabel || p.category}</td>
+          <td><strong>${p.priceFormatted || adminFormatMoney(p.price)}</strong></td>
+          <td style="font-size:0.75rem;color:var(--adm-text-light);max-width:140px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.fabric || "—"}</td>
+          <td>
+            ${p.isNew        ? `<span class="adm-badge" style="background:#EFF6FF;color:#1D4ED8;">New</span> ` : ""}
+            ${p.isBestseller ? `<span class="adm-badge" style="background:#FEF3C7;color:#92400E;">Best</span>` : ""}
+            ${!p.available   ? `<span class="adm-badge" style="background:#FEE2E2;color:#991B1B;">Out of Stock</span>` : ""}
+          </td>
+          <td>${adminStatusBadge(p.available ? "active" : "inactive")}</td>
+          <td>
+            <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="openProductModal('${p.id}')">
+              <i class="fa-regular fa-pen"></i> Edit
+            </button>
+          </td>
+        </tr>`).join("")
+    : adminEmptyRow(8, "No products found.");
+
+  document.getElementById("prod-pager").innerHTML =
+    adminRenderPager(paged, (pg) => { currentPage = pg; renderProducts(); });
+}
+
+// Build size checkboxes
+function buildSizeCheckboxes(selected = []) {
+  const sizes = ["XS","S","M","L","XL","XXL","One Size"];
+  document.getElementById("prod-sizes-wrap").innerHTML = sizes.map(s => `
+    <label style="display:flex;align-items:center;gap:0.35rem;cursor:pointer;font-size:0.78rem;">
+      <input type="checkbox" data-size="${s}" ${selected.includes(s) ? "checked" : ""}>
+      ${s}
+    </label>`).join("");
+}
+
+function openProductModal(productId) {
+  editingId = productId;
+  const isNew = !productId;
+  document.getElementById("modal-prod-title").textContent = isNew ? "Add New Product" : "Edit Product";
+  document.getElementById("btn-prod-delete").style.display = isNew ? "none" : "inline-flex";
+
+  // Clear errors
+  ["prod-name","prod-price","prod-description"].forEach(id => {
+    const e = document.getElementById(`err-${id}`);
+    if (e) e.textContent = "";
+  });
+
+  if (isNew) {
+    // Defaults for new product
+    document.getElementById("prod-id").value          = "fka-" + (Date.now().toString().slice(-4));
+    document.getElementById("prod-name").value        = "";
+    document.getElementById("prod-category").value    = "dresses";
+    document.getElementById("prod-price").value       = "";
+    document.getElementById("prod-fabric").value      = "";
+    document.getElementById("prod-description").value = "";
+    document.getElementById("prod-care").value        = "";
+    document.getElementById("prod-images").value      = "";
+    document.getElementById("prod-collections").value = "";
+    document.getElementById("prod-colours").value     = "";
+    document.getElementById("prod-available").checked  = true;
+    document.getElementById("prod-isnew").checked      = false;
+    document.getElementById("prod-bestseller").checked = false;
+    buildSizeCheckboxes([]);
+  } else {
+    const p = getMergedProducts().find(x => x.id === productId);
+    if (!p) return;
+    document.getElementById("prod-id").value          = p.id;
+    document.getElementById("prod-name").value        = p.name;
+    document.getElementById("prod-category").value    = p.category;
+    document.getElementById("prod-price").value       = p.price;
+    document.getElementById("prod-fabric").value      = p.fabric || "";
+    document.getElementById("prod-description").value = p.description || "";
+    document.getElementById("prod-care").value        = p.care || "";
+    document.getElementById("prod-images").value      = (p.images || []).join("\n");
+    document.getElementById("prod-collections").value = (p.collections || []).join(",");
+    document.getElementById("prod-colours").value     = (p.colours || []).map(c => `${c.name}:${c.hex}`).join("\n");
+    document.getElementById("prod-available").checked  = !!p.available;
+    document.getElementById("prod-isnew").checked      = !!p.isNew;
+    document.getElementById("prod-bestseller").checked = !!p.isBestseller;
+    buildSizeCheckboxes(p.sizes || []);
+  }
+  adminOpenModal("modal-product");
+}
+
+function saveProduct() {
+  const name  = document.getElementById("prod-name").value.trim();
+  const price = parseFloat(document.getElementById("prod-price").value);
+  const desc  = document.getElementById("prod-description").value.trim();
+  let valid   = true;
+
+  if (!name)     { document.getElementById("err-prod-name").textContent        = "Name is required.";  valid = false; }
+  if (!price||price<=0) { document.getElementById("err-prod-price").textContent= "Valid price required."; valid = false; }
+  if (!desc)     { document.getElementById("err-prod-description").textContent = "Description is required."; valid = false; }
+  if (!valid) return;
+
+  const cat   = document.getElementById("prod-category").value;
+  const catLabels = { abayas:"Abayas", dresses:"Dresses", "coord-sets":"Co-ord Sets", skirts:"Skirts", tops:"Tops", accessories:"Accessories" };
+
+  const sizes   = [...document.querySelectorAll("#prod-sizes-wrap input:checked")].map(el => el.dataset.size);
+  const images  = document.getElementById("prod-images").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const colRaw  = document.getElementById("prod-colours").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const colours = colRaw.map(line => {
+    const [n, h] = line.split(":").map(s=>s.trim());
+    return { name: n || line, hex: h || "#C4B5A5" };
+  });
+  const collections = document.getElementById("prod-collections").value.split(",").map(s=>s.trim()).filter(Boolean);
+
+  const product = {
+    id:            document.getElementById("prod-id").value.trim() || ("fka-"+Date.now()),
+    name,
+    category:      cat,
+    categoryLabel: catLabels[cat] || cat,
+    price,
+    priceFormatted: "₦" + price.toLocaleString("en-NG"),
+    images,
+    description:   desc,
+    fabric:        document.getElementById("prod-fabric").value.trim(),
+    care:          document.getElementById("prod-care").value.trim(),
+    colours:       colours.length ? colours : [{ name:"Default", hex:"#C4B5A5" }],
+    sizes:         sizes.length   ? sizes   : ["XS","S","M","L","XL","XXL"],
+    available:     document.getElementById("prod-available").checked,
+    isNew:         document.getElementById("prod-isnew").checked,
+    isBestseller:  document.getElementById("prod-bestseller").checked,
+    collections
+  };
+
+  const overrides = loadAdminProducts();
+  const idx       = overrides.findIndex(o => o.id === product.id);
+  if (idx >= 0) overrides[idx] = product;
+  else          overrides.push(product);
+  saveAdminProducts(overrides);
+
+  adminCloseModal("modal-product");
+  adminToast(`"${product.name}" saved successfully.`);
+  renderProducts();
+}
+
+async function deleteCurrentProduct() {
+  const confirmed = await adminConfirm("Remove this product from the catalogue? This only removes admin overrides — base products will still appear.");
+  if (!confirmed) return;
+  const overrides = loadAdminProducts().filter(o => o.id !== editingId);
+  saveAdminProducts(overrides);
+  adminCloseModal("modal-product");
+  adminToast("Product removed from overrides.", "error");
+  renderProducts();
+}
+
+// Wire filters
+["prod-search","prod-category-filter","prod-status-filter"].forEach(id => {
+  document.getElementById(id)?.addEventListener("input",  () => { currentPage=1; renderProducts(); });
+  document.getElementById(id)?.addEventListener("change", () => { currentPage=1; renderProducts(); });
+});
+document.getElementById("modal-product").addEventListener("click", e => {
+  if (e.target === document.getElementById("modal-product")) adminCloseModal("modal-product");
+});
+
+renderProducts();
+</script>
+</body>
+</html>
