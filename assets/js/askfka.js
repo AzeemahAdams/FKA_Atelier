@@ -10,12 +10,19 @@
 "use strict";
 
 /* ── Configuration ───────────────────────────────────── */
+// Key is loaded from localStorage (set once via admin/settings.html).
+// Nothing sensitive is ever stored in this file.
 const FKA_AI_CONFIG = {
-  // API key is kept in .env on the server — NOT here.
-  // The browser calls /api/chat on the local proxy (server.js)
-  // which forwards to Groq with the key server-side.
-  apiUrl:      "/api/chat",   // local proxy endpoint — change to full URL if deployed
-  maxHistory:  12             // keep last 12 messages in context window
+  get apiKey() {
+    return localStorage.getItem("fka_groq_api_key") || "";
+  },
+  get model() {
+    return localStorage.getItem("fka_groq_model") || "llama-3.3-70b-versatile";
+  },
+  apiUrl:      "https://api.groq.com/openai/v1/chat/completions",
+  maxTokens:   500,
+  temperature: 0.7,
+  maxHistory:  12
 };
 
 /* ── Brand knowledge base — injected as system prompt ─── */
@@ -197,23 +204,13 @@ function initAskFkaAI() {
     });
   });
 
-  /* ── API availability check ── */
-  // Check if the proxy server is running
-  fetch("/api/health").then(r => r.json()).then(data => {
-    if (!data.keySet) {
-      fkaAppendMessage("bot",
-        "⚠️ The Groq API key is not configured on the server. " +
-        "Open <code>.env</code> and set <code>GROQ_API_KEY=your_key</code>, then restart the server. " +
-        "Get a free key at <a href='https://console.groq.com' target='_blank' rel='noopener'>console.groq.com</a>.");
-    }
-  }).catch(() => {
-    // Server not running — show a helpful message
-    if (_thread) fkaAppendMessage("bot-error",
-      "⚠️ The local server is not running. " +
-      "Open a terminal in the project folder and run: <code>npm install</code> then <code>node server.js</code>. " +
-      "Then open <a href='http://localhost:3000' target='_blank'>http://localhost:3000</a>. " +
-      "<br><br>In the meantime, <a href='https://wa.me/2347019243312' target='_blank'>chat with us on WhatsApp</a>.");
-  });
+  /* ── API key check ── */
+  if (!FKA_AI_CONFIG.apiKey) {
+    if (_thread) fkaAppendMessage("bot",
+      "⚙️ Ask FKA needs a Groq API key. " +
+      "Go to <strong>Admin → Settings</strong> and add your key under the Ask FKA section. " +
+      "Get a free key at <a href='https://console.groq.com' target='_blank' rel='noopener'>console.groq.com</a>.");
+  }
 }
 
 /* ── Send a message ─────────────────────────────────── */
@@ -268,13 +265,17 @@ async function fkaSendMessageText(text) {
     fkaSetSendState(false);
 
     let errorMsg;
-    if (err.message.includes("Failed to fetch") || err.message.includes("NetworkError")) {
-      errorMsg = "Can't reach the server. Make sure <code>node server.js</code> is running, then refresh. " +
-        "Or <a href='https://wa.me/2347019243312' target='_blank'>chat with us on WhatsApp</a>.";
+    if (err.message === "no_key") {
+      errorMsg = "⚙️ Ask FKA needs your Groq API key to work. " +
+        "Go to <strong>Admin → Settings → Ask FKA</strong> and paste your key. " +
+        "Get a free key at <a href='https://console.groq.com' target='_blank' rel='noopener'>console.groq.com</a>. " +
+        "<br><br>For now, <a href='https://wa.me/2347019243312' target='_blank'>chat with us on WhatsApp</a>.";
+    } else if (err.message.includes("401") || err.message.includes("invalid_api_key")) {
+      errorMsg = "🔑 Invalid API key. Go to <strong>Admin → Settings → Ask FKA</strong> and update your key.";
     } else if (err.message.includes("429")) {
-      errorMsg = "Too many requests — please wait a moment and try again.";
-    } else if (err.message.includes("key") || err.message.includes("401")) {
-      errorMsg = "API key issue on the server. Check your <code>.env</code> file.";
+      errorMsg = "⏳ Too many requests — please wait a moment and try again.";
+    } else if (err.message.includes("decommissioned") || err.message.includes("does not exist")) {
+      errorMsg = "The AI model needs updating. Go to <strong>Admin → Settings → Ask FKA</strong> to change the model.";
     } else {
       errorMsg = `Something went wrong: ${err.message}. ` +
         `<a href="https://wa.me/2347019243312" target="_blank">Chat with us on WhatsApp</a> instead.`;
@@ -284,20 +285,26 @@ async function fkaSendMessageText(text) {
   }
 }
 
-/* ── Proxy API call ─────────────────────────────────── */
+/* ── Groq API call ─────────────────────────────────── */
 async function fkaCallGroq(messages) {
-  // Send conversation to the local proxy (/api/chat).
-  // The proxy prepends the system prompt and attaches the API key.
-  // The system prompt is also sent from here so it works even without a server
-  // (the server strips any duplicate system messages).
+  const key = FKA_AI_CONFIG.apiKey;
+  if (!key) throw new Error("no_key");
+
   const response = await fetch(FKA_AI_CONFIG.apiUrl, {
     method:  "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type":  "application/json",
+      "Authorization": `Bearer ${key}`
+    },
     body: JSON.stringify({
+      model:       FKA_AI_CONFIG.model,
       messages: [
         { role: "system", content: FKA_SYSTEM_PROMPT },
         ...messages
-      ]
+      ],
+      max_tokens:  FKA_AI_CONFIG.maxTokens,
+      temperature: FKA_AI_CONFIG.temperature,
+      stream:      false
     })
   });
 

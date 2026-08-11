@@ -96,6 +96,53 @@
             </div>
           </div>
 
+          <!-- Ask FKA AI Key -->
+          <div class="adm-card" style="border:1.5px solid rgba(139,115,85,0.35);">
+            <div class="adm-card-header">
+              <span class="adm-card-title"><i class="fa-regular fa-sparkles" style="color:var(--adm-accent);margin-right:0.5rem;"></i>Ask FKA — AI Configuration</span>
+            </div>
+            <div class="adm-card-body">
+              <div class="adm-form-grid" style="gap:1.1rem;">
+                <div class="adm-field">
+                  <label class="adm-label">Groq API Key</label>
+                  <div style="position:relative;">
+                    <input class="adm-input" type="password" id="s-groq-key"
+                      placeholder="gsk_••••••••••••••••••••••"
+                      autocomplete="off" style="padding-right:3rem;">
+                    <button type="button" onclick="toggleGroqKeyVisibility()"
+                      style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);background:none;border:none;cursor:pointer;color:var(--adm-text-light);font-size:0.9rem;">
+                      <i class="fa-regular fa-eye" id="groq-key-eye"></i>
+                    </button>
+                  </div>
+                  <span class="adm-field-hint">
+                    Stored in your browser only — never sent to any server or included in any file.
+                    Get a free key at <a href="https://console.groq.com" target="_blank" style="color:var(--adm-accent);">console.groq.com</a>.
+                  </span>
+                </div>
+                <div class="adm-field">
+                  <label class="adm-label">AI Model</label>
+                  <select class="adm-select" id="s-groq-model">
+                    <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile (Best quality — default)</option>
+                    <option value="llama-3.1-8b-instant">llama-3.1-8b-instant (Fastest)</option>
+                    <option value="mixtral-8x7b-32768">mixtral-8x7b-32768 (Long conversations)</option>
+                  </select>
+                </div>
+              </div>
+              <div id="groq-key-status" style="display:none;margin-top:0.75rem;padding:0.6rem 0.85rem;border-radius:var(--adm-radius);font-size:0.78rem;"></div>
+              <div style="display:flex;gap:0.75rem;flex-wrap:wrap;margin-top:1.25rem;">
+                <button class="adm-btn adm-btn-primary" onclick="saveGroqKey()">
+                  <i class="fa-regular fa-check"></i> Save API Key
+                </button>
+                <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="testGroqKey()">
+                  <i class="fa-regular fa-bolt"></i> Test Connection
+                </button>
+                <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="clearGroqKey()" style="color:var(--adm-danger);border-color:var(--adm-danger);">
+                  <i class="fa-regular fa-trash"></i> Clear Key
+                </button>
+              </div>
+            </div>
+          </div>
+
           <!-- Admin Credentials -->
           <div class="adm-card">
             <div class="adm-card-header">
@@ -237,8 +284,17 @@ function loadSettings() {
   document.getElementById("s-order-message").value      = s.orderMessage  || "Thank you for your order! We'll be in touch shortly.";
   document.getElementById("s-admin-username").value     = s.adminUsername || "admin";
 
+  // Load Groq key status (show masked if set)
+  const storedKey = localStorage.getItem("fka_groq_api_key") || "";
+  const keyInput  = document.getElementById("s-groq-key");
+  const model     = localStorage.getItem("fka_groq_model") || "llama-3.3-70b-versatile";
+  if (storedKey && keyInput) keyInput.placeholder = storedKey.slice(0,8) + "••••••••••••••••" + storedKey.slice(-4);
+  const modelSelect = document.getElementById("s-groq-model");
+  if (modelSelect) modelSelect.value = model;
+  showGroqKeyStatus(storedKey ? "saved" : "none");
+
   // Storage info
-  const keys    = ["fka_orders","fka_customers","fka_delivery_zones","fka_admin_settings","fka_admin_products_overrides"];
+  const keys    = ["fka_orders","fka_customers","fka_delivery_zones","fka_admin_settings","fka_admin_products_overrides","fka_bookings"];
   const sizes   = keys.map(k => {
     const val = localStorage.getItem(k) || "";
     return { key: k, size: Math.round(new Blob([val]).size / 1024 * 10) / 10 };
@@ -249,6 +305,105 @@ function loadSettings() {
       <span>${x.key}</span><span style="font-weight:500;">${x.size} KB</span></div>`).join("")
     + `<div style="display:flex;justify-content:space-between;padding:0.4rem 0;font-weight:700;">
         <span>Total</span><span>${Math.round(total * 10)/10} KB / ~5,000 KB</span></div>`;
+}
+
+/* ── Groq API Key management ─────────────────────────── */
+function saveGroqKey() {
+  const keyInput = document.getElementById("s-groq-key");
+  const key      = keyInput ? keyInput.value.trim() : "";
+  const model    = document.getElementById("s-groq-model")?.value || "llama-3.3-70b-versatile";
+
+  if (key && !key.startsWith("gsk_")) {
+    adminToast("Groq API keys start with 'gsk_'. Please check your key.", "error");
+    return;
+  }
+  if (key) {
+    localStorage.setItem("fka_groq_api_key",   key);
+    localStorage.setItem("fka_groq_model",     model);
+    if (keyInput) { keyInput.value = ""; keyInput.placeholder = key.slice(0,8) + "••••••••••••••••" + key.slice(-4); }
+    showGroqKeyStatus("saved");
+    adminToast("API key saved. Ask FKA is ready.");
+  } else {
+    // Model only update
+    localStorage.setItem("fka_groq_model", model);
+    adminToast("Model updated.");
+  }
+}
+
+function clearGroqKey() {
+  localStorage.removeItem("fka_groq_api_key");
+  localStorage.removeItem("fka_groq_model");
+  const keyInput = document.getElementById("s-groq-key");
+  if (keyInput) { keyInput.value = ""; keyInput.placeholder = "gsk_••••••••••••••••••••••"; }
+  showGroqKeyStatus("none");
+  adminToast("API key cleared.", "info");
+}
+
+function toggleGroqKeyVisibility() {
+  const input = document.getElementById("s-groq-key");
+  const eye   = document.getElementById("groq-key-eye");
+  if (!input) return;
+  // Show stored key temporarily
+  const stored = localStorage.getItem("fka_groq_api_key") || "";
+  if (input.type === "password" && !input.value && stored) {
+    input.type        = "text";
+    input.value       = stored;
+    eye.className     = "fa-regular fa-eye-slash";
+  } else if (input.type === "text") {
+    input.type        = "password";
+    input.value       = "";
+    input.placeholder = stored ? stored.slice(0,8) + "••••••••••••••••" + stored.slice(-4) : "gsk_••••••••••••••••••••••";
+    eye.className     = "fa-regular fa-eye";
+  }
+}
+
+async function testGroqKey() {
+  const key   = localStorage.getItem("fka_groq_api_key") || "";
+  const model = localStorage.getItem("fka_groq_model")   || "llama-3.3-70b-versatile";
+  if (!key) { adminToast("No API key saved yet.", "error"); return; }
+
+  showGroqKeyStatus("testing");
+  adminToast("Testing connection…", "info");
+
+  try {
+    const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+      method:  "POST",
+      headers: { "Content-Type": "application/json", "Authorization": `Bearer ${key}` },
+      body: JSON.stringify({
+        model,
+        messages: [{ role: "user", content: "Say: Ask FKA is working!" }],
+        max_tokens: 20
+      })
+    });
+    if (!res.ok) {
+      const e = await res.json().catch(() => ({}));
+      showGroqKeyStatus("error", e?.error?.message || res.statusText);
+      adminToast("Connection failed: " + (e?.error?.message || res.statusText), "error");
+    } else {
+      const d = await res.json();
+      const reply = d.choices?.[0]?.message?.content || "Connected!";
+      showGroqKeyStatus("ok", reply);
+      adminToast("✓ Connected to Groq successfully!");
+    }
+  } catch (err) {
+    showGroqKeyStatus("error", err.message);
+    adminToast("Connection error: " + err.message, "error");
+  }
+}
+
+function showGroqKeyStatus(state, msg = "") {
+  const el = document.getElementById("groq-key-status");
+  if (!el) return;
+  const states = {
+    none:    ["display:none",      ""],
+    saved:   ["background:#D1FAE5;color:#065F46;display:block;", "✓ API key is saved and ready."],
+    testing: ["background:#DBEAFE;color:#1E40AF;display:block;", "⏳ Testing connection…"],
+    ok:      ["background:#D1FAE5;color:#065F46;display:block;", "✓ Connected — AI replied: " + msg],
+    error:   ["background:#FEE2E2;color:#991B1B;display:block;", "✗ " + msg]
+  };
+  const [style, text] = states[state] || states.none;
+  el.style.cssText = style + "border-radius:var(--adm-radius);padding:0.6rem 0.85rem;font-size:0.78rem;";
+  el.textContent   = text;
 }
 
 function saveStoreSettings() {
