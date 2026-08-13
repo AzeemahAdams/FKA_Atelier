@@ -73,7 +73,7 @@
 <!-- ABOUT HERO -->
 <section class="about-hero" aria-label="About FKA Atelier">
   <div style="position:absolute;inset:0;overflow:hidden;z-index:0;" aria-hidden="true">
-    <img src="https://images.unsplash.com/photo-1509631179647-0177331693ae?w=1400&q=80"
+    <img src="/assets/images/img/hero-img.png"
       alt="" style="width:100%;height:100%;object-fit:cover;opacity:0.18;">
   </div>
   <div class="fka-container">
@@ -273,9 +273,11 @@
 <script src="../../assets/js/products.js"></script>
 <script src="../../assets/js/cart.js"></script>
 <script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/delivery.js"></script>
+<script src="../../assets/js/orders.js"></script>
 <script src="../../assets/js/auth.js"></script>
 <script src="../../assets/js/main.js"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); });</script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); if(typeof initProductSync==="function") initProductSync(); });</script>
 <script src="../../assets/js/askfka.js"></script>
 </body>
 </html>

@@ -1,11 +1,11 @@
-/* ============================================================
-   FKA ATELIER — Product Data Catalogue
+﻿/* ============================================================
+   FKA ATELIER â€” Product Data Catalogue
    Add / edit products here. Each product follows the schema below.
    ============================================================ */
 
 const FKA_PRODUCTS = [
 
-  /* ── ABAYAS ─────────────────────────────────────────── */
+  /* â”€â”€ ABAYAS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-001",
     name: "Noir Flow Abaya",
@@ -58,7 +58,7 @@ const FKA_PRODUCTS = [
     collections: ["signature","occasion-wear"]
   },
 
-  /* ── DRESSES ─────────────────────────────────────────── */
+  /* â”€â”€ DRESSES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-003",
     name: "Linen Grace Dress",
@@ -163,7 +163,7 @@ const FKA_PRODUCTS = [
     collections: ["everyday-elegance"]
   },
 
-  /* ── CO-ORD SETS ─────────────────────────────────────── */
+  /* â”€â”€ CO-ORD SETS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-007",
     name: "Dusk Co-ord Set",
@@ -176,7 +176,7 @@ const FKA_PRODUCTS = [
       "https://images.unsplash.com/photo-1561677978-583a6c32e5f8?w=600&q=80"
     ],
     description: "A beautifully matched two-piece set in the soft warmth of dusk-toned fabric. The relaxed wide-leg trousers and longline top create an effortlessly polished look that works for any occasion.",
-    fabric: "Structured crepe — top and trousers",
+    fabric: "Structured crepe â€” top and trousers",
     colours: [
       { name: "Dusk Rose", hex: "#D4A0A0" },
       { name: "Warm Taupe", hex: "#C4B5A5" },
@@ -202,7 +202,7 @@ const FKA_PRODUCTS = [
       "https://images.unsplash.com/photo-1583744946564-b52ac1c389c8?w=600&q=80"
     ],
     description: "Relaxed and refined in natural linen. The boxy blazer-style top and matching wide trousers make a quiet statement about considered dressing. Wear together or as separates.",
-    fabric: "100% linen — top and trousers",
+    fabric: "100% linen â€” top and trousers",
     colours: [
       { name: "Latte", hex: "#C8A882" },
       { name: "Natural", hex: "#D8CFC4" }
@@ -215,7 +215,7 @@ const FKA_PRODUCTS = [
     collections: ["everyday-elegance","signature"]
   },
 
-  /* ── SKIRTS ──────────────────────────────────────────── */
+  /* â”€â”€ SKIRTS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-009",
     name: "Fluid Maxi Skirt",
@@ -268,7 +268,7 @@ const FKA_PRODUCTS = [
     collections: ["everyday-elegance","signature"]
   },
 
-  /* ── TOPS ────────────────────────────────────────────── */
+  /* â”€â”€ TOPS â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-011",
     name: "Drape Shoulder Top",
@@ -321,7 +321,7 @@ const FKA_PRODUCTS = [
     collections: ["everyday-elegance"]
   },
 
-  /* ── ACCESSORIES ─────────────────────────────────────── */
+  /* â”€â”€ ACCESSORIES â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
   {
     id: "fka-013",
     name: "Silk Head Wrap",
@@ -375,147 +375,260 @@ const FKA_PRODUCTS = [
 
 ];
 
-/* ── Admin override helpers ─────────────────────────── */
-// Key must match what admin/products.html uses
-const _ADMIN_PROD_KEY = "fka_admin_products_overrides";
+/* â”€â”€ Supabase product normaliser â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
+function _normaliseProduct(p) {
+  if (!p) return null;
+  return {
+    ...p,
+    isNew:         p.is_new         !== undefined ? p.is_new         : p.isNew,
+    isBestseller:  p.is_bestseller  !== undefined ? p.is_bestseller  : p.isBestseller,
+    categoryLabel: p.category_label || p.categoryLabel || (p.category ? p.category.charAt(0).toUpperCase()+p.category.slice(1) : ""),
+    priceFormatted:p.price_formatted || p.priceFormatted || ("₦"+Number(p.price).toLocaleString("en-NG")),
+    images:        Array.isArray(p.images)      ? p.images      : _tryParse(p.images,     []),
+    colours:       Array.isArray(p.colours)     ? p.colours     : _tryParse(p.colours,    []),
+    sizes:         Array.isArray(p.sizes)       ? p.sizes       : _tryParse(p.sizes,      ["XS","S","M","L","XL","XXL"]),
+    collections:   Array.isArray(p.collections) ? p.collections : _tryParse(p.collections,[])
+  };
+}
+function _tryParse(val, fallback) {
+  if (!val) return fallback;
+  try { return JSON.parse(val); } catch { return fallback; }
+}
 
+/* â”€â”€ Admin override helpers (localStorage fallback) â”€â”€â”€â”€ */
+const _ADMIN_PROD_KEY = "fka_admin_products_overrides";
 function _loadAdminOverrides() {
   try { return JSON.parse(localStorage.getItem(_ADMIN_PROD_KEY)) || []; }
   catch { return []; }
 }
+function _saveAdminOverrides(list) {
+  localStorage.setItem(_ADMIN_PROD_KEY, JSON.stringify(list));
+  // Broadcast to other tabs so storefront reloads
+  try {
+    const bc = new BroadcastChannel("fka_products_channel");
+    bc.postMessage({ type: "products_updated" });
+    bc.close();
+  } catch {}
+}
 
 /**
- * Merge base products with any admin overrides stored in localStorage.
- * Called by every public product function so the storefront always
- * reflects what the admin has saved.
+ * Merge FKA_PRODUCTS with localStorage overrides.
+ * Used as a fallback when Supabase is not configured.
  */
 function _getMergedProducts() {
   const overrides = _loadAdminOverrides();
   if (!overrides.length) return FKA_PRODUCTS;
-
   const base   = [...FKA_PRODUCTS];
   const result = [];
-
-  // Apply overrides on top of base products
   base.forEach(p => {
     const ov = overrides.find(o => o.id === p.id);
     result.push(ov ? { ...p, ...ov } : p);
   });
-
-  // Add any new products the admin created (not in base)
   overrides
     .filter(o => !base.find(p => p.id === o.id))
     .forEach(o => result.push(o));
-
   return result;
 }
 
-/* ── Public helpers ─────────────────────────────────── */
+/* â”€â”€ Public helpers (async, Supabase-first) â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 
 /**
- * Get all products (merges admin overrides)
- * @returns {Array}
+ * Get all available products.
+ * Tries Supabase first; falls back to merged localStorage + FKA_PRODUCTS.
  */
-function getAllProducts() {
+async function getAllProducts() {
+  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+    try {
+      const { data } = await fkaDB().from("products").select("*")
+        .eq("available", true).order("sort_order").order("created_at", { ascending: false });
+      if (data && data.length > 0) return data.map(_normaliseProduct);
+    } catch (e) { console.warn("[FKA products] Supabase fetch failed, using fallback:", e.message); }
+  }
   return _getMergedProducts();
 }
 
 /**
- * Get product by ID (checks admin overrides first)
- * @param {string} id
- * @returns {Object|undefined}
+ * Get a single product by ID.
  */
-function getProductById(id) {
-  return _getMergedProducts().find(p => p.id === id);
+async function getProductById(id) {
+  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+    try {
+      const { data } = await fkaDB().from("products").select("*").eq("id", id).single();
+      if (data) return _normaliseProduct(data);
+    } catch {}
+  }
+  return _getMergedProducts().find(p => p.id === id) || null;
 }
 
 /**
- * Get products by category slug
- * @param {string} category
- * @returns {Array}
+ * Get new arrivals.
  */
-function getProductsByCategory(category) {
-  if (!category || category === "all") return _getMergedProducts();
-  return _getMergedProducts().filter(p => p.category === category);
+async function getNewArrivals(limit = 4) {
+  const all = await getAllProducts();
+  return all.filter(p => (p.isNew || p.is_new) && p.available !== false).slice(0, limit);
 }
 
 /**
- * Get new arrivals
- * @param {number} limit
- * @returns {Array}
+ * Get bestsellers.
  */
-function getNewArrivals(limit = 4) {
-  return _getMergedProducts().filter(p => p.isNew && p.available !== false).slice(0, limit);
+async function getBestsellers(limit = 4) {
+  const all = await getAllProducts();
+  return all.filter(p => (p.isBestseller || p.is_bestseller) && p.available !== false).slice(0, limit);
 }
 
 /**
- * Get bestsellers
- * @param {number} limit
- * @returns {Array}
+ * Get products by category.
  */
-function getBestsellers(limit = 4) {
-  return _getMergedProducts().filter(p => p.isBestseller && p.available !== false).slice(0, limit);
+async function getProductsByCategory(category) {
+  const all = await getAllProducts();
+  if (!category || category === "all") return all;
+  return all.filter(p => p.category === category);
 }
 
 /**
- * Get products by collection slug
- * @param {string} collection
- * @returns {Array}
+ * Get products by collection slug.
  */
-function getProductsByCollection(collection) {
-  return _getMergedProducts().filter(p => p.collections && p.collections.includes(collection) && p.available !== false);
+async function getProductsByCollection(collection) {
+  const all = await getAllProducts();
+  return all.filter(p => (p.collections || []).includes(collection) && p.available !== false);
 }
 
 /**
- * Search products by query string
- * @param {string} query
- * @returns {Array}
+ * Search products.
  */
-function searchProducts(query) {
-  if (!query || query.trim() === "") return [];
-  const q = query.toLowerCase().trim();
-  return _getMergedProducts().filter(p =>
+async function searchProducts(query) {
+  if (!query || !query.trim()) return [];
+  const q   = query.toLowerCase().trim();
+  const all = await getAllProducts();
+  return all.filter(p =>
     p.name.toLowerCase().includes(q) ||
-    p.category.toLowerCase().includes(q) ||
-    p.categoryLabel.toLowerCase().includes(q) ||
+    (p.category_label||p.categoryLabel||"").toLowerCase().includes(q) ||
     (p.description||"").toLowerCase().includes(q) ||
     (p.colours||[]).some(c => c.name.toLowerCase().includes(q)) ||
     (p.fabric||"").toLowerCase().includes(q)
   );
 }
 
-/**
- * Sort products array
- * @param {Array} products
- * @param {string} sortBy  "newest" | "price-asc" | "price-desc" | "name-asc"
- * @returns {Array}
- */
-function sortProducts(products, sortBy) {
+async function filterByPrice(products, maxPrice) {
+  return products.filter(p => p.price <= maxPrice);
+}
+
+async function sortProducts(products, sortBy) {
   const arr = [...products];
   switch (sortBy) {
-    case "price-asc":   return arr.sort((a, b) => a.price - b.price);
-    case "price-desc":  return arr.sort((a, b) => b.price - a.price);
-    case "name-asc":    return arr.sort((a, b) => a.name.localeCompare(b.name));
-    case "newest":
-    default:            return arr.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+    case "price-asc":  return arr.sort((a, b) => a.price - b.price);
+    case "price-desc": return arr.sort((a, b) => b.price - a.price);
+    case "name-asc":   return arr.sort((a, b) => a.name.localeCompare(b.name));
+    default:           return arr.sort((a, b) => ((b.isNew||b.is_new)?1:0) - ((a.isNew||a.is_new)?1:0));
+  }
+}
+
+function formatPrice(n) {
+  return "\u20A6" + (n || 0).toLocaleString("en-NG");
+}
+
+/**
+ * Admin: save a product to Supabase (or localStorage fallback).
+ * This is the SINGLE function admin pages should call.
+ */
+async function adminSaveProduct(product) {
+  const catLabels = { abayas:"Abayas", dresses:"Dresses", "coord-sets":"Co-ord Sets", skirts:"Skirts", tops:"Tops", accessories:"Accessories" };
+  const cat = product.category || "dresses";
+  const row = {
+    id:             product.id || ("fka-" + Date.now()),
+    name:           product.name,
+    category:       cat,
+    category_label: product.categoryLabel || catLabels[cat] || cat,
+    price:          Number(product.price),
+    price_formatted:"₦" + Number(product.price).toLocaleString("en-NG"),
+    images:         product.images || [],
+    description:    product.description || "",
+    fabric:         product.fabric || "",
+    colours:        product.colours || [],
+    sizes:          product.sizes || ["XS","S","M","L","XL","XXL"],
+    care:           product.care || "",
+    available:      product.available !== false,
+    is_new:         !!(product.isNew || product.is_new),
+    is_bestseller:  !!(product.isBestseller || product.is_bestseller),
+    collections:    product.collections || [],
+    sort_order:     product.sort_order || 0
+  };
+
+  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+    const { error } = await fkaDB().from("products").upsert(row);
+    if (error) throw new Error(error.message);
+  } else {
+    // localStorage fallback
+    const overrides = _loadAdminOverrides();
+    const idx = overrides.findIndex(o => o.id === row.id);
+    const localRow = { ...row, isNew: row.is_new, isBestseller: row.is_bestseller, categoryLabel: row.category_label, priceFormatted: row.price_formatted };
+    if (idx >= 0) overrides[idx] = localRow;
+    else overrides.push(localRow);
+    _saveAdminOverrides(overrides);
+  }
+  return row;
+}
+
+/**
+ * Admin: delete a product.
+ */
+async function adminDeleteProduct(id) {
+  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+    const { error } = await fkaDB().from("products").delete().eq("id", id);
+    if (error) throw new Error(error.message);
+  } else {
+    const overrides = _loadAdminOverrides().filter(o => o.id !== id);
+    _saveAdminOverrides(overrides);
   }
 }
 
 /**
- * Filter products by max price
- * @param {Array} products
- * @param {number} maxPrice
- * @returns {Array}
+ * Admin: get all products including unavailable ones (for admin product list).
  */
-function filterByPrice(products, maxPrice) {
-  return products.filter(p => p.price <= maxPrice);
+async function adminGetAllProducts() {
+  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+    try {
+      const { data } = await fkaDB().from("products").select("*")
+        .order("sort_order").order("created_at", { ascending: false });
+      if (data) return data.map(_normaliseProduct);
+    } catch (e) { console.warn("[FKA] adminGetAllProducts Supabase failed:", e.message); }
+  }
+  return _getMergedProducts();
 }
 
+/* â”€â”€ Realtime product sync for storefront â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€ */
 /**
- * Format price as ₦ string
- * @param {number} price
- * @returns {string}
+ * Listen for product changes (Supabase realtime or localStorage broadcast).
+ * Call once on storefront pages to auto-refresh product grids.
  */
-function formatPrice(price) {
-  return "₦" + price.toLocaleString("en-NG");
+function initProductSync() {
+  // Supabase realtime
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
+    try {
+      fkaDB().channel("rt_products_storefront")
+        .on("postgres_changes", { event: "*", schema: "public", table: "products" }, () => {
+          _refreshProductGrids();
+        })
+        .subscribe();
+    } catch {}
+  }
+
+  // localStorage broadcast (fallback / same-device cross-tab)
+  try {
+    const bc = new BroadcastChannel("fka_products_channel");
+    bc.onmessage = () => _refreshProductGrids();
+  } catch {}
+
+  // Also listen for storage events (different tab, same device)
+  window.addEventListener("storage", e => {
+    if (e.key === _ADMIN_PROD_KEY) _refreshProductGrids();
+  });
+}
+
+function _refreshProductGrids() {
+  if (document.getElementById("shop-products-grid"))    initShopPage?.();
+  if (document.getElementById("new-arrivals-grid"))     initHomePage?.();
+  if (document.getElementById("product-detail-container")) initProductPage?.();
+  if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage?.();
+  if (typeof wishlistSyncButtons === "function") wishlistSyncButtons();
 }

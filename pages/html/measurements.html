@@ -320,16 +320,7 @@
         <button class="ask-fka-suggestion-btn"><i class="fa-brands fa-whatsapp"></i> Talk to a human</button>
       </div>
       <div id="fka-chat-thread" class="fka-chat-thread" aria-live="polite" aria-label="Chat messages"></div>
-    </div>
-      <div class="ask-fka-greeting"><div class="ask-fka-avatar">F</div><div class="ask-fka-bubble">Hello 🤍 Need help with measurements? I'm here.</div></div>
-      <div class="ask-fka-suggestions">
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler"></i> Help me choose my size</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler-combined"></i> How do custom measurements work?</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-message"></i> Talk to a human</button>
-      </div>
-      
-    </div>
-    <div class="ask-fka-panel-footer">
+    </div><div class="ask-fka-panel-footer">
       <input class="ask-fka-input" id="ask-fka-input" type="text" placeholder="Ask me anything about FKA Atelier…" aria-label="Message" autocomplete="off" maxlength="400">
       <button class="ask-fka-send" id="ask-fka-send" aria-label="Send"><i class="fa-regular fa-paper-plane-top"></i></button>
     </div>
@@ -345,9 +336,11 @@
 <script src="../../assets/js/products.js"></script>
 <script src="../../assets/js/cart.js"></script>
 <script src="../../assets/js/wishlist.js"></script>
+<script src="../../assets/js/delivery.js"></script>
+<script src="../../assets/js/orders.js"></script>
 <script src="../../assets/js/auth.js"></script>
 <script src="../../assets/js/main.js"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); });</script>
+<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); if(typeof initProductSync==="function") initProductSync(); });</script>
 <script src="../../assets/js/askfka.js"></script>
 </body>
 </html>
