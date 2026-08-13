@@ -99,8 +99,9 @@ function adminLogin(username, password) {
 }
 
 function adminLogout() {
-  if (_isSupabaseReady() && _supabase) {
-    _supabase.auth.signOut().catch(() => {});
+  // Sign out of Supabase only if configured
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
+    try { fkaDB().auth.signOut(); } catch {}
   }
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
   window.location.href = "index.html";

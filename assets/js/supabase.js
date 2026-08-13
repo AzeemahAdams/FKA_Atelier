@@ -1,68 +1,91 @@
 /* ============================================================
    FKA ATELIER — Supabase Client
-   Single shared instance used by auth, orders, products etc.
-
-   Setup:
-     1. Create a free project at https://supabase.com
-     2. Go to Project Settings → API
-     3. Copy your Project URL and anon public key below
-     4. Run the SQL schema in supabase-schema.sql in the
-        Supabase SQL Editor to create all tables
+   Gracefully degrades to localStorage-only mode when
+   Supabase is not configured or CDN fails to load.
    ============================================================ */
 
-// Load from window.FKA_CONFIG (set in a <script> tag on each page)
-// so these values can be changed without editing this file.
-// Falls back to the values below if no config block is present.
+"use strict";
 
-const SUPABASE_URL     = window.FKA_CONFIG?.supabaseUrl     || "YOUR_SUPABASE_URL";
-const SUPABASE_ANON_KEY= window.FKA_CONFIG?.supabaseAnonKey || "YOUR_SUPABASE_ANON_KEY";
+const SUPABASE_URL      = window.FKA_CONFIG?.supabaseUrl     || "";
+const SUPABASE_ANON_KEY = window.FKA_CONFIG?.supabaseAnonKey || "";
 
-// Import Supabase via CDN (loaded in HTML before this script)
-// <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-const { createClient } = window.supabase || {};
-
-if (!createClient) {
-  console.error("[FKA] Supabase JS not loaded. Add the CDN script tag before supabase.js.");
+/* ── Resolve createClient from UMD bundle ─────────────── */
+// The @supabase/supabase-js v2 UMD bundle exposes:
+//   window.supabase = { createClient, ... }
+// Some older versions expose createClient directly as window.supabase.
+// Handle both.
+function _resolveCreateClient() {
+  const sb = window.supabase;
+  if (!sb) return null;
+  if (typeof sb.createClient === "function") return sb.createClient; // v2 UMD
+  if (typeof sb             === "function")  return sb;              // legacy
+  return null;
 }
 
-const _supabase = createClient ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession:   true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-}) : null;
+const createClient = _resolveCreateClient();
+
+/* ── Initialise client (only when URL is real) ────────── */
+const _isSupabaseConfigured =
+  !!createClient &&
+  SUPABASE_URL !== "" &&
+  SUPABASE_URL !== "YOUR_SUPABASE_URL" &&
+  SUPABASE_URL.startsWith("https://");
+
+const _supabase = _isSupabaseConfigured
+  ? createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+      auth: {
+        persistSession:     true,
+        autoRefreshToken:   true,
+        detectSessionInUrl: true
+      }
+    })
+  : null;
+
+if (!createClient) {
+  console.warn("[FKA] Supabase CDN not loaded — running in localStorage-only mode.");
+} else if (!_isSupabaseConfigured) {
+  console.info("[FKA] Supabase URL not configured — running in localStorage-only mode.");
+}
+
+/* ── Public helpers ────────────────────────────────────── */
 
 /**
- * Get the Supabase client.
- * Usage: const db = fkaDB(); then db.from('orders').select()...
+ * Returns the Supabase client, or throws if not initialised.
+ * Use _isSupabaseReady() before calling fkaDB() in optional code.
  */
 function fkaDB() {
-  if (!_supabase) throw new Error("Supabase client not initialised. Check SUPABASE_URL and SUPABASE_ANON_KEY.");
+  if (!_supabase) {
+    throw new Error(
+      "Supabase is not configured. Add your project URL and key to fka-config.js, " +
+      "or run in localStorage-only mode (no Supabase needed for basic admin)."
+    );
+  }
   return _supabase;
 }
 
 /**
- * Get current Supabase auth session.
- * Returns { user, session } or null.
+ * True when Supabase is configured AND the CDN loaded successfully.
+ */
+function _isSupabaseReady() {
+  return !!_supabase;
+}
+
+/**
+ * Get current auth session, or null if Supabase not configured.
  */
 async function fkaGetSession() {
   if (!_supabase) return null;
-  const { data } = await _supabase.auth.getSession();
-  return data?.session || null;
+  try {
+    const { data } = await _supabase.auth.getSession();
+    return data?.session || null;
+  } catch { return null; }
 }
 
-/**
- * Get currently signed-in user.
- */
 async function fkaGetUser() {
-  const session = await fkaGetSession();
-  return session?.user || null;
+  const s = await fkaGetSession();
+  return s?.user || null;
 }
 
-/**
- * Helper: handle Supabase response, throw on error.
- */
 function fkaCheck({ data, error }, label = "") {
   if (error) {
     console.error(`[FKA Supabase error] ${label}:`, error.message);
@@ -71,9 +94,6 @@ function fkaCheck({ data, error }, label = "") {
   return data;
 }
 
-/**
- * Helper: format any Supabase Postgrest error into a user-friendly string.
- */
 function fkaErrorMsg(error) {
   if (!error) return null;
   const msg = error.message || String(error);

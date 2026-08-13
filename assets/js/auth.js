@@ -49,6 +49,10 @@ async function authRegister({ firstName, lastName, email, phone, password }) {
 
 /* ── Login ─────────────────────────────────────────────────── */
 async function authLogin(email, password) {
+  // Guard: Supabase not configured — caller handles fallback
+  if (!_isSupabaseReady()) {
+    return { ok:false, error:"Supabase not configured." };
+  }
   try {
     const db = fkaDB();
     const { data, error } = await db.auth.signInWithPassword({
