@@ -375,33 +375,68 @@ const FKA_PRODUCTS = [
 
 ];
 
-/* ── Helpers ──────────────────────────────────────────── */
+/* ── Admin override helpers ─────────────────────────── */
+// Key must match what admin/products.html uses
+const _ADMIN_PROD_KEY = "fka_admin_products_overrides";
 
-/**
- * Get all products
- * @returns {Array}
- */
-function getAllProducts() {
-  return FKA_PRODUCTS;
+function _loadAdminOverrides() {
+  try { return JSON.parse(localStorage.getItem(_ADMIN_PROD_KEY)) || []; }
+  catch { return []; }
 }
 
 /**
- * Get product by ID
+ * Merge base products with any admin overrides stored in localStorage.
+ * Called by every public product function so the storefront always
+ * reflects what the admin has saved.
+ */
+function _getMergedProducts() {
+  const overrides = _loadAdminOverrides();
+  if (!overrides.length) return FKA_PRODUCTS;
+
+  const base   = [...FKA_PRODUCTS];
+  const result = [];
+
+  // Apply overrides on top of base products
+  base.forEach(p => {
+    const ov = overrides.find(o => o.id === p.id);
+    result.push(ov ? { ...p, ...ov } : p);
+  });
+
+  // Add any new products the admin created (not in base)
+  overrides
+    .filter(o => !base.find(p => p.id === o.id))
+    .forEach(o => result.push(o));
+
+  return result;
+}
+
+/* ── Public helpers ─────────────────────────────────── */
+
+/**
+ * Get all products (merges admin overrides)
+ * @returns {Array}
+ */
+function getAllProducts() {
+  return _getMergedProducts();
+}
+
+/**
+ * Get product by ID (checks admin overrides first)
  * @param {string} id
  * @returns {Object|undefined}
  */
 function getProductById(id) {
-  return FKA_PRODUCTS.find(p => p.id === id);
+  return _getMergedProducts().find(p => p.id === id);
 }
 
 /**
  * Get products by category slug
- * @param {string} category  e.g. "abayas", "dresses"
+ * @param {string} category
  * @returns {Array}
  */
 function getProductsByCategory(category) {
-  if (!category || category === "all") return FKA_PRODUCTS;
-  return FKA_PRODUCTS.filter(p => p.category === category);
+  if (!category || category === "all") return _getMergedProducts();
+  return _getMergedProducts().filter(p => p.category === category);
 }
 
 /**
@@ -410,7 +445,7 @@ function getProductsByCategory(category) {
  * @returns {Array}
  */
 function getNewArrivals(limit = 4) {
-  return FKA_PRODUCTS.filter(p => p.isNew).slice(0, limit);
+  return _getMergedProducts().filter(p => p.isNew && p.available !== false).slice(0, limit);
 }
 
 /**
@@ -419,7 +454,7 @@ function getNewArrivals(limit = 4) {
  * @returns {Array}
  */
 function getBestsellers(limit = 4) {
-  return FKA_PRODUCTS.filter(p => p.isBestseller).slice(0, limit);
+  return _getMergedProducts().filter(p => p.isBestseller && p.available !== false).slice(0, limit);
 }
 
 /**
@@ -428,7 +463,7 @@ function getBestsellers(limit = 4) {
  * @returns {Array}
  */
 function getProductsByCollection(collection) {
-  return FKA_PRODUCTS.filter(p => p.collections && p.collections.includes(collection));
+  return _getMergedProducts().filter(p => p.collections && p.collections.includes(collection) && p.available !== false);
 }
 
 /**
@@ -439,13 +474,13 @@ function getProductsByCollection(collection) {
 function searchProducts(query) {
   if (!query || query.trim() === "") return [];
   const q = query.toLowerCase().trim();
-  return FKA_PRODUCTS.filter(p =>
+  return _getMergedProducts().filter(p =>
     p.name.toLowerCase().includes(q) ||
     p.category.toLowerCase().includes(q) ||
     p.categoryLabel.toLowerCase().includes(q) ||
-    p.description.toLowerCase().includes(q) ||
-    p.colours.some(c => c.name.toLowerCase().includes(q)) ||
-    p.fabric.toLowerCase().includes(q)
+    (p.description||"").toLowerCase().includes(q) ||
+    (p.colours||[]).some(c => c.name.toLowerCase().includes(q)) ||
+    (p.fabric||"").toLowerCase().includes(q)
   );
 }
 

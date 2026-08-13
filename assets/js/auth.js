@@ -1,272 +1,282 @@
 /* ============================================================
-   FKA ATELIER — Customer Auth System
-   Register / Login / Logout / Session
-   Keys:
-     "fka_accounts"        → array of registered accounts
-     "fka_user_session"    → sessionStorage: active session
-     "fka_user_session_p"  → localStorage: remembered session
+   FKA ATELIER — Customer Auth (Supabase)
+   Replaces localStorage account management with Supabase Auth.
+   Supabase handles passwords, JWTs and session persistence.
    ============================================================ */
 "use strict";
 
-const AUTH_ACCOUNTS_KEY  = "fka_accounts";
-const AUTH_SESSION_KEY   = "fka_user_session";
-const AUTH_PERSIST_KEY   = "fka_user_session_p"; // "remember me"
-const AUTH_ACTIVITY_KEY  = "fka_activity_log";
-
-/* ── Helpers ─────────────────────────────────────────────── */
-function _accountsLoad() {
-  try { return JSON.parse(localStorage.getItem(AUTH_ACCOUNTS_KEY)) || []; }
-  catch { return []; }
-}
-function _accountsSave(list) {
-  localStorage.setItem(AUTH_ACCOUNTS_KEY, JSON.stringify(list));
-}
-/* Simple hash — NOT cryptographic. Static-only site constraint. */
-function _hash(str) {
-  let h = 5381;
-  for (let i = 0; i < str.length; i++) h = ((h << 5) + h) ^ str.charCodeAt(i);
-  return (h >>> 0).toString(36);
-}
-
-/* ── Activity Log (admin reads this) ──────────────────────── */
-function authEmitActivity(type, payload) {
-  try {
-    const log = JSON.parse(localStorage.getItem(AUTH_ACTIVITY_KEY)) || [];
-    log.unshift({ type, payload, ts: new Date().toISOString(), id: Date.now() + Math.random() });
-    if (log.length > 200) log.splice(200);
-    localStorage.setItem(AUTH_ACTIVITY_KEY, JSON.stringify(log));
-  } catch {}
-  // Broadcast to other tabs (admin dashboard)
-  try {
-    const bc = new BroadcastChannel("fka_admin_channel");
-    bc.postMessage({ type, payload, ts: new Date().toISOString() });
-    bc.close();
-  } catch {}
-}
-
 /* ── Register ─────────────────────────────────────────────── */
-/**
- * Register a new customer account.
- * @param {Object} data  { firstName, lastName, email, phone, password }
- * @returns {{ ok:boolean, error?:string, account?:Object }}
- */
-function authRegister(data) {
-  const { firstName, lastName, email, phone, password } = data;
-
-  // Validate
+async function authRegister({ firstName, lastName, email, phone, password }) {
+  // Validate client-side first for fast feedback
   if (!firstName || firstName.trim().length < 2) return { ok:false, error:"First name must be at least 2 characters." };
   if (!lastName  || lastName.trim().length  < 2) return { ok:false, error:"Last name must be at least 2 characters." };
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return { ok:false, error:"Please enter a valid email address." };
-
-  const phoneClean = (phone || "").replace(/[\s\-()]/g, "");
-  if (!phoneClean || !/^(\+234|0)[789][01]\d{8}$/.test(phoneClean))
-    return { ok:false, error:"Please enter a valid Nigerian phone number (e.g. 08012345678)." };
-
+  const phoneClean = (phone||"").replace(/[\s\-()]/g,"");
+  if (!phoneClean || !/^(\+234|0)[789][01]\d{8}$/.test(phoneClean)) return { ok:false, error:"Please enter a valid Nigerian phone number." };
   if (!password || password.length < 6) return { ok:false, error:"Password must be at least 6 characters." };
 
-  const accounts = _accountsLoad();
-  const emailLow = email.trim().toLowerCase();
+  try {
+    const db = fkaDB();
+    const emailLow = email.trim().toLowerCase();
 
-  if (accounts.find(a => a.email === emailLow))
-    return { ok:false, error:"An account with this email already exists. Please sign in." };
-
-  const account = {
-    id:          "ACC-" + Date.now().toString(36).toUpperCase(),
-    firstName:   firstName.trim(),
-    lastName:    lastName.trim(),
-    fullName:    `${firstName.trim()} ${lastName.trim()}`,
-    email:       emailLow,
-    phone:       phoneClean,
-    passwordHash: _hash(password),
-    createdAt:   new Date().toISOString(),
-    lastLoginAt: null,
-    addresses:   [],
-    preferences: {}
-  };
-
-  accounts.push(account);
-  _accountsSave(accounts);
-
-  // Upsert into customer records so admin can see them
-  if (typeof customerUpsert === "function") {
-    customerUpsert({
-      firstName: account.firstName,
-      lastName:  account.lastName,
-      fullName:  account.fullName,
-      email:     account.email,
-      phone:     account.phone
+    const { data, error } = await db.auth.signUp({
+      email:    emailLow,
+      password,
+      options:  {
+        data: {
+          first_name: firstName.trim(),
+          last_name:  lastName.trim(),
+          phone:      phoneClean
+        }
+      }
     });
+
+    if (error) return { ok:false, error: fkaErrorMsg(error) };
+
+    // Log activity
+    await _authActivity("new_account", {
+      id:       data.user?.id,
+      fullName: `${firstName.trim()} ${lastName.trim()}`,
+      email:    emailLow,
+      phone:    phoneClean
+    });
+
+    return { ok:true, user: data.user };
+  } catch (err) {
+    return { ok:false, error: err.message };
   }
-
-  authEmitActivity("new_account", {
-    id: account.id, fullName: account.fullName,
-    email: account.email, phone: account.phone
-  });
-
-  return { ok:true, account };
 }
 
 /* ── Login ─────────────────────────────────────────────────── */
-/**
- * @param {string} email
- * @param {string} password
- * @param {boolean} remember  persist across browser closes
- * @returns {{ ok:boolean, error?:string, account?:Object }}
- */
-function authLogin(email, password, remember = false) {
-  const accounts = _accountsLoad();
-  const emailLow = (email || "").trim().toLowerCase();
-  const account  = accounts.find(a => a.email === emailLow);
-
-  if (!account) return { ok:false, error:"No account found with that email address." };
-  if (account.passwordHash !== _hash(password))
-    return { ok:false, error:"Incorrect password. Please try again." };
-
-  // Update lastLoginAt
-  account.lastLoginAt = new Date().toISOString();
-  _accountsSave(accounts);
-
-  const session = {
-    accountId: account.id,
-    email:     account.email,
-    fullName:  account.fullName,
-    firstName: account.firstName,
-    phone:     account.phone,
-    loginAt:   new Date().toISOString(),
-    expiresAt: new Date(Date.now() + (remember ? 30 : 1) * 24 * 60 * 60 * 1000).toISOString()
-  };
-
-  sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-  if (remember) localStorage.setItem(AUTH_PERSIST_KEY, JSON.stringify(session));
-
-  authEmitActivity("login", { id: account.id, fullName: account.fullName, email: account.email });
-  return { ok:true, account };
+async function authLogin(email, password) {
+  try {
+    const db = fkaDB();
+    const { data, error } = await db.auth.signInWithPassword({
+      email:    (email||"").trim().toLowerCase(),
+      password
+    });
+    if (error) {
+      const msg = error.message?.includes("Invalid login") ? "Incorrect email or password." : fkaErrorMsg(error);
+      return { ok:false, error: msg };
+    }
+    await _authActivity("login", { email: data.user?.email });
+    return { ok:true, user: data.user, session: data.session };
+  } catch (err) {
+    return { ok:false, error: err.message };
+  }
 }
 
 /* ── Logout ─────────────────────────────────────────────────── */
-function authLogout() {
-  sessionStorage.removeItem(AUTH_SESSION_KEY);
-  localStorage.removeItem(AUTH_PERSIST_KEY);
+async function authLogout() {
+  try {
+    const db = fkaDB();
+    await db.auth.signOut();
+  } catch {}
   window.location.href = "index.html";
 }
 
-/* ── Session ─────────────────────────────────────────────────── */
+/* ── Session helpers ─────────────────────────────────────────── */
 /**
- * Returns active session object or null.
+ * Returns the Supabase session (includes user) or null.
+ * Cached synchronously once loaded via initAuthListener.
  */
-function authGetSession() {
-  // Try sessionStorage first, then persisted localStorage session
-  const sources = [
-    () => JSON.parse(sessionStorage.getItem(AUTH_SESSION_KEY)),
-    () => JSON.parse(localStorage.getItem(AUTH_PERSIST_KEY))
-  ];
-  for (const src of sources) {
-    try {
-      const s = src();
-      if (!s || !s.accountId) continue;
-      if (new Date(s.expiresAt) < new Date()) {
-        sessionStorage.removeItem(AUTH_SESSION_KEY);
-        localStorage.removeItem(AUTH_PERSIST_KEY);
-        continue;
-      }
-      // Restore to sessionStorage if loaded from persistent store
-      if (!sessionStorage.getItem(AUTH_SESSION_KEY))
-        sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(s));
-      return s;
-    } catch {}
-  }
-  return null;
+let _cachedSession = null;
+let _sessionLoaded = false;
+
+async function _loadSession() {
+  if (_sessionLoaded) return _cachedSession;
+  try {
+    const db = fkaDB();
+    const { data } = await db.auth.getSession();
+    _cachedSession  = data?.session || null;
+    _sessionLoaded  = true;
+  } catch { _cachedSession = null; _sessionLoaded = true; }
+  return _cachedSession;
 }
 
-function authIsLoggedIn() { return !!authGetSession(); }
+/**
+ * Returns active session object or null.
+ * Use `await authGetSession()` — async because first call loads from Supabase.
+ */
+async function authGetSession() {
+  return _loadSession();
+}
 
 /**
- * Require login — if not signed in, redirect to account page,
- * saving intended destination in sessionStorage.
- * @param {string} returnUrl  page to return to after login
+ * Synchronous version — only safe after page has fully initialised.
+ * Use authGetSession() in async contexts.
  */
-function authRequireLogin(returnUrl) {
-  if (!authIsLoggedIn()) {
-    sessionStorage.setItem("fka_auth_return", returnUrl || window.location.pathname);
+function authGetSessionSync() {
+  return _cachedSession;
+}
+
+function authIsLoggedIn() {
+  return !!_cachedSession;
+}
+
+/**
+ * Require login — redirect to account page if not signed in.
+ */
+async function authRequireLogin(returnUrl) {
+  const session = await authGetSession();
+  if (!session) {
+    sessionStorage.setItem("fka_auth_return", returnUrl || window.location.href);
     window.location.href = "account.html?mode=login";
     return false;
   }
   return true;
 }
 
-/* ── Account CRUD ─────────────────────────────────────────────── */
-function authGetAccount(accountId) {
-  return _accountsLoad().find(a => a.id === accountId) || null;
-}
-
-function authGetAccountByEmail(email) {
-  return _accountsLoad().find(a => a.email === (email||"").toLowerCase()) || null;
+/* ── Profile operations ─────────────────────────────────────── */
+/**
+ * Get profile for the currently signed-in user.
+ */
+async function authGetProfile() {
+  const session = await authGetSession();
+  if (!session) return null;
+  try {
+    const { data, error } = await fkaDB()
+      .from("profiles")
+      .select("*")
+      .eq("id", session.user.id)
+      .single();
+    if (error) return null;
+    return data;
+  } catch { return null; }
 }
 
 /**
  * Update the signed-in user's profile.
- * @param {Object} updates  { firstName, lastName, phone, password? }
  */
-function authUpdateProfile(updates) {
-  const session = authGetSession();
+async function authUpdateProfile(updates) {
+  const session = await authGetSession();
   if (!session) return { ok:false, error:"Not signed in." };
-
-  const accounts = _accountsLoad();
-  const account  = accounts.find(a => a.id === session.accountId);
-  if (!account) return { ok:false, error:"Account not found." };
-
-  if (updates.firstName) account.firstName = updates.firstName.trim();
-  if (updates.lastName)  account.lastName  = updates.lastName.trim();
-  if (updates.phone)     account.phone     = updates.phone.replace(/[\s\-()]/g,"");
-  account.fullName = `${account.firstName} ${account.lastName}`;
-
-  if (updates.currentPassword && updates.newPassword) {
-    if (account.passwordHash !== _hash(updates.currentPassword))
-      return { ok:false, error:"Current password is incorrect." };
-    if (updates.newPassword.length < 6)
-      return { ok:false, error:"New password must be at least 6 characters." };
-    account.passwordHash = _hash(updates.newPassword);
-  }
-
-  if (updates.address && updates.address.line1) {
-    const key = `${updates.address.line1}|${updates.address.city}`.toLowerCase();
-    if (!account.addresses.find(a => `${a.line1}|${a.city}`.toLowerCase() === key)) {
-      account.addresses.unshift({ ...updates.address, addedAt: new Date().toISOString() });
-      if (account.addresses.length > 5) account.addresses.pop();
+  try {
+    const db = fkaDB();
+    // Update Supabase auth metadata
+    if (updates.firstName || updates.lastName) {
+      await db.auth.updateUser({ data: {
+        first_name: updates.firstName,
+        last_name:  updates.lastName,
+        phone:      updates.phone
+      }});
     }
+    // Update password if provided
+    if (updates.newPassword) {
+      const { error: pwErr } = await db.auth.updateUser({ password: updates.newPassword });
+      if (pwErr) return { ok:false, error: fkaErrorMsg(pwErr) };
+    }
+    // Update profiles table
+    const profileUpdate = {};
+    if (updates.firstName)  profileUpdate.first_name = updates.firstName.trim();
+    if (updates.lastName)   profileUpdate.last_name  = updates.lastName.trim();
+    if (updates.phone)      profileUpdate.phone      = updates.phone.replace(/[\s\-()]/g,"");
+    if (updates.address) {
+      // Append address to jsonb array
+      const { data: prof } = await db.from("profiles").select("addresses").eq("id", session.user.id).single();
+      const addrs   = prof?.addresses || [];
+      const key     = `${updates.address.line1}|${updates.address.city}`.toLowerCase();
+      if (!addrs.find(a => `${a.line1}|${a.city}`.toLowerCase() === key)) {
+        addrs.unshift({ ...updates.address, addedAt: new Date().toISOString() });
+        if (addrs.length > 5) addrs.pop();
+        profileUpdate.addresses = addrs;
+      }
+    }
+    if (Object.keys(profileUpdate).length > 0) {
+      const { error: profErr } = await db.from("profiles").update(profileUpdate).eq("id", session.user.id);
+      if (profErr) return { ok:false, error: fkaErrorMsg(profErr) };
+    }
+    return { ok:true };
+  } catch (err) {
+    return { ok:false, error: err.message };
   }
+}
 
-  _accountsSave(accounts);
+/**
+ * Get order history for signed-in user.
+ */
+async function authGetOrders() {
+  const session = await authGetSession();
+  if (!session) return [];
+  try {
+    const { data } = await fkaDB()
+      .from("orders")
+      .select("*")
+      .eq("account_id", session.user.id)
+      .order("created_at", { ascending: false });
+    return data || [];
+  } catch { return []; }
+}
 
-  // Refresh session
-  const newSession = { ...session, fullName: account.fullName, firstName: account.firstName, phone: account.phone };
-  sessionStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(newSession));
-  if (localStorage.getItem(AUTH_PERSIST_KEY)) localStorage.setItem(AUTH_PERSIST_KEY, JSON.stringify(newSession));
+/**
+ * Get bookings (pre-payment) for signed-in user.
+ */
+async function authGetBookings() {
+  const session = await authGetSession();
+  if (!session) return [];
+  try {
+    const { data } = await fkaDB()
+      .from("bookings")
+      .select("*")
+      .eq("account_id", session.user.id)
+      .order("created_at", { ascending: false });
+    return data || [];
+  } catch { return []; }
+}
 
-  // Sync customer record
-  if (typeof customerUpsert === "function") {
-    customerUpsert({ firstName: account.firstName, lastName: account.lastName, fullName: account.fullName, email: account.email, phone: account.phone });
-  }
-
-  return { ok:true, account };
+/* ── Auth state listener ─────────────────────────────────────── */
+/**
+ * Set up auth state change listener.
+ * Call once on page load — updates cached session and syncs navbar.
+ */
+function initAuthListener() {
+  if (!_supabase) return;
+  // Load initial session
+  _loadSession().then(() => {
+    authSyncNavbar();
+  });
+  // Listen for changes (login, logout, token refresh)
+  _supabase.auth.onAuthStateChange(async (event, session) => {
+    _cachedSession = session;
+    _sessionLoaded = true;
+    authSyncNavbar();
+    if (event === "SIGNED_IN") {
+      // If there's a pending redirect (e.g. from checkout auth gate)
+      const ret = sessionStorage.getItem("fka_auth_return");
+      if (ret && window.location.href.includes("account.html")) {
+        sessionStorage.removeItem("fka_auth_return");
+        window.location.href = ret;
+      }
+    }
+  });
 }
 
 /* ── Navbar Sync ─────────────────────────────────────────────── */
-/**
- * Call on every storefront page to update account icon state.
- */
 function authSyncNavbar() {
-  const session = authGetSession();
+  const session = authGetSessionSync();
+  const user    = session?.user;
+  const meta    = user?.user_metadata || {};
+  const name    = meta.first_name || user?.email?.split("@")[0] || "";
+
   document.querySelectorAll(".auth-account-btn").forEach(el => {
-    if (session) {
-      el.title       = `My Account (${session.firstName})`;
+    if (user) {
+      el.title       = `My Account (${name})`;
       el.href        = "account.html";
       el.style.color = "var(--warm-brown)";
       const ico = el.querySelector("i");
-      if (ico) { ico.className = "fa-solid fa-circle-user"; }
+      if (ico) ico.className = "fa-solid fa-circle-user";
     } else {
       el.title = "Sign In / Register";
       el.href  = "account.html?mode=login";
+      const ico = el.querySelector("i");
+      if (ico) ico.className = "fa-regular fa-circle-user";
     }
   });
+}
+
+/* ── Activity log ─────────────────────────────────────────────── */
+async function _authActivity(type, payload) {
+  try {
+    await fkaDB().from("activity_log").insert({ type, payload });
+  } catch {}
 }

@@ -1,5 +1,8 @@
-# Environment variables — NEVER commit this
+# API keys and config — NEVER commit these
 .env
+*.env
+new.env
+fka-config.js
 
 # Node
 node_modules/
@@ -12,6 +15,6 @@ Thumbs.db
 desktop.ini
 
 # Editor
-.vscode/settings.json
+.vscode/
 *.swp
 *.swo

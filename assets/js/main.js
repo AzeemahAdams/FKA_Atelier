@@ -344,7 +344,6 @@ function initShopPage() {
   let activeSort     = "newest";
   let maxPrice       = 200000;
 
-  // Check for URL params (search query or category)
   const params = new URLSearchParams(window.location.search);
   if (params.get("q")) {
     const qInput = document.getElementById("shop-search-input");
@@ -357,33 +356,29 @@ function initShopPage() {
     });
   }
 
-  function applyFilters() {
-    let products = getAllProducts();
+  async function applyFilters() {
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light);font-size:0.85rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading pieces…</div>`;
 
-    // Category
+    let products = await getAllProducts().catch(() => FKA_PRODUCTS || []);
+
     if (activeCategory !== "all") {
-      products = products.filter(p => p.category === activeCategory);
+      products = products.filter(p => (p.category || p.category) === activeCategory);
     }
 
-    // Search
     const qInput = document.getElementById("shop-search-input");
     if (qInput && qInput.value.trim().length > 1) {
       const q = qInput.value.trim().toLowerCase();
       products = products.filter(p =>
         p.name.toLowerCase().includes(q) ||
-        p.categoryLabel.toLowerCase().includes(q) ||
-        p.description.toLowerCase().includes(q) ||
-        p.colours.some(c => c.name.toLowerCase().includes(q))
+        (p.category_label||p.categoryLabel||"").toLowerCase().includes(q) ||
+        (p.description||"").toLowerCase().includes(q) ||
+        (p.colours||[]).some(c => c.name.toLowerCase().includes(q))
       );
     }
 
-    // Price
-    products = filterByPrice(products, maxPrice);
+    products = products.filter(p => p.price <= maxPrice);
+    products = await sortProducts(products, activeSort).catch(() => products);
 
-    // Sort
-    products = sortProducts(products, activeSort);
-
-    // Render
     if (products.length === 0) {
       grid.innerHTML = "";
       if (noResults) noResults.classList.add("show");
@@ -397,7 +392,6 @@ function initShopPage() {
     }
   }
 
-  // Category buttons
   catBtns.forEach(btn => {
     btn.addEventListener("click", () => {
       catBtns.forEach(b => b.classList.remove("active"));
@@ -407,7 +401,6 @@ function initShopPage() {
     });
   });
 
-  // Sort
   if (sortSelect) {
     sortSelect.addEventListener("change", () => {
       activeSort = sortSelect.value;
@@ -415,7 +408,6 @@ function initShopPage() {
     });
   }
 
-  // Price slider
   if (priceSlider) {
     priceSlider.addEventListener("input", () => {
       maxPrice = parseInt(priceSlider.value);
@@ -426,10 +418,9 @@ function initShopPage() {
     if (priceLabel) priceLabel.textContent = formatPrice(maxPrice);
   }
 
-  // Search input on shop page
   const shopSearch = document.getElementById("shop-search-input");
   if (shopSearch) {
-    shopSearch.addEventListener("input", applyFilters);
+    shopSearch.addEventListener("input",   applyFilters);
     shopSearch.addEventListener("keydown", e => { if (e.key === "Enter") applyFilters(); });
   }
 
@@ -439,13 +430,17 @@ function initShopPage() {
 /* ============================================================
    PRODUCT DETAIL PAGE
    ============================================================ */
-function initProductPage() {
+async function initProductPage() {
   const container = document.getElementById("product-detail-container");
   if (!container) return;
 
   const params    = new URLSearchParams(window.location.search);
   const productId = params.get("id");
-  const product   = productId ? getProductById(productId) : null;
+  if (!productId) return;
+
+  container.innerHTML = `<div style="text-align:center;padding:5rem 1.5rem;"><i class="fa-regular fa-spinner fa-spin" style="font-size:2rem;color:var(--taupe);"></i></div>`;
+
+  const product = await getProductById(productId).catch(()=>null);
 
   if (!product) {
     container.innerHTML = `
@@ -649,26 +644,25 @@ function initProductPage() {
 /* ============================================================
    HOMEPAGE — New Arrivals render
    ============================================================ */
-function initHomePage() {
-  const newArrivalsGrid = document.getElementById("new-arrivals-grid");
-  if (!newArrivalsGrid) return;
+async function initHomePage() {
+  const grid = document.getElementById("new-arrivals-grid");
+  if (!grid) return;
   if (typeof getNewArrivals === "function") {
-    renderProductGrid("new-arrivals-grid", getNewArrivals(4));
+    const products = await getNewArrivals(4);
+    renderProductGrid("new-arrivals-grid", products);
   }
 }
 
 /* ============================================================
    COLLECTIONS PAGE — per-collection grids
    ============================================================ */
-function initCollectionsPage() {
+async function initCollectionsPage() {
   const grids = document.querySelectorAll("[data-collection-grid]");
-  grids.forEach(grid => {
-    const slug = grid.dataset.collectionGrid;
-    if (typeof getProductsByCollection === "function") {
-      const products = getProductsByCollection(slug).slice(0, 4);
-      renderProductGrid(grid.id, products);
-    }
-  });
+  for (const grid of grids) {
+    const slug     = grid.dataset.collectionGrid;
+    const products = await getProductsByCollection(slug).catch(()=>[]);
+    renderProductGrid(grid.id, products.slice(0,4));
+  }
 }
 
 /* ============================================================
@@ -719,9 +713,32 @@ function initHeroParallax() {
 }
 
 /* ============================================================
+   REAL-TIME PRODUCT SYNC
+   Listens for admin product changes in localStorage and
+   refreshes visible product grids without a page reload.
+   ============================================================ */
+function initProductSync() {
+  window.addEventListener("storage", e => {
+    if (e.key !== "fka_admin_products_overrides") return;
+
+    // Re-run whichever page initialiser is active
+    if (document.getElementById("shop-products-grid"))   initShopPage();
+    if (document.getElementById("new-arrivals-grid"))    initHomePage();
+    if (document.getElementById("product-detail-container")) initProductPage();
+    if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage();
+
+    // Re-sync wishlist heart states after grid rerender
+    if (typeof wishlistSyncButtons === "function") wishlistSyncButtons();
+  });
+}
+
+/* ============================================================
    GLOBAL INIT — runs on every page
    ============================================================ */
 document.addEventListener("DOMContentLoaded", () => {
+  // Initialise Supabase auth state listener first
+  if (typeof initAuthListener === "function") initAuthListener();
+
   initNavbar();
   setActiveNavLink();
   initMobileNav();
@@ -733,6 +750,8 @@ document.addEventListener("DOMContentLoaded", () => {
   initAskFka();
   initSmoothScroll();
   initHeroParallax();
+
+  initProductSync();
 
   // Page-specific inits
   initHomePage();

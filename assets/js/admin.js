@@ -18,56 +18,74 @@ const DEFAULT_ADMIN = {
 
 /* ── Auth Helpers ──────────────────────────────────────── */
 
-function adminLogin(username, password) {
-  const settings = adminSettingsLoad();
-  const storedUser = settings.adminUsername || DEFAULT_ADMIN.username;
-  const storedPass = settings.adminPassword || DEFAULT_ADMIN.passwordHash;
+/**
+ * Check if the current user is an admin (exists in admin_users table).
+ * Cached in sessionStorage for performance.
+ */
+async function adminCheckIsAdmin() {
+  try {
+    const session = await fkaGetSession();
+    if (!session?.user) return false;
+    const { data } = await fkaDB()
+      .from("admin_users")
+      .select("id")
+      .eq("id", session.user.id)
+      .single();
+    return !!data;
+  } catch { return false; }
+}
 
-  if (username.trim() === storedUser && password === storedPass) {
-    const session = {
-      loggedIn:  true,
-      username:  storedUser,
-      loginAt:   new Date().toISOString(),
-      expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString() // 8h
-    };
-    sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
-    return true;
-  }
+function adminLogin(username, password) {
+  // Legacy sync login — now handled by Supabase Auth.
+  // Use adminLoginSupabase() instead.
+  console.warn("adminLogin() is deprecated. Use adminLoginSupabase().");
   return false;
 }
 
+async function adminLoginSupabase(email, password) {
+  const result = await authLogin(email, password);
+  if (!result.ok) return result;
+  // Verify they are in admin_users
+  const isAdmin = await adminCheckIsAdmin();
+  if (!isAdmin) {
+    await fkaDB().auth.signOut();
+    return { ok:false, error:"This account does not have admin access." };
+  }
+  return { ok:true };
+}
+
 function adminLogout() {
+  if (_supabase) _supabase.auth.signOut().catch(()=>{});
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
   window.location.href = "index.html";
 }
 
 function adminIsLoggedIn() {
-  try {
-    const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
-    if (!s || !s.loggedIn) return false;
-    if (new Date(s.expiresAt) < new Date()) {
-      sessionStorage.removeItem(ADMIN_SESSION_KEY);
-      return false;
-    }
-    return true;
-  } catch { return false; }
+  // Synchronous check — uses cached session from initAuthListener()
+  return !!authGetSessionSync();
 }
 
-/**
- * Call at top of every admin page.
- * Redirects to login if not authenticated.
- */
-function adminAuthGuard() {
+async function adminAuthGuard() {
   if (!adminIsLoggedIn()) {
     window.location.href = "index.html?reason=session";
+    return false;
+  }
+  const isAdmin = await adminCheckIsAdmin();
+  if (!isAdmin) {
+    window.location.href = "index.html?reason=access";
     return false;
   }
   return true;
 }
 
 function adminGetSession() {
-  try { return JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY)); }
-  catch { return null; }
+  const session = authGetSessionSync();
+  if (!session) return null;
+  return {
+    loggedIn:  true,
+    username:  session.user?.email?.split("@")[0] || "admin",
+    loginAt:   session.user?.last_sign_in_at || new Date().toISOString()
+  };
 }
 
 /* ── Settings ──────────────────────────────────────────── */
