@@ -148,7 +148,7 @@
 <script src="../assets/js/admin.js"></script>
 <script>
 "use strict";
-if (!adminAuthGuard()) throw new Error("Unauthorized");
+(async () => { if (!(await adminAuthGuard())) { throw new Error("Unauthorized"); } })();
 adminRenderShell("dashboard");
 adminSetPageTitle("Dashboard");
 
