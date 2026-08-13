@@ -205,10 +205,13 @@ function initAskFkaAI() {
   });
 
   /* ── API key check ── */
+  // Don't return early — always wire buttons so panel is functional.
+  // The no_key error shows when user actually tries to send.
   if (!FKA_AI_CONFIG.apiKey) {
     if (_thread) fkaAppendMessage("bot",
       "⚙️ Ask FKA needs a Groq API key. " +
-      "Go to <strong>Admin → Settings</strong> and add your key under the Ask FKA section. " +
+      "Go to <strong><a href='../admin/settings.html' style='color:var(--warm-brown)'>Admin → Settings</a></strong> " +
+      "and add your key under <em>Ask FKA Configuration</em>. " +
       "Get a free key at <a href='https://console.groq.com' target='_blank' rel='noopener'>console.groq.com</a>.");
   }
 }
@@ -290,6 +293,8 @@ async function fkaCallGroq(messages) {
   const key = FKA_AI_CONFIG.apiKey;
   if (!key) throw new Error("no_key");
 
+  console.log("[Ask FKA] Calling Groq, model:", FKA_AI_CONFIG.model, "key prefix:", key.slice(0,8));
+
   const response = await fetch(FKA_AI_CONFIG.apiUrl, {
     method:  "POST",
     headers: {
@@ -309,15 +314,19 @@ async function fkaCallGroq(messages) {
   });
 
   if (!response.ok) {
-    const errData = await response.json().catch(() => ({ error: { message: response.statusText } }));
-    throw new Error(
-      `${response.status} — ${errData?.error?.message || errData?.error || response.statusText}`
-    );
+    let errMsg = response.statusText;
+    try {
+      const errData = await response.json();
+      errMsg = errData?.error?.message || errData?.error || response.statusText;
+    } catch {}
+    console.error("[Ask FKA] Groq error", response.status, errMsg);
+    throw new Error(`${response.status} — ${errMsg}`);
   }
 
   const data = await response.json();
-  return data.choices?.[0]?.message?.content
-    || "I'm not sure how to answer that. Please [chat with us on WhatsApp](https://wa.me/2347019243312).";
+  const content = data.choices?.[0]?.message?.content;
+  if (!content) throw new Error("Empty response from Groq.");
+  return content;
 }
 
 /* ── UI helpers ─────────────────────────────────────── */

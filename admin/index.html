@@ -57,9 +57,15 @@
       </button>
     </form>
 
-    <p class="adm-login-hint">
-      Sign in with the email you registered in Supabase.<br>
-      First time? See the setup guide in <code>supabase-schema.sql</code>.
+    <p class="adm-login-hint" id="login-hint">
+      <span id="hint-supabase" style="display:none;">
+        Sign in with your Supabase admin email.
+      </span>
+      <span id="hint-fallback">
+        Default credentials: <strong>admin</strong> / <strong>admin123</strong><br>
+        Change these in Settings after first login.<br>
+        <small style="color:#9A9A9A;">(To use Supabase Auth, add your credentials to <code>fka-config.js</code>)</small>
+      </span>
     </p>
   </div>
 </div>
@@ -71,16 +77,35 @@
 <script>
 "use strict";
 
-// Init auth listener so session cache is populated
-initAuthListener();
-
-// If already logged in as admin, go straight to dashboard
-(async () => {
-  await new Promise(r => setTimeout(r, 400)); // brief wait for session load
-  if (adminIsLoggedIn()) {
-    const isAdmin = await adminCheckIsAdmin();
-    if (isAdmin) { window.location.href = "dashboard.html"; return; }
+// Show correct hint based on whether Supabase is configured
+(function() {
+  const url = window.FKA_CONFIG?.supabaseUrl || "";
+  const isConfigured = url !== "YOUR_SUPABASE_URL" && url.startsWith("https://");
+  document.getElementById("hint-supabase").style.display  = isConfigured ? "block" : "none";
+  document.getElementById("hint-fallback").style.display  = isConfigured ? "none"  : "block";
+  // Update placeholder based on mode
+  if (isConfigured) {
+    document.getElementById("adm-email").placeholder = "admin@yoursite.com";
+  } else {
+    document.getElementById("adm-email").placeholder = "admin (or your username)";
   }
+})();
+
+// Init auth listener only when Supabase is configured
+if (typeof initAuthListener === "function") {
+  try { initAuthListener(); } catch(e) { console.warn("Auth listener:", e.message); }
+}
+
+// If already logged in, go straight to dashboard
+(async () => {
+  try {
+    await new Promise(r => setTimeout(r, 300));
+    if (adminIsLoggedIn()) {
+      window.location.href = "dashboard.html";
+      return;
+    }
+  } catch(e) {}
+
   // Show session-expired notice if redirected here
   const params = new URLSearchParams(window.location.search);
   if (params.get("reason") === "session") {
@@ -104,21 +129,33 @@ document.getElementById("login-form").addEventListener("submit", async e => {
   const errEl    = document.getElementById("login-error");
   const btn      = document.getElementById("login-btn");
 
+  if (!email || !password) {
+    errEl.textContent   = "Please enter your username/email and password.";
+    errEl.style.display = "flex";
+    return;
+  }
+
   errEl.style.display = "none";
   btn.disabled    = true;
   btn.innerHTML   = '<i class="fa-regular fa-spinner fa-spin"></i> Signing in…';
 
-  const result = await adminLoginSupabase(email, password);
-
-  if (result.ok) {
-    window.location.href = "dashboard.html";
-  } else {
-    errEl.textContent    = result.error || "Invalid email or password.";
-    errEl.style.display  = "flex";
+  try {
+    const result = await adminLoginSupabase(email, password);
+    if (result.ok) {
+      window.location.href = "dashboard.html";
+    } else {
+      errEl.textContent    = result.error || "Invalid credentials. Please try again.";
+      errEl.style.display  = "flex";
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fa-regular fa-right-to-bracket"></i> Sign In';
+      document.getElementById("adm-password").value = "";
+      document.getElementById("adm-password").focus();
+    }
+  } catch(err) {
+    errEl.textContent   = "Something went wrong: " + (err.message || "Please try again.");
+    errEl.style.display = "flex";
     btn.disabled = false;
     btn.innerHTML = '<i class="fa-regular fa-right-to-bracket"></i> Sign In';
-    document.getElementById("adm-password").value = "";
-    document.getElementById("adm-password").focus();
   }
 });
 </script>

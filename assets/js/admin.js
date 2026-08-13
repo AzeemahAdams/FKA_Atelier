@@ -19,10 +19,26 @@ const DEFAULT_ADMIN = {
 /* ── Auth Helpers ──────────────────────────────────────── */
 
 /**
- * Check if the current user is an admin (exists in admin_users table).
- * Cached in sessionStorage for performance.
+ * Check if Supabase is configured and available.
+ */
+function _isSupabaseReady() {
+  const url = window.FKA_CONFIG?.supabaseUrl || "";
+  return !!_supabase && url !== "YOUR_SUPABASE_URL" && url.startsWith("https://");
+}
+
+/**
+ * Check if the current user is an admin.
+ * If Supabase is configured, checks admin_users table.
+ * Otherwise falls back to localStorage credentials.
  */
 async function adminCheckIsAdmin() {
+  if (!_isSupabaseReady()) {
+    // Fallback: session is set by localStorage login below
+    try {
+      const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
+      return !!(s && s.loggedIn && new Date(s.expiresAt) > new Date());
+    } catch { return false; }
+  }
   try {
     const session = await fkaGetSession();
     if (!session?.user) return false;
@@ -35,34 +51,69 @@ async function adminCheckIsAdmin() {
   } catch { return false; }
 }
 
-function adminLogin(username, password) {
-  // Legacy sync login — now handled by Supabase Auth.
-  // Use adminLoginSupabase() instead.
-  console.warn("adminLogin() is deprecated. Use adminLoginSupabase().");
-  return false;
+/**
+ * Main login function — tries Supabase first, falls back to
+ * localStorage credentials if Supabase is not configured.
+ */
+async function adminLoginSupabase(email, password) {
+  // ── FALLBACK MODE (no Supabase configured) ──────────────
+  if (!_isSupabaseReady()) {
+    const settings   = adminSettingsLoad();
+    const storedUser = settings.adminUsername || DEFAULT_ADMIN.username;
+    const storedPass = settings.adminPassword || DEFAULT_ADMIN.passwordHash;
+
+    // Accept either email or username
+    const inputUser = email.includes("@") ? email.split("@")[0] : email;
+    if ((email === storedUser || inputUser === storedUser) && password === storedPass) {
+      const session = {
+        loggedIn:  true,
+        username:  storedUser,
+        loginAt:   new Date().toISOString(),
+        expiresAt: new Date(Date.now() + 8 * 60 * 60 * 1000).toISOString()
+      };
+      sessionStorage.setItem(ADMIN_SESSION_KEY, JSON.stringify(session));
+      return { ok: true };
+    }
+    return { ok: false, error: "Invalid email or password." };
+  }
+
+  // ── SUPABASE MODE ───────────────────────────────────────
+  try {
+    const result = await authLogin(email, password);
+    if (!result.ok) return result;
+    const isAdmin = await adminCheckIsAdmin();
+    if (!isAdmin) {
+      if (_supabase) await _supabase.auth.signOut();
+      return { ok: false, error: "This account does not have admin access." };
+    }
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: err.message || "Login failed. Please try again." };
+  }
 }
 
-async function adminLoginSupabase(email, password) {
-  const result = await authLogin(email, password);
-  if (!result.ok) return result;
-  // Verify they are in admin_users
-  const isAdmin = await adminCheckIsAdmin();
-  if (!isAdmin) {
-    await fkaDB().auth.signOut();
-    return { ok:false, error:"This account does not have admin access." };
-  }
-  return { ok:true };
+/** Legacy alias */
+function adminLogin(username, password) {
+  console.warn("adminLogin() is deprecated. Calling adminLoginSupabase().");
+  return adminLoginSupabase(username, password);
 }
 
 function adminLogout() {
-  if (_supabase) _supabase.auth.signOut().catch(()=>{});
+  if (_isSupabaseReady() && _supabase) {
+    _supabase.auth.signOut().catch(() => {});
+  }
   sessionStorage.removeItem(ADMIN_SESSION_KEY);
   window.location.href = "index.html";
 }
 
 function adminIsLoggedIn() {
-  // Synchronous check — uses cached session from initAuthListener()
-  return !!authGetSessionSync();
+  // Check Supabase cached session first
+  if (_isSupabaseReady()) return !!authGetSessionSync();
+  // Fallback: check sessionStorage
+  try {
+    const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
+    return !!(s && s.loggedIn && new Date(s.expiresAt) > new Date());
+  } catch { return false; }
 }
 
 async function adminAuthGuard() {
@@ -70,22 +121,31 @@ async function adminAuthGuard() {
     window.location.href = "index.html?reason=session";
     return false;
   }
-  const isAdmin = await adminCheckIsAdmin();
-  if (!isAdmin) {
-    window.location.href = "index.html?reason=access";
-    return false;
+  // Only check Supabase admin_users table when Supabase is configured
+  if (_isSupabaseReady()) {
+    try {
+      const isAdmin = await adminCheckIsAdmin();
+      if (!isAdmin) { window.location.href = "index.html?reason=access"; return false; }
+    } catch { /* if check fails, allow — admin is already logged in via session */ }
   }
   return true;
 }
 
 function adminGetSession() {
-  const session = authGetSessionSync();
-  if (!session) return null;
-  return {
-    loggedIn:  true,
-    username:  session.user?.email?.split("@")[0] || "admin",
-    loginAt:   session.user?.last_sign_in_at || new Date().toISOString()
-  };
+  if (_isSupabaseReady()) {
+    const session = authGetSessionSync();
+    if (!session) return null;
+    return {
+      loggedIn: true,
+      username: session.user?.email?.split("@")[0] || "admin",
+      loginAt:  session.user?.last_sign_in_at || new Date().toISOString()
+    };
+  }
+  // Fallback
+  try {
+    const s = JSON.parse(sessionStorage.getItem(ADMIN_SESSION_KEY));
+    return s && s.loggedIn ? s : null;
+  } catch { return null; }
 }
 
 /* ── Settings ──────────────────────────────────────────── */

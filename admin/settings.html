@@ -315,14 +315,32 @@ function loadSettings() {
 /* ── Groq API Key management ─────────────────────────── */
 function saveGroqKey() {
   const keyInput = document.getElementById("s-groq-key");
-  const key      = keyInput ? keyInput.value.trim() : "";
+  const rawKey   = keyInput ? keyInput.value.trim() : "";
   const model    = document.getElementById("s-groq-model")?.value || "llama-3.3-70b-versatile";
+
+  // Accept the key that was entered OR the one already saved (shown as placeholder)
+  const existingKey = localStorage.getItem("fka_groq_api_key") || "";
+  const key = rawKey || existingKey;
 
   if (key && !key.startsWith("gsk_")) {
     adminToast("Groq API keys start with 'gsk_'. Please check your key.", "error");
     return;
   }
   if (key) {
+    localStorage.setItem("fka_groq_api_key",   key);
+    localStorage.setItem("fka_groq_model",     model);
+    if (keyInput) {
+      keyInput.value       = "";
+      keyInput.placeholder = key.slice(0,8) + "••••••••••••••••" + key.slice(-4);
+    }
+    showGroqKeyStatus("saved");
+    adminToast("✓ API key saved. Ask FKA is ready.");
+  } else {
+    // Model only update
+    localStorage.setItem("fka_groq_model", model);
+    adminToast("Model preference saved.");
+  }
+}
     localStorage.setItem("fka_groq_api_key",   key);
     localStorage.setItem("fka_groq_model",     model);
     if (keyInput) { keyInput.value = ""; keyInput.placeholder = key.slice(0,8) + "••••••••••••••••" + key.slice(-4); }
