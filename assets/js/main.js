@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    FKA ATELIER — Main JavaScript
    Handles: navbar, mobile menu, search overlay, scroll animations,
    Ask FKA placeholder UI, toast notifications, modals,
@@ -285,8 +285,8 @@ function buildProductCard(product) {
 
   const img = product.images && product.images[0]
     ? `<img src="${product.images[0]}" alt="${product.name}" loading="lazy"
-         onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-light fa-shirt\\'></i><span>${product.categoryLabel}</span></div>'">`
-    : `<div class="product-img-placeholder"><i class="fa-light fa-shirt"></i><span>${product.categoryLabel}</span></div>`;
+         onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i><span>${product.categoryLabel}</span></div>'">`
+    : `<div class="product-img-placeholder"><i class="fa-regular fa-shirt"></i><span>${product.categoryLabel}</span></div>`;
 
   return `
     <div class="product-card fade-in" data-id="${product.id}" data-category="${product.category}" data-price="${product.price}">
@@ -452,8 +452,17 @@ async function initProductPage() {
     return;
   }
 
+  // Guard arrays defensively - a missing field crashes the whole render
+  const colours    = Array.isArray(product.colours)     ? product.colours     : [];
+  const sizes      = Array.isArray(product.sizes)       ? product.sizes       : ["XS","S","M","L","XL","XXL"];
+  const images     = Array.isArray(product.images)      ? product.images      : [];
+  const collections= Array.isArray(product.collections) ? product.collections : [];
+  const firstImage = images[0] || "";
+  const firstColour= colours[0] || { name:"Default", hex:"#C4B5A5" };
+  const firstSize  = sizes[0]   || "";
+
   // Build colour swatches
-  const swatches = product.colours.map((c, i) => `
+  const swatches = colours.map((c, i) => `
     <span class="colour-swatch ${i === 0 ? "active" : ""}"
       style="background:${c.hex};"
       data-name="${c.name}"
@@ -462,12 +471,12 @@ async function initProductPage() {
       tabindex="0" role="button" aria-label="${c.name}">
     </span>`).join("");
 
-  // Build size buttons
-  const sizes = product.sizes.map((s, i) => `
+  // Build size buttons (use guarded `sizes` array)
+  const sizeBtns = sizes.map((s, i) => `
     <button class="size-btn ${i === 0 ? "active" : ""}" data-size="${s}">${s}</button>`).join("");
 
-  // Build thumbnails
-  const thumbs = product.images.map((img, i) => `
+  // Build thumbnails (use guarded `images` array)
+  const thumbs = images.map((img, i) => `
     <div class="product-thumb ${i === 0 ? "active" : ""}" data-index="${i}" tabindex="0" role="button" aria-label="View image ${i+1}">
       <img src="${img}" alt="${product.name} view ${i+1}"
         onerror="this.parentElement.style.background='var(--cream)'">
@@ -484,10 +493,10 @@ async function initProductPage() {
       <!-- Gallery -->
       <div class="product-gallery">
         <div class="product-main-img" id="product-main-img">
-          <img id="product-main-img-el" src="${product.images[0]}" alt="${product.name}"
-            onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-light fa-shirt\\'></i></div>'">
+          <img id="product-main-img-el" src="${firstImage}" alt="${product.name}"
+            onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i></div>'">
         </div>
-        ${product.images.length > 1 ? `<div class="product-thumbnails">${thumbs}</div>` : ""}
+        ${images.length > 1 ? `<div class="product-thumbnails">${thumbs}</div>` : ""}
       </div>
 
       <!-- Info -->
@@ -495,19 +504,19 @@ async function initProductPage() {
         ${badge}
         <div class="product-detail-category">${product.categoryLabel}</div>
         <h1 class="product-detail-name">${product.name}</h1>
-        <div class="product-detail-price">${product.priceFormatted}</div>
+        <div class="product-detail-price">${product.priceFormatted || (product.price ? "₦" + Number(product.price).toLocaleString() : "")}</div>
         <p class="product-detail-desc">${product.description}</p>
 
         <!-- Colours -->
-        <span class="option-label">Colour <span id="selected-colour-label" style="color:var(--warm-brown);font-weight:400;">${product.colours[0].name}</span></span>
+        <span class="option-label">Colour <span id="selected-colour-label" style="color:var(--warm-brown);font-weight:400;">${firstColour.name}</span></span>
         <div class="colour-swatches">${swatches}</div>
 
         <!-- Sizes -->
         <span class="option-label">
-          Size <span id="selected-size-label" style="color:var(--warm-brown);font-weight:400;">${product.sizes[0]}</span>
+          Size <span id="selected-size-label" style="color:var(--warm-brown);font-weight:400;">${firstSize}</span>
           <span class="size-guide-link" data-modal-open="modal-size-guide">Size Guide</span>
         </span>
-        <div class="size-btns">${sizes}</div>
+        <div class="size-btns">${sizeBtns}</div>
 
         <!-- Quantity -->
         <span class="option-label">Quantity</span>
@@ -566,14 +575,14 @@ async function initProductPage() {
     thumb.addEventListener("click", () => {
       const idx = parseInt(thumb.dataset.index);
       const mainImg = document.getElementById("product-main-img-el");
-      if (mainImg && product.images[idx]) mainImg.src = product.images[idx];
+      if (mainImg && images[idx]) mainImg.src = images[idx];
       document.querySelectorAll(".product-thumb").forEach(t => t.classList.remove("active"));
       thumb.classList.add("active");
     });
   });
 
   // Colour selection
-  let selectedColour = product.colours[0].name;
+  let selectedColour = firstColour.name;
   document.querySelectorAll(".colour-swatch").forEach(sw => {
     sw.addEventListener("click", () => {
       document.querySelectorAll(".colour-swatch").forEach(s => s.classList.remove("active"));
@@ -585,7 +594,7 @@ async function initProductPage() {
   });
 
   // Size selection
-  let selectedSize = product.sizes[0];
+  let selectedSize = firstSize;
   document.querySelectorAll(".size-btn").forEach(btn => {
     btn.addEventListener("click", () => {
       document.querySelectorAll(".size-btn").forEach(b => b.classList.remove("active"));

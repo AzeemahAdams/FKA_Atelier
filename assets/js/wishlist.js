@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    FKA ATELIER — Wishlist
    Persisted in localStorage under key "fka_wishlist"
    ============================================================ */
@@ -169,7 +169,7 @@ function wishlistRenderPage() {
     <div class="product-card" data-id="${item.productId}">
       <div class="product-card-image">
         <img src="${item.image}" alt="${item.name}"
-             onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-light fa-shirt\\'></i><span>${item.category}</span></div>'">
+             onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i><span>${item.category}</span></div>'">
         <button class="product-wishlist-btn active" data-wishlist-id="${item.productId}"
           onclick="wishlistToggle('${item.productId}'); wishlistRenderPage();" title="Remove from wishlist">
           <i class="fa-solid fa-heart"></i>

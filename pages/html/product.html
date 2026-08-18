@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -232,21 +232,26 @@
 <script src="../../assets/js/auth.js"></script>
 <script src="../../assets/js/main.js"></script>
 <script>
-  // Render related products after main product detail loads
-  document.addEventListener("DOMContentLoaded", () => {
-  if (typeof authSyncNavbar === "function") authSyncNavbar();
+  document.addEventListener("DOMContentLoaded", async () => {
+    if (typeof authSyncNavbar   === "function") authSyncNavbar();
+    if (typeof initProductSync  === "function") initProductSync();
+    // Related products — async because getProductById/getAllProducts hit Supabase
     const params = new URLSearchParams(window.location.search);
     const id = params.get("id");
-    if (id && typeof getProductById === "function") {
-      const product = getProductById(id);
-      if (product) {
-        const related = getAllProducts()
-          .filter(p => p.id !== id && p.category === product.category)
-          .slice(0, 4);
-        if (related.length > 0) renderProductGrid("related-products-grid", related);
-        else document.querySelector('[aria-label="Related products"]').style.display = "none";
+    if (!id) return;
+    try {
+      const product = await getProductById(id);
+      if (!product) return;
+      const all     = await getAllProducts();
+      const related = all.filter(p => p.id !== id && p.category === product.category).slice(0, 4);
+      const grid    = document.getElementById("related-products-grid");
+      const section = document.querySelector('[aria-label="Related products"]');
+      if (related.length > 0 && grid) {
+        renderProductGrid("related-products-grid", related);
+      } else if (section) {
+        section.style.display = "none";
       }
-    }
+    } catch(e) { console.warn("[FKA] related products:", e.message); }
   });
 </script>
 <script src="../../assets/js/askfka.js"></script>

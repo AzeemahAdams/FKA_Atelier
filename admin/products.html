@@ -138,11 +138,48 @@
         <input class="adm-input" type="text" id="prod-care" placeholder="Hand wash cold. Do not tumble dry.">
       </div>
 
+      <!-- ── IMAGE UPLOAD ── -->
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Image URLs <span style="color:var(--adm-text-light);font-weight:400;">(one per line)</span></label>
-        <textarea class="adm-textarea" id="prod-images" rows="3"
-          placeholder="https://images.unsplash.com/…&#10;https://images.unsplash.com/…"></textarea>
-        <span class="adm-field-hint">Enter full image URLs, one per line. First image is the primary.</span>
+        <label class="adm-label">Product Images</label>
+
+        <!-- Tab switcher -->
+        <div style="display:flex;border:1px solid var(--adm-border);border-radius:var(--adm-radius);overflow:hidden;margin-bottom:0.85rem;width:fit-content;">
+          <button type="button" id="img-tab-url" onclick="switchImageTab('url')"
+            style="padding:0.45rem 1.1rem;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:var(--adm-sidebar-bg);color:#fff;border:none;cursor:pointer;transition:all 0.2s;font-family:var(--adm-font);">
+            <i class="fa-regular fa-link"></i> URL
+          </button>
+          <button type="button" id="img-tab-upload" onclick="switchImageTab('upload')"
+            style="padding:0.45rem 1.1rem;font-size:0.72rem;font-weight:600;letter-spacing:0.1em;text-transform:uppercase;background:var(--adm-surface);color:var(--adm-text-mid);border:none;cursor:pointer;transition:all 0.2s;font-family:var(--adm-font);">
+            <i class="fa-regular fa-upload"></i> Upload
+          </button>
+        </div>
+
+        <!-- URL input panel -->
+        <div id="img-panel-url">
+          <textarea class="adm-textarea" id="prod-images" rows="3"
+            placeholder="https://images.unsplash.com/…&#10;https://example.com/image2.jpg&#10;One URL per line. First image is primary."></textarea>
+          <span class="adm-field-hint">Paste full image URLs — one per line. First is the primary product image.</span>
+        </div>
+
+        <!-- File upload panel -->
+        <div id="img-panel-upload" style="display:none;">
+          <div id="img-drop-zone"
+            style="border:2px dashed var(--adm-border);border-radius:var(--adm-radius);padding:2rem 1.5rem;text-align:center;cursor:pointer;transition:border-color 0.2s;background:var(--adm-bg);"
+            onclick="document.getElementById('prod-image-file').click()"
+            ondragover="event.preventDefault();this.style.borderColor='var(--adm-accent)'"
+            ondragleave="this.style.borderColor='var(--adm-border)'"
+            ondrop="handleImageDrop(event)">
+            <i class="fa-regular fa-cloud-arrow-up" style="font-size:2rem;color:var(--adm-text-light);display:block;margin-bottom:0.75rem;"></i>
+            <div style="font-size:0.85rem;font-weight:600;color:var(--adm-text);margin-bottom:0.25rem;">Click to upload or drag &amp; drop</div>
+            <div style="font-size:0.72rem;color:var(--adm-text-light);">JPG, PNG, WebP — max 2 MB per image. Multiple files supported.</div>
+          </div>
+          <input type="file" id="prod-image-file" accept="image/*" multiple
+            style="display:none;" onchange="handleImageFileSelect(this.files)">
+
+          <!-- Preview grid -->
+          <div id="img-preview-grid" style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.75rem;"></div>
+          <div id="img-upload-status" style="font-size:0.75rem;color:var(--adm-text-light);margin-top:0.35rem;"></div>
+        </div>
       </div>
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
@@ -364,7 +401,7 @@ function openProductModal(productId) {
   adminOpenModal("modal-product");
 }
 
-function saveProduct() {
+async function saveProduct() {
   const name  = document.getElementById("prod-name").value.trim();
   const price = parseFloat(document.getElementById("prod-price").value);
   const desc  = document.getElementById("prod-description").value.trim();
@@ -379,7 +416,7 @@ function saveProduct() {
   const catLabels = { abayas:"Abayas", dresses:"Dresses", "coord-sets":"Co-ord Sets", skirts:"Skirts", tops:"Tops", accessories:"Accessories" };
 
   const sizes   = [...document.querySelectorAll("#prod-sizes-wrap input:checked")].map(el => el.dataset.size);
-  const images  = document.getElementById("prod-images").value.split("\n").map(s=>s.trim()).filter(Boolean);
+  const images  = collectImages();
   const colRaw  = document.getElementById("prod-colours").value.split("\n").map(s=>s.trim()).filter(Boolean);
   const colours = colRaw.map(line => {
     const [n, h] = line.split(":").map(s=>s.trim());
@@ -410,7 +447,14 @@ function saveProduct() {
   const idx       = overrides.findIndex(o => o.id === product.id);
   if (idx >= 0) overrides[idx] = product;
   else          overrides.push(product);
-  saveAdminProducts(overrides);
+
+  // Use adminSaveProduct from products.js — handles Supabase when configured,
+  // falls back to localStorage so storefront always sees the change
+  if (typeof adminSaveProduct === "function") {
+    await adminSaveProduct(product);
+  } else {
+    saveAdminProducts(overrides);
+  }
 
   adminCloseModal("modal-product");
   adminToast(`"${product.name}" saved successfully.`);
@@ -422,12 +466,114 @@ async function deleteCurrentProduct() {
   if (!confirmed) return;
   const overrides = loadAdminProducts().filter(o => o.id !== editingId);
   saveAdminProducts(overrides);
+  // Also remove from products.js override store
+  if (typeof adminSaveProduct === "function") {
+    const raw = JSON.parse(localStorage.getItem("fka_admin_products_overrides") || "[]").filter(o => o.id !== editingId);
+    localStorage.setItem("fka_admin_products_overrides", JSON.stringify(raw));
+  }
   adminCloseModal("modal-product");
   adminToast("Product removed from overrides.", "error");
   renderProducts();
 }
 
-// Wire filters
+// ── Image tab switching ───────────────────────────────
+let _uploadedImages = []; // base64 data URLs from file uploads
+
+function switchImageTab(tab) {
+  const urlPanel    = document.getElementById("img-panel-url");
+  const uploadPanel = document.getElementById("img-panel-upload");
+  const urlBtn      = document.getElementById("img-tab-url");
+  const uploadBtn   = document.getElementById("img-tab-upload");
+  if (tab === "url") {
+    urlPanel.style.display    = "block";
+    uploadPanel.style.display = "none";
+    urlBtn.style.background   = "var(--adm-sidebar-bg)";
+    urlBtn.style.color        = "#fff";
+    uploadBtn.style.background= "var(--adm-surface)";
+    uploadBtn.style.color     = "var(--adm-text-mid)";
+  } else {
+    urlPanel.style.display    = "none";
+    uploadPanel.style.display = "block";
+    urlBtn.style.background   = "var(--adm-surface)";
+    urlBtn.style.color        = "var(--adm-text-mid)";
+    uploadBtn.style.background= "var(--adm-sidebar-bg)";
+    uploadBtn.style.color     = "#fff";
+    // Sync upload previews with existing images
+    renderUploadPreviews();
+  }
+}
+
+function handleImageDrop(event) {
+  event.preventDefault();
+  document.getElementById("img-drop-zone").style.borderColor = "var(--adm-border)";
+  handleImageFileSelect(event.dataTransfer.files);
+}
+
+function handleImageFileSelect(files) {
+  const status = document.getElementById("img-upload-status");
+  status.textContent = "Processing…";
+  let processed = 0;
+  const total   = files.length;
+
+  Array.from(files).forEach(file => {
+    if (!file.type.startsWith("image/")) { processed++; return; }
+    if (file.size > 2 * 1024 * 1024) {
+      adminToast(`"${file.name}" is over 2 MB — skipped.`, "error");
+      processed++;
+      if (processed === total) status.textContent = `${_uploadedImages.length} image${_uploadedImages.length !== 1 ? "s" : ""} ready.`;
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = e => {
+      _uploadedImages.push(e.target.result); // base64 data URL
+      processed++;
+      renderUploadPreviews();
+      if (processed === total) {
+        status.textContent = `${_uploadedImages.length} image${_uploadedImages.length !== 1 ? "s" : ""} ready. First image will be the primary.`;
+      }
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+function renderUploadPreviews() {
+  const grid = document.getElementById("img-preview-grid");
+  if (!grid) return;
+  grid.innerHTML = _uploadedImages.map((src, i) => `
+    <div style="position:relative;width:80px;height:80px;border-radius:var(--adm-radius);overflow:hidden;border:${i===0?"2px solid var(--adm-accent)":"1px solid var(--adm-border)"};">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover;"
+        alt="Upload ${i+1}" title="${i===0?"Primary image":""}"
+        onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22><text y=%2250%25%22 font-size=%2220%22>🖼</text></svg>'">
+      <button type="button" onclick="removeUploadedImage(${i})"
+        style="position:absolute;top:2px;right:2px;width:20px;height:20px;background:rgba(0,0,0,0.6);color:#fff;border:none;border-radius:50%;font-size:0.7rem;cursor:pointer;display:flex;align-items:center;justify-content:center;">
+        <i class="fa-regular fa-xmark"></i>
+      </button>
+      ${i===0?'<div style="position:absolute;bottom:2px;left:50%;transform:translateX(-50%);background:var(--adm-accent);color:#fff;font-size:0.55rem;padding:1px 5px;border-radius:3px;white-space:nowrap;">Primary</div>':""}
+    </div>`).join("");
+}
+
+function removeUploadedImage(index) {
+  _uploadedImages.splice(index, 1);
+  renderUploadPreviews();
+  const status = document.getElementById("img-upload-status");
+  if (status) status.textContent = `${_uploadedImages.length} image${_uploadedImages.length !== 1 ? "s" : ""} ready.`;
+}
+
+// Collect images from whichever tab is active
+function collectImages() {
+  const urlPanel = document.getElementById("img-panel-url");
+  if (urlPanel && urlPanel.style.display !== "none") {
+    // URL mode
+    return document.getElementById("prod-images").value
+      .split("\n").map(s => s.trim()).filter(Boolean);
+  } else {
+    // Upload mode — return base64 array
+    return [..._uploadedImages];
+  }
+}
+
+// ── Wire filters ───────────────────────────────────────
 ["prod-search","prod-category-filter","prod-status-filter"].forEach(id => {
   document.getElementById(id)?.addEventListener("input",  () => { currentPage=1; renderProducts(); });
   document.getElementById(id)?.addEventListener("change", () => { currentPage=1; renderProducts(); });

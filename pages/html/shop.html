@@ -1,322 +1,668 @@
-﻿<!DOCTYPE html>
+﻿<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Shop — FKA Atelier</title>
-  <meta name="description" content="Browse all FKA Atelier pieces — abayas, dresses, co-ord sets, skirts, tops and accessories.">
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
-  <link rel="stylesheet" href="../../assets/css/style.css">
-</head>
-<body>
-
-<div class="announcement-bar">
-  FREE DELIVERY ON ORDERS OVER ₦70,000 <span>|</span> CUSTOM MEASUREMENTS ACCEPTED
-</div>
-
-<nav class="fka-navbar" role="navigation" aria-label="Main navigation">
-  <div class="navbar-inner">
-    <button class="navbar-toggler" id="navbar-toggler" aria-label="Open menu" aria-expanded="false">
-      <i class="fa-regular fa-bars"></i>
-    </button>
-    <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
-    <ul class="navbar-nav-links" role="list">
-      <li><a href="../../index.html">Home</a></li>
-      <li><a href="shop.html" class="active">Shop</a></li>
-      <li><a href="collections.html">Collections</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="measurements.html">Measurements</a></li>
-      <li><a href="contact.html">Contact</a></li>
-    </ul>
-    <div class="navbar-actions">
-      <button class="navbar-icon-btn search-open-btn" aria-label="Search"><i class="fa-regular fa-magnifying-glass"></i></button>
-      <a href="wishlist.html" class="navbar-icon-btn" aria-label="Wishlist" style="position:relative;">
-        <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
-      </a>
-      <a href="cart.html" class="navbar-icon-btn" aria-label="Shopping bag" style="position:relative;">
-        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
-      </a>
-      <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My Account" title="Sign In / Register" style="position:relative;">
-        <i class="fa-regular fa-circle-user"></i>
-      </a>
-      <button class="ask-fka-nav-btn" aria-label="Ask FKA"><span class="sparkle">✨</span> Ask FKA</button>
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Shop — FKA Atelier</title>
+    <meta
+      name="description"
+      content="Browse all FKA Atelier pieces — abayas, dresses, co-ord sets, skirts, tops and accessories."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+    />
+    <link rel="stylesheet" href="../../assets/css/style.css" />
+  </head>
+  <body>
+    <div class="announcement-bar">
+      FREE DELIVERY ON ORDERS OVER ₦70,000 <span>|</span> CUSTOM MEASUREMENTS
+      ACCEPTED
     </div>
-  </div>
-</nav>
 
-<div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
-<nav id="mobile-nav-drawer" class="mobile-nav-drawer" aria-label="Mobile navigation">
-  <button id="mobile-nav-close" class="mobile-nav-close" aria-label="Close menu"><i class="fa-regular fa-xmark"></i></button>
-  <div class="mobile-nav-brand">FKA Atelier</div>
-  <ul class="mobile-nav-links" role="list">
-    <li><a href="../../index.html">Home</a></li>
-    <li><a href="shop.html">Shop</a></li>
-    <li><a href="collections.html">Collections</a></li>
-    <li><a href="about.html">About</a></li>
-    <li><a href="measurements.html">Measurements</a></li>
-    <li><a href="faq.html">FAQ</a></li>
-    <li><a href="contact.html">Contact</a></li>
-    <li><a href="cart.html">Shopping Bag</a></li>
-    <li><a href="wishlist.html">Wishlist</a></li>
-  </ul>
-</nav>
+    <nav class="fka-navbar" role="navigation" aria-label="Main navigation">
+      <div class="navbar-inner">
+        <button
+          class="navbar-toggler"
+          id="navbar-toggler"
+          aria-label="Open menu"
+          aria-expanded="false"
+        >
+          <i class="fa-regular fa-bars"></i>
+        </button>
+        <a href="../../index.html" class="navbar-brand">FKA Atelier</a>
+        <ul class="navbar-nav-links" role="list">
+          <li><a href="../../index.html">Home</a></li>
+          <li><a href="shop.html" class="active">Shop</a></li>
+          <li><a href="collections.html">Collections</a></li>
+          <li><a href="about.html">About</a></li>
+          <li><a href="measurements.html">Measurements</a></li>
+          <li><a href="contact.html">Contact</a></li>
+        </ul>
+        <div class="navbar-actions">
+          <button class="navbar-icon-btn search-open-btn" aria-label="Search">
+            <i
+              class="fa-solid fa-magnifying-glass"
+              style="color: rgb(152, 128, 46)"
+            ></i>
+          </button>
+          <a
+            href="wishlist.html"
+            class="navbar-icon-btn"
+            aria-label="Wishlist"
+            style="position: relative"
+          >
+            <i class="fa-regular fa-heart"></i
+            ><span class="wishlist-count" style="display: none">0</span>
+          </a>
+          <a
+            href="cart.html"
+            class="navbar-icon-btn"
+            aria-label="Shopping bag"
+            style="position: relative"
+          >
+            <i
+              class="fa-solid fa-cart-shopping"
+              style="color: rgb(152, 128, 46)"
+            ></i>
+            <span class="cart-count" style="display: none">0</span>
+          </a>
+          <a
+            href="account.html"
+            class="navbar-icon-btn auth-account-btn"
+            aria-label="My Account"
+            title="Sign In / Register"
+            style="position: relative"
+          >
+            <i class="fa-regular fa-circle-user"></i>
+          </a>
+          <button class="ask-fka-nav-btn" aria-label="Ask FKA">
+            <span class="sparkle">✨</span> Ask FKA
+          </button>
+        </div>
+      </div>
+    </nav>
 
-<div id="search-overlay" class="search-overlay" role="search" aria-label="Search">
-  <div class="search-overlay-inner">
-    <div class="search-overlay-input-row">
-      <i class="fa-regular fa-magnifying-glass" style="color:var(--taupe);font-size:1rem;flex-shrink:0;"></i>
-      <input id="search-input" class="search-overlay-input" type="search"
-        placeholder="Search pieces, colours, styles&#x2026;" autocomplete="off" aria-label="Search products">
-      <button id="search-overlay-close" class="search-overlay-close" aria-label="Close search">
+    <div id="mobile-nav-overlay" class="mobile-nav-overlay"></div>
+    <nav
+      id="mobile-nav-drawer"
+      class="mobile-nav-drawer"
+      aria-label="Mobile navigation"
+    >
+      <button
+        id="mobile-nav-close"
+        class="mobile-nav-close"
+        aria-label="Close menu"
+      >
         <i class="fa-regular fa-xmark"></i>
       </button>
-    </div>
-    <div id="search-results-preview" class="search-results-preview"></div>
-  </div>
-</div>
-
-<!-- SHOP HERO -->
-<div class="shop-hero">
-  <div class="breadcrumb">
-    <a href="../../index.html">Home</a>
-    <span class="breadcrumb-sep"><i class="fa-regular fa-chevron-right"></i></span>
-    <span>Shop</span>
-  </div>
-  <h1 class="shop-hero-title">All Pieces</h1>
-  <p class="shop-hero-sub">Modest fashion designed for timeless elegance</p>
-</div>
-
-<!-- MOBILE FILTER BAR -->
-<div style="background:var(--cream);border-bottom:1px solid var(--border);padding:0.75rem 1.5rem;display:none;" id="mobile-filter-bar">
-  <div style="display:flex;gap:0.5rem;overflow-x:auto;padding-bottom:0.25rem;scrollbar-width:none;">
-    <button class="filter-category-btn active" data-category="all" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">All</button>
-    <button class="filter-category-btn" data-category="abayas" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Abayas</button>
-    <button class="filter-category-btn" data-category="dresses" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Dresses</button>
-    <button class="filter-category-btn" data-category="coord-sets" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Co-ord Sets</button>
-    <button class="filter-category-btn" data-category="skirts" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Skirts</button>
-    <button class="filter-category-btn" data-category="tops" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Tops</button>
-    <button class="filter-category-btn" data-category="accessories" style="white-space:nowrap;padding:0.45rem 1rem;border:1px solid var(--border-dark);font-size:0.72rem;letter-spacing:0.1em;text-transform:uppercase;">Accessories</button>
-  </div>
-</div>
-
-<!-- SHOP LAYOUT -->
-<div class="shop-layout">
-
-  <!-- SIDEBAR -->
-  <aside class="shop-sidebar" aria-label="Filters">
-
-    <!-- Search -->
-    <div class="filter-group">
-      <div class="filter-group-title">Search</div>
-      <div style="position:relative;">
-        <input id="shop-search-input" type="search" placeholder="Search pieces…"
-          style="width:100%;padding:0.6rem 2.2rem 0.6rem 0.75rem;border:1px solid var(--border-dark);background:var(--white);font-size:0.82rem;color:var(--text-dark);outline:none;font-family:var(--font-sans);"
-          aria-label="Search products">
-        <i class="fa-regular fa-magnifying-glass" style="position:absolute;right:0.75rem;top:50%;transform:translateY(-50%);color:var(--text-light);font-size:0.8rem;"></i>
-      </div>
-    </div>
-
-    <!-- Categories -->
-    <div class="filter-group">
-      <div class="filter-group-title">Category</div>
-      <button class="filter-category-btn active" data-category="all">All Pieces</button>
-      <button class="filter-category-btn" data-category="abayas">Abayas</button>
-      <button class="filter-category-btn" data-category="dresses">Dresses</button>
-      <button class="filter-category-btn" data-category="coord-sets">Co-ord Sets</button>
-      <button class="filter-category-btn" data-category="skirts">Skirts</button>
-      <button class="filter-category-btn" data-category="tops">Tops</button>
-      <button class="filter-category-btn" data-category="accessories">Accessories</button>
-    </div>
-
-    <!-- Price Range -->
-    <div class="filter-group">
-      <div class="filter-group-title">Max Price</div>
-      <div class="price-range-labels">
-        <span>₦0</span>
-        <span id="price-slider-max">₦200,000</span>
-      </div>
-      <input id="price-slider" class="price-slider" type="range" min="10000" max="200000" step="5000" value="200000" aria-label="Maximum price filter">
-    </div>
-
-    <!-- Support link -->
-    <div style="border-top:1px solid var(--border);padding-top:1.5rem;margin-top:0.5rem;">
-      <p style="font-size:0.75rem;color:var(--text-light);line-height:1.6;margin-bottom:0.75rem;">Need help choosing? Our team is happy to assist.</p>
-      <a href="https://wa.me/2347019243312" class="btn-whatsapp" style="font-size:0.68rem;padding:0.6rem 1rem;display:inline-flex;">
-        <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
-      </a>
-    </div>
-  </aside>
-
-  <!-- MAIN GRID -->
-  <main>
-    <div class="shop-main-header">
-      <span id="shop-result-count" class="shop-result-count">Loading pieces…</span>
-      <select id="shop-sort" class="sort-select" aria-label="Sort products">
-        <option value="newest">Newest First</option>
-        <option value="price-asc">Price: Low to High</option>
-        <option value="price-desc">Price: High to Low</option>
-        <option value="name-asc">Name: A–Z</option>
-      </select>
-    </div>
-
-    <div class="products-grid" id="shop-products-grid"></div>
-
-    <!-- No results -->
-    <div class="no-results" id="shop-no-results">
-      <i class="fa-regular fa-magnifying-glass"></i>
-      <h4>We couldn't find what you're looking for.</h4>
-      <p>Try a different search term or browse all our pieces.</p>
-      <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap;">
-        <button class="btn-fka-outline" onclick="document.getElementById('shop-search-input').value=''; document.querySelectorAll('.filter-category-btn').forEach(b=>b.classList.remove('active')); document.querySelector('[data-category=all]').classList.add('active'); initShopPage();">Clear Filters</button>
-        <a href="contact.html" class="btn-fka-ghost">Contact Us</a>
-      </div>
-    </div>
-  </main>
-</div>
-
-<!-- NEWSLETTER STRIP -->
-<section class="newsletter-section" style="padding:3.5rem 1.5rem;" aria-label="Newsletter">
-  <div class="fka-container" style="max-width:520px;">
-    <h3 class="newsletter-title" style="font-size:1.4rem;">Be the First to Know</h3>
-    <p class="newsletter-subtitle" style="font-size:0.82rem;">New pieces, exclusive launches and special offers.</p>
-    <form class="newsletter-form" novalidate>
-      <input class="newsletter-input" type="email" placeholder="Enter your email" required aria-label="Email address">
-      <button type="submit" class="newsletter-btn">Subscribe</button>
-    </form>
-    <p class="newsletter-success">Thank you for joining FKA Atelier. 🤍</p>
-  </div>
-</section>
-
-<!-- FOOTER -->
-<footer class="fka-footer">
-  <div class="footer-grid">
-    <div class="footer-brand-col">
-      <div class="footer-brand">FKA Atelier</div>
-      <div class="footer-tagline">Timeless. Modest. Elegant.</div>
-      <div class="footer-social">
-        <a href="#" class="footer-social-link" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
-        <a href="#" class="footer-social-link" aria-label="TikTok"><i class="fa-brands fa-tiktok"></i></a>
-        <a href="https://wa.me/2347019243312" class="footer-social-link" aria-label="WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-        <a href="mailto:omotolaazeemah7@gmail.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
-      </div>
-    </div>
-    <div>
-      <div class="footer-col-title">Shop</div>
-      <ul class="footer-links">
-        <li><a href="shop.html">All Pieces</a></li>
-        <li><a href="shop.html?cat=abayas">Abayas</a></li>
-        <li><a href="shop.html?cat=dresses">Dresses</a></li>
-        <li><a href="shop.html?cat=coord-sets">Co-ord Sets</a></li>
-        <li><a href="shop.html?cat=accessories">Accessories</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Customer Care</div>
-      <ul class="footer-links">
-        <li><a href="measurements.html">Measurements</a></li>
-        <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
-        <li><a href="returns.html">Returns &amp; Exchanges</a></li>
-        <li><a href="faq.html">FAQ</a></li>
-        <li><a href="contact.html">Contact Us</a></li>
-      </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">About</div>
-      <ul class="footer-links">
-        <li><a href="about.html">Our Story</a></li>
-        <li><a href="about.html#values">Our Values</a></li>
+      <div class="mobile-nav-brand">FKA Atelier</div>
+      <ul class="mobile-nav-links" role="list">
+        <li><a href="../../index.html">Home</a></li>
+        <li><a href="shop.html">Shop</a></li>
         <li><a href="collections.html">Collections</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="measurements.html">Measurements</a></li>
+        <li><a href="faq.html">FAQ</a></li>
+        <li><a href="contact.html">Contact</a></li>
+        <li><a href="cart.html">Shopping Bag</a></li>
+        <li><a href="wishlist.html">Wishlist</a></li>
       </ul>
-    </div>
-    <div>
-      <div class="footer-col-title">Connect</div>
-      <ul class="footer-links">
-        <li><a href="#">Instagram</a></li>
-        <li><a href="#">TikTok</a></li>
-        <li><a href="https://wa.me/2347019243312">WhatsApp</a></li>
-        <li><a href="mailto:omotolaazeemah7@gmail.com">Email Us</a></li>
-      </ul>
-    </div>
-  </div>
-  <div class="footer-bottom">
-    <span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span>
-    <span class="footer-copy">
-      <a href="shipping.html" style="color:inherit;">Shipping</a> &nbsp;·&nbsp;
-      <a href="returns.html" style="color:inherit;">Returns</a> &nbsp;·&nbsp;
-      <a href="faq.html" style="color:inherit;">FAQ</a>
-    </span>
-  </div>
-</footer>
+    </nav>
 
-<!-- ASK FKA -->
-<div class="ask-fka-fab" id="ask-fka-fab">
-  <div class="ask-fka-panel" id="ask-fka-panel" role="dialog" aria-label="Ask FKA" aria-modal="true">
-    <div class="ask-fka-panel-header">
-      <div>
-        <div class="ask-fka-panel-title">✨ Ask FKA</div>
-        <div class="ask-fka-panel-sub">Your FKA Atelier fashion concierge</div>
+    <div
+      id="search-overlay"
+      class="search-overlay"
+      role="search"
+      aria-label="Search"
+    >
+      <div class="search-overlay-inner">
+        <div class="search-overlay-input-row">
+          <i
+            class="fa-regular fa-magnifying-glass"
+            style="color: var(--taupe); font-size: 1rem; flex-shrink: 0"
+          ></i>
+          <input
+            id="search-input"
+            class="search-overlay-input"
+            type="search"
+            placeholder="Search pieces, colours, styles&#x2026;"
+            autocomplete="off"
+            aria-label="Search products"
+          />
+          <button
+            id="search-overlay-close"
+            class="search-overlay-close"
+            aria-label="Close search"
+          >
+            <i class="fa-regular fa-xmark"></i>
+          </button>
+        </div>
+        <div id="search-results-preview" class="search-results-preview"></div>
       </div>
-      <button class="ask-fka-close" id="ask-fka-close" aria-label="Close">
-        <i class="fa-regular fa-xmark"></i>
+    </div>
+
+    <!-- SHOP HERO -->
+    <div class="shop-hero">
+      <div class="breadcrumb">
+        <a href="../../index.html">Home</a>
+        <span class="breadcrumb-sep"
+          ><i class="fa-regular fa-chevron-right"></i
+        ></span>
+        <span>Shop</span>
+      </div>
+      <h1 class="shop-hero-title">All Pieces</h1>
+      <p class="shop-hero-sub">Modest fashion designed for timeless elegance</p>
+    </div>
+
+    <!-- MOBILE FILTER BAR -->
+    <div
+      style="
+        background: var(--cream);
+        border-bottom: 1px solid var(--border);
+        padding: 0.75rem 1.5rem;
+        display: none;
+      "
+      id="mobile-filter-bar"
+    >
+      <div
+        style="
+          display: flex;
+          gap: 0.5rem;
+          overflow-x: auto;
+          padding-bottom: 0.25rem;
+          scrollbar-width: none;
+        "
+      >
+        <button
+          class="filter-category-btn active"
+          data-category="all"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          All
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="abayas"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Abayas
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="dresses"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Dresses
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="coord-sets"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Co-ord Sets
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="skirts"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Skirts
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="tops"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Tops
+        </button>
+        <button
+          class="filter-category-btn"
+          data-category="accessories"
+          style="
+            white-space: nowrap;
+            padding: 0.45rem 1rem;
+            border: 1px solid var(--border-dark);
+            font-size: 0.72rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+          "
+        >
+          Accessories
+        </button>
+      </div>
+    </div>
+
+    <!-- SHOP LAYOUT -->
+    <div class="shop-layout">
+      <!-- SIDEBAR -->
+      <aside class="shop-sidebar" aria-label="Filters">
+        <!-- Search -->
+        <div class="filter-group">
+          <div class="filter-group-title">Search</div>
+          <div style="position: relative">
+            <input
+              id="shop-search-input"
+              type="search"
+              placeholder="Search pieces…"
+              style="
+                width: 100%;
+                padding: 0.6rem 2.2rem 0.6rem 0.75rem;
+                border: 1px solid var(--border-dark);
+                background: var(--white);
+                font-size: 0.82rem;
+                color: var(--text-dark);
+                outline: none;
+                font-family: var(--font-sans);
+              "
+              aria-label="Search products"
+            />
+            <i
+              class="fa-regular fa-magnifying-glass"
+              style="
+                position: absolute;
+                right: 0.75rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: var(--text-light);
+                font-size: 0.8rem;
+              "
+            ></i>
+          </div>
+        </div>
+
+        <!-- Categories -->
+        <div class="filter-group">
+          <div class="filter-group-title">Category</div>
+          <button class="filter-category-btn active" data-category="all">
+            All Pieces
+          </button>
+          <button class="filter-category-btn" data-category="abayas">
+            Abayas
+          </button>
+          <button class="filter-category-btn" data-category="dresses">
+            Dresses
+          </button>
+          <button class="filter-category-btn" data-category="coord-sets">
+            Co-ord Sets
+          </button>
+          <button class="filter-category-btn" data-category="skirts">
+            Skirts
+          </button>
+          <button class="filter-category-btn" data-category="tops">Tops</button>
+          <button class="filter-category-btn" data-category="accessories">
+            Accessories
+          </button>
+        </div>
+
+        <!-- Price Range -->
+        <div class="filter-group">
+          <div class="filter-group-title">Max Price</div>
+          <div class="price-range-labels">
+            <span>₦0</span>
+            <span id="price-slider-max">₦200,000</span>
+          </div>
+          <input
+            id="price-slider"
+            class="price-slider"
+            type="range"
+            min="10000"
+            max="200000"
+            step="5000"
+            value="200000"
+            aria-label="Maximum price filter"
+          />
+        </div>
+
+        <!-- Support link -->
+        <div
+          style="
+            border-top: 1px solid var(--border);
+            padding-top: 1.5rem;
+            margin-top: 0.5rem;
+          "
+        >
+          <p
+            style="
+              font-size: 0.75rem;
+              color: var(--text-light);
+              line-height: 1.6;
+              margin-bottom: 0.75rem;
+            "
+          >
+            Need help choosing? Our team is happy to assist.
+          </p>
+          <a
+            href="https://wa.me/2347019243312"
+            class="btn-whatsapp"
+            style="
+              font-size: 0.68rem;
+              padding: 0.6rem 1rem;
+              display: inline-flex;
+            "
+          >
+            <i class="fa-brands fa-whatsapp"></i> Chat on WhatsApp
+          </a>
+        </div>
+      </aside>
+
+      <!-- MAIN GRID -->
+      <main>
+        <div class="shop-main-header">
+          <span id="shop-result-count" class="shop-result-count"
+            >Loading pieces…</span
+          >
+          <select id="shop-sort" class="sort-select" aria-label="Sort products">
+            <option value="newest">Newest First</option>
+            <option value="price-asc">Price: Low to High</option>
+            <option value="price-desc">Price: High to Low</option>
+            <option value="name-asc">Name: A–Z</option>
+          </select>
+        </div>
+
+        <div class="products-grid" id="shop-products-grid"></div>
+
+        <!-- No results -->
+        <div class="no-results" id="shop-no-results">
+          <i class="fa-regular fa-magnifying-glass"></i>
+          <h4>We couldn't find what you're looking for.</h4>
+          <p>Try a different search term or browse all our pieces.</p>
+          <div
+            style="
+              display: flex;
+              gap: 1rem;
+              justify-content: center;
+              flex-wrap: wrap;
+            "
+          >
+            <button
+              class="btn-fka-outline"
+              onclick="
+                document.getElementById('shop-search-input').value = '';
+                document
+                  .querySelectorAll('.filter-category-btn')
+                  .forEach((b) => b.classList.remove('active'));
+                document
+                  .querySelector('[data-category=all]')
+                  .classList.add('active');
+                initShopPage();
+              "
+            >
+              Clear Filters
+            </button>
+            <a href="contact.html" class="btn-fka-ghost">Contact Us</a>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- NEWSLETTER STRIP -->
+    <section
+      class="newsletter-section"
+      style="padding: 3.5rem 1.5rem"
+      aria-label="Newsletter"
+    >
+      <div class="fka-container" style="max-width: 520px">
+        <h3 class="newsletter-title" style="font-size: 1.4rem">
+          Be the First to Know
+        </h3>
+        <p class="newsletter-subtitle" style="font-size: 0.82rem">
+          New pieces, exclusive launches and special offers.
+        </p>
+        <form class="newsletter-form" novalidate>
+          <input
+            class="newsletter-input"
+            type="email"
+            placeholder="Enter your email"
+            required
+            aria-label="Email address"
+          />
+          <button type="submit" class="newsletter-btn">Subscribe</button>
+        </form>
+        <p class="newsletter-success">Thank you for joining FKA Atelier. 🤍</p>
+      </div>
+    </section>
+
+    <!-- FOOTER -->
+    <footer class="fka-footer">
+      <div class="footer-grid">
+        <div class="footer-brand-col">
+          <div class="footer-brand">FKA Atelier</div>
+          <div class="footer-tagline">Timeless. Modest. Elegant.</div>
+          <div class="footer-social">
+            <a href="#" class="footer-social-link" aria-label="Instagram"
+              ><i class="fa-brands fa-instagram"></i
+            ></a>
+            <a href="#" class="footer-social-link" aria-label="TikTok"
+              ><i class="fa-brands fa-tiktok"></i
+            ></a>
+            <a
+              href="https://wa.me/2347019243312"
+              class="footer-social-link"
+              aria-label="WhatsApp"
+              ><i class="fa-brands fa-whatsapp"></i
+            ></a>
+            <a
+              href="mailto:omotolaazeemah7@gmail.com"
+              class="footer-social-link"
+              aria-label="Email"
+              ><i class="fa-regular fa-envelope"></i
+            ></a>
+          </div>
+        </div>
+        <div>
+          <div class="footer-col-title">Shop</div>
+          <ul class="footer-links">
+            <li><a href="shop.html">All Pieces</a></li>
+            <li><a href="shop.html?cat=abayas">Abayas</a></li>
+            <li><a href="shop.html?cat=dresses">Dresses</a></li>
+            <li><a href="shop.html?cat=coord-sets">Co-ord Sets</a></li>
+            <li><a href="shop.html?cat=accessories">Accessories</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Customer Care</div>
+          <ul class="footer-links">
+            <li><a href="measurements.html">Measurements</a></li>
+            <li><a href="shipping.html">Shipping &amp; Delivery</a></li>
+            <li><a href="returns.html">Returns &amp; Exchanges</a></li>
+            <li><a href="faq.html">FAQ</a></li>
+            <li><a href="contact.html">Contact Us</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">About</div>
+          <ul class="footer-links">
+            <li><a href="about.html">Our Story</a></li>
+            <li><a href="about.html#values">Our Values</a></li>
+            <li><a href="collections.html">Collections</a></li>
+          </ul>
+        </div>
+        <div>
+          <div class="footer-col-title">Connect</div>
+          <ul class="footer-links">
+            <li><a href="#">Instagram</a></li>
+            <li><a href="#">TikTok</a></li>
+            <li><a href="https://wa.me/2347019243312">WhatsApp</a></li>
+            <li><a href="mailto:omotolaazeemah7@gmail.com">Email Us</a></li>
+          </ul>
+        </div>
+      </div>
+      <div class="footer-bottom">
+        <span class="footer-copy"
+          >&copy; FKA Atelier. All rights reserved.</span
+        >
+        <span class="footer-copy">
+          <a href="shipping.html" style="color: inherit">Shipping</a>
+          &nbsp;·&nbsp;
+          <a href="returns.html" style="color: inherit">Returns</a>
+          &nbsp;·&nbsp;
+          <a href="faq.html" style="color: inherit">FAQ</a>
+        </span>
+      </div>
+    </footer>
+
+    <!-- ASK FKA -->
+    <div class="ask-fka-fab" id="ask-fka-fab">
+      <div
+        class="ask-fka-panel"
+        id="ask-fka-panel"
+        role="dialog"
+        aria-label="Ask FKA"
+        aria-modal="true"
+      >
+        <div class="ask-fka-panel-header">
+          <div>
+            <div class="ask-fka-panel-title">✨ Ask FKA</div>
+            <div class="ask-fka-panel-sub">
+              Your FKA Atelier fashion concierge
+            </div>
+          </div>
+          <button class="ask-fka-close" id="ask-fka-close" aria-label="Close">
+            <i class="fa-regular fa-xmark"></i>
+          </button>
+        </div>
+        <div class="ask-fka-panel-body">
+          <div class="ask-fka-greeting">
+            <div class="ask-fka-avatar">F</div>
+            <div class="ask-fka-bubble">
+              Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I
+              help you today?
+            </div>
+          </div>
+          <div class="ask-fka-suggestions">
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-regular fa-shirt"></i> Find me a dress
+            </button>
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-regular fa-ruler"></i> Help me choose my size
+            </button>
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-regular fa-ruler-combined"></i> How do custom
+              measurements work?
+            </button>
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-regular fa-naira-sign"></i> What's in my budget?
+            </button>
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-regular fa-truck"></i> How much is delivery?
+            </button>
+            <button class="ask-fka-suggestion-btn">
+              <i class="fa-brands fa-whatsapp"></i> Talk to a human
+            </button>
+          </div>
+          <div
+            id="fka-chat-thread"
+            class="fka-chat-thread"
+            aria-live="polite"
+            aria-label="Chat messages"
+          ></div>
+        </div>
+        <div class="ask-fka-panel-footer">
+          <input
+            class="ask-fka-input"
+            id="ask-fka-input"
+            type="text"
+            placeholder="Ask me anything about FKA Atelier…"
+            aria-label="Message"
+            autocomplete="off"
+            maxlength="400"
+          />
+          <button class="ask-fka-send" id="ask-fka-send" aria-label="Send">
+            <i class="fa-regular fa-paper-plane-top"></i>
+          </button>
+        </div>
+        <div class="ask-fka-disclaimer">
+          Powered by Groq AI &nbsp;·&nbsp;
+          <a href="contact.html" style="color: var(--warm-brown)"
+            >Contact our team</a
+          >
+        </div>
+      </div>
+      <button
+        class="ask-fka-btn"
+        id="ask-fka-fab-btn"
+        aria-label="Open Ask FKA"
+        aria-expanded="false"
+      >
+        <span class="sparkle">✨</span> Ask FKA
       </button>
     </div>
-    <div class="ask-fka-panel-body">
-      <div class="ask-fka-greeting">
-        <div class="ask-fka-avatar">F</div>
-        <div class="ask-fka-bubble">Hello 🤍 I'm Ask FKA — your personal fashion concierge. How can I help you today?</div>
-      </div>
-      <div class="ask-fka-suggestions">
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-shirt"></i> Find me a dress</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler"></i> Help me choose my size</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-ruler-combined"></i> How do custom measurements work?</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-naira-sign"></i> What's in my budget?</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-regular fa-truck"></i> How much is delivery?</button>
-        <button class="ask-fka-suggestion-btn"><i class="fa-brands fa-whatsapp"></i> Talk to a human</button>
-      </div>
-      <div id="fka-chat-thread" class="fka-chat-thread" aria-live="polite" aria-label="Chat messages"></div>
-    </div>
-    <div class="ask-fka-panel-footer">
-      <input class="ask-fka-input" id="ask-fka-input" type="text"
-        placeholder="Ask me anything about FKA Atelier…"
-        aria-label="Message" autocomplete="off" maxlength="400">
-      <button class="ask-fka-send" id="ask-fka-send" aria-label="Send">
-        <i class="fa-regular fa-paper-plane-top"></i>
-      </button>
-    </div>
-    <div class="ask-fka-disclaimer">
-      Powered by Groq AI &nbsp;·&nbsp;
-      <a href="contact.html" style="color:var(--warm-brown);">Contact our team</a>
-    </div>
-  </div>
-  <button class="ask-fka-btn" id="ask-fka-fab-btn" aria-label="Open Ask FKA" aria-expanded="false">
-    <span class="sparkle">✨</span> Ask FKA
-  </button>
-</div>
 
-<div id="toast-container" class="toast-container" aria-live="polite"></div>
+    <div id="toast-container" class="toast-container" aria-live="polite"></div>
 
-<script>
-  // Show mobile filter bar on small screens
-  if (window.innerWidth <= 900) {
-    const bar = document.getElementById('mobile-filter-bar');
-    if (bar) bar.style.display = 'block';
-  }
-</script>
-<!-- Supabase client + site config -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
-<script src="../../fka-config.js"></script>
-<script src="../../assets/js/supabase.js"></script>
-<script src="../../assets/js/products.js"></script>
-<script src="../../assets/js/cart.js"></script>
-<script src="../../assets/js/wishlist.js"></script>
-<script src="../../assets/js/delivery.js"></script>
-<script src="../../assets/js/orders.js"></script>
-<script src="../../assets/js/auth.js"></script>
-<script src="../../assets/js/main.js"></script>
-<script>document.addEventListener("DOMContentLoaded",()=>{ if(typeof authSyncNavbar==="function") authSyncNavbar(); if(typeof initProductSync==="function") initProductSync(); });</script>
-<script src="../../assets/js/askfka.js"></script>
-</body>
+    <script>
+      // Show mobile filter bar on small screens
+      if (window.innerWidth <= 900) {
+        const bar = document.getElementById("mobile-filter-bar");
+        if (bar) bar.style.display = "block";
+      }
+    </script>
+    <!-- Supabase client + site config -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"></script>
+    <script src="../../fka-config.js"></script>
+    <script src="../../assets/js/supabase.js"></script>
+    <script src="../../assets/js/products.js"></script>
+    <script src="../../assets/js/cart.js"></script>
+    <script src="../../assets/js/wishlist.js"></script>
+    <script src="../../assets/js/delivery.js"></script>
+    <script src="../../assets/js/orders.js"></script>
+    <script src="../../assets/js/auth.js"></script>
+    <script src="../../assets/js/main.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", () => {
+        if (typeof authSyncNavbar === "function") authSyncNavbar();
+        if (typeof initProductSync === "function") initProductSync();
+      });
+    </script>
+    <script src="../../assets/js/askfka.js"></script>
+  </body>
 </html>

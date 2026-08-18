@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    FKA ATELIER — Shopping Bag (Cart)
    Persisted in localStorage under key "fka_cart"
    ============================================================ */
@@ -174,7 +174,7 @@ function cartRenderPage() {
   container.innerHTML = items.map(item => `
     <div class="cart-item" data-key="${item.key}">
       <div class="cart-item-img">
-        <img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-light fa-shirt\\'></i></div>'">
+        <img src="${item.image}" alt="${item.name}" onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i></div>'">
       </div>
       <div class="cart-item-details">
         <div class="cart-item-name">${item.name}</div>

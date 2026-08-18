@@ -379,7 +379,7 @@ function checkoutRenderCartSummary() {
     <div class="co-cart-items">
       ${items.map(i => `
         <div class="co-cart-item">
-          <div class="co-cart-item-img">${i.image ? `<img src="${i.image}" alt="${i.name}" onerror="this.style.display='none'">` : `<i class="fa-light fa-shirt"></i>`}</div>
+          <div class="co-cart-item-img">${i.image ? `<img src="${i.image}" alt="${i.name}" onerror="this.style.display='none'">` : `<i class="fa-regular fa-shirt"></i>`}</div>
           <div class="co-cart-item-info">
             <div class="co-cart-item-name">${i.name}</div>
             <div class="co-cart-item-meta">${[i.size?"Size "+i.size:"", i.colour||""].filter(Boolean).join(" · ")}</div>
