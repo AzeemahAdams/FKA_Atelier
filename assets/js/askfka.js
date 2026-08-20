@@ -19,10 +19,10 @@ const FKA_AI_CONFIG = {
   get model() {
     return localStorage.getItem("fka_groq_model") || "llama-3.3-70b-versatile";
   },
-  apiUrl:      "https://api.groq.com/openai/v1/chat/completions",
-  maxTokens:   500,
+  apiUrl: "https://api.groq.com/openai/v1/chat/completions",
+  maxTokens: 500,
   temperature: 0.7,
-  maxHistory:  12
+  maxHistory: 12
 };
 
 /* ── Brand knowledge base — injected as system prompt ─── */
@@ -77,8 +77,9 @@ CUSTOM MEASUREMENTS:
 
 DELIVERY:
 - Free delivery on orders over ₦85,00.
-- Lagos Island: ₦2,500 | 1–2 business days
-- Lagos Mainland: ₦3,000 | 1–2 business days
+- Ogun:₦2,000 | 1–2 business days 
+- Lagos Island: ₦3,500 | 3–5 business days
+- Lagos Mainland: ₦4,000 | 3–5 business days
 - Lagos Outskirts (Ajah, Ikorodu, etc): ₦4,000 | 2–3 business days
 - Abuja (FCT): ₦5,500 | 3–5 business days
 - Port Harcourt: ₦6,000 | 3–5 business days
@@ -115,9 +116,9 @@ YOUR ROLE:
 IMPORTANT: You are a helpful, warm fashion concierge. You are NOT a general-purpose assistant. Only answer questions relevant to FKA Atelier, fashion, sizing, styling, orders, and delivery.`;
 
 /* ── Conversation state ──────────────────────────────── */
-let fkaMessages     = [];   // [{role, content}] — running conversation
-let fkaIsStreaming  = false;
-let fkaIsReady      = false; // set true once panel is mounted
+let fkaMessages = [];   // [{role, content}] — running conversation
+let fkaIsStreaming = false;
+let fkaIsReady = false; // set true once panel is mounted
 
 /* ── DOM references (populated on init) ─────────────── */
 let _thread, _input, _sendBtn, _typingEl;
@@ -128,14 +129,14 @@ function initAskFkaAI() {
   if (_fkaInitDone) return;
   _fkaInitDone = true;
 
-  _thread  = document.getElementById("fka-chat-thread");
-  _input   = document.getElementById("ask-fka-input");
+  _thread = document.getElementById("fka-chat-thread");
+  _input = document.getElementById("ask-fka-input");
   _sendBtn = document.getElementById("ask-fka-send");
 
-  const panel    = document.getElementById("ask-fka-panel");
-  const fabBtn   = document.getElementById("ask-fka-fab-btn");
+  const panel = document.getElementById("ask-fka-panel");
+  const fabBtn = document.getElementById("ask-fka-fab-btn");
   const closeBtn = document.getElementById("ask-fka-close");
-  const navBtns  = document.querySelectorAll(".ask-fka-nav-btn");
+  const navBtns = document.querySelectorAll(".ask-fka-nav-btn");
 
   if (!panel) return; // panel not on this page
 
@@ -228,9 +229,9 @@ async function fkaSendMessageText(text) {
   if (!fkaIsReady || fkaIsStreaming || !text) return;
 
   // Hide greeting + suggestions after first message
-  const greeting     = document.querySelector(".ask-fka-greeting");
-  const suggestions  = document.querySelector(".ask-fka-suggestions");
-  if (greeting)    greeting.style.display    = "none";
+  const greeting = document.querySelector(".ask-fka-greeting");
+  const suggestions = document.querySelector(".ask-fka-suggestions");
+  if (greeting) greeting.style.display = "none";
   if (suggestions) suggestions.style.display = "none";
 
   // Append user message to UI
@@ -246,7 +247,7 @@ async function fkaSendMessageText(text) {
 
   // Show typing indicator
   const typingId = fkaShowTyping();
-  fkaIsStreaming  = true;
+  fkaIsStreaming = true;
   fkaSetSendState(true);
 
   try {
@@ -293,23 +294,23 @@ async function fkaCallGroq(messages) {
   const key = FKA_AI_CONFIG.apiKey;
   if (!key) throw new Error("no_key");
 
-  console.log("[Ask FKA] Calling Groq, model:", FKA_AI_CONFIG.model, "key prefix:", key.slice(0,8));
+  console.log("[Ask FKA] Calling Groq, model:", FKA_AI_CONFIG.model, "key prefix:", key.slice(0, 8));
 
   const response = await fetch(FKA_AI_CONFIG.apiUrl, {
-    method:  "POST",
+    method: "POST",
     headers: {
-      "Content-Type":  "application/json",
+      "Content-Type": "application/json",
       "Authorization": `Bearer ${key}`
     },
     body: JSON.stringify({
-      model:       FKA_AI_CONFIG.model,
+      model: FKA_AI_CONFIG.model,
       messages: [
         { role: "system", content: FKA_SYSTEM_PROMPT },
         ...messages
       ],
-      max_tokens:  FKA_AI_CONFIG.maxTokens,
+      max_tokens: FKA_AI_CONFIG.maxTokens,
       temperature: FKA_AI_CONFIG.temperature,
-      stream:      false
+      stream: false
     })
   });
 
@@ -318,7 +319,7 @@ async function fkaCallGroq(messages) {
     try {
       const errData = await response.json();
       errMsg = errData?.error?.message || errData?.error || response.statusText;
-    } catch {}
+    } catch { }
     console.error("[Ask FKA] Groq error", response.status, errMsg);
     throw new Error(`${response.status} — ${errMsg}`);
   }
@@ -355,9 +356,9 @@ function fkaAppendMessage(role, html) {
 
 function fkaShowTyping() {
   if (!_thread) return null;
-  const id  = "fka-typing-" + Date.now();
+  const id = "fka-typing-" + Date.now();
   const div = document.createElement("div");
-  div.id        = id;
+  div.id = id;
   div.className = "fka-msg fka-msg-bot";
   div.innerHTML = `
     <div class="fka-msg-avatar">F</div>
@@ -401,11 +402,11 @@ function formatBotText(text) {
   return text
     .replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;")  // escape first
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")                    // **bold**
-    .replace(/\*(.+?)\*/g,     "<em>$1</em>")                            // *italic*
-    .replace(/`(.+?)`/g,       "<code>$1</code>")                        // `code`
-    .replace(/₦([\d,]+)/g,     "<strong>₦$1</strong>")                  // ₦prices bold
-    .replace(/\n\n/g,           "</p><p>")                               // double newline → paragraphs
-    .replace(/\n/g,             "<br>")                                   // single newline → br
+    .replace(/\*(.+?)\*/g, "<em>$1</em>")                            // *italic*
+    .replace(/`(.+?)`/g, "<code>$1</code>")                        // `code`
+    .replace(/₦([\d,]+)/g, "<strong>₦$1</strong>")                  // ₦prices bold
+    .replace(/\n\n/g, "</p><p>")                               // double newline → paragraphs
+    .replace(/\n/g, "<br>")                                   // single newline → br
     .replace(/^/, "<p>").replace(/$/, "</p>");                            // wrap in <p>
 }
 
