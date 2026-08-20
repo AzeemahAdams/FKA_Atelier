@@ -119,23 +119,29 @@ function initSearch() {
   document.addEventListener("keydown", e => { if (e.key === "Escape" && overlay.classList.contains("active")) close(); });
 
   if (input && results) {
+    let _searchTimer;
     input.addEventListener("input", () => {
+      clearTimeout(_searchTimer);
       const q = input.value.trim();
       if (q.length < 2) { results.innerHTML = ""; return; }
-      if (typeof searchProducts !== "function") return;
-      const found = searchProducts(q).slice(0, 8);
-      if (found.length === 0) {
-        results.innerHTML = `<span class="search-no-results">No results for "<strong>${q}</strong>" — <a href="contact.html">Contact us</a> or <a href="shop.html">Browse all</a></span>`;
-        return;
-      }
-      results.innerHTML = found.map(p =>
-        `<a href="product.html?id=${p.id}" class="search-result-chip">${p.name}</a>`
-      ).join("");
+      _searchTimer = setTimeout(async () => {
+        if (typeof searchProducts !== "function") return;
+        let found;
+        try { found = await searchProducts(q); } catch { found = []; }
+        found = found.slice(0, 8);
+        if (found.length === 0) {
+          results.innerHTML = `<span class="search-no-results">No results for "<strong>${q}</strong>" — <a href="${_shopUrl()}">Browse all</a></span>`;
+          return;
+        }
+        results.innerHTML = found.map(p =>
+          `<a href="${_productUrl(p.id)}" class="search-result-chip">${p.name}</a>`
+        ).join("");
+      }, 200);
     });
     input.addEventListener("keydown", e => {
       if (e.key === "Enter") {
         const q = input.value.trim();
-        if (q) window.location.href = `shop.html?q=${encodeURIComponent(q)}`;
+        if (q) window.location.href = _shopUrl(`q=${encodeURIComponent(q)}`);
       }
     });
   }
@@ -273,6 +279,32 @@ function initAskFka() {
 }
 
 /* ============================================================
+   PATH HELPERS
+   Product cards are rendered from multiple page depths:
+     depth 0  → root/index.html
+     depth 1  → admin/*.html
+     depth 2  → pages/html/*.html
+   We compute the correct relative path at runtime so every
+   product link resolves to pages/html/product.html correctly.
+   ============================================================ */
+function _pageDepth() {
+  const parts = window.location.pathname.replace(/\\/g, "/").split("/").filter(p => p && p !== "");
+  // parts is e.g. [] for root, ["admin","products.html"] for admin page
+  return Math.max(parts.length - 1, 0);
+}
+function _productUrl(id) {
+  const d = _pageDepth();
+  if (d === 0) return `pages/html/product.html?id=${encodeURIComponent(id)}`;
+  if (d === 1) return `../pages/html/product.html?id=${encodeURIComponent(id)}`;
+  return `product.html?id=${encodeURIComponent(id)}`;
+}
+function _shopUrl(qs) {
+  const d = _pageDepth();
+  const base = d === 0 ? "pages/html/shop.html" : d === 1 ? "../pages/html/shop.html" : "shop.html";
+  return qs ? `${base}?${qs}` : base;
+}
+
+/* ============================================================
    PRODUCT CARD BUILDER
    Returns HTML string for a product card.
    ============================================================ */
@@ -298,13 +330,13 @@ function buildProductCard(product) {
           title="Add to wishlist" aria-label="Add ${product.name} to wishlist">
           <i class="fa-regular fa-heart"></i>
         </button>
-        <a href="product.html?id=${product.id}" class="product-quick-view" tabindex="-1" aria-hidden="true">
+        <a href="${_productUrl(product.id)}" class="product-quick-view" tabindex="-1" aria-hidden="true">
           View Product
         </a>
       </div>
       <div class="product-card-info">
         <div class="product-card-category">${product.categoryLabel}</div>
-        <a href="product.html?id=${product.id}">
+        <a href="${_productUrl(product.id)}">
           <div class="product-card-name">${product.name}</div>
         </a>
         <div class="product-card-price">${product.priceFormatted}</div>
@@ -723,22 +755,29 @@ function initHeroParallax() {
 
 /* ============================================================
    REAL-TIME PRODUCT SYNC
-   Listens for admin product changes in localStorage and
-   refreshes visible product grids without a page reload.
+   Listens for admin product changes via both BroadcastChannel
+   (same-device cross-tab) and storage events (different origins),
+   then refreshes visible product grids without a page reload.
    ============================================================ */
 function initProductSync() {
+  // BroadcastChannel — fires when admin saves in any tab on same browser
+  try {
+    const bc = new BroadcastChannel("fka_products_channel");
+    bc.onmessage = () => _refreshGrids();
+  } catch {}
+
+  // storage event — fires in OTHER tabs when localStorage changes
   window.addEventListener("storage", e => {
-    if (e.key !== "fka_admin_products_overrides") return;
-
-    // Re-run whichever page initialiser is active
-    if (document.getElementById("shop-products-grid"))   initShopPage();
-    if (document.getElementById("new-arrivals-grid"))    initHomePage();
-    if (document.getElementById("product-detail-container")) initProductPage();
-    if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage();
-
-    // Re-sync wishlist heart states after grid rerender
-    if (typeof wishlistSyncButtons === "function") wishlistSyncButtons();
+    if (e.key === "fka_admin_products_overrides") _refreshGrids();
   });
+}
+
+function _refreshGrids() {
+  if (document.getElementById("shop-products-grid"))           initShopPage();
+  if (document.getElementById("new-arrivals-grid"))            initHomePage();
+  if (document.getElementById("product-detail-container"))     initProductPage();
+  if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage();
+  if (typeof wishlistSyncButtons === "function")               wishlistSyncButtons();
 }
 
 /* ============================================================
