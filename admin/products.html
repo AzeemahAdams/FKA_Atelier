@@ -450,10 +450,16 @@ async function saveProduct() {
 
   // Use adminSaveProduct from products.js — handles Supabase when configured,
   // falls back to localStorage so storefront always sees the change
-  if (typeof adminSaveProduct === "function") {
-    await adminSaveProduct(product);
-  } else {
-    saveAdminProducts(overrides);
+  try {
+    if (typeof adminSaveProduct === "function") {
+      await adminSaveProduct(product);
+    } else {
+      saveAdminProducts(overrides);
+    }
+  } catch(e) {
+    console.error("[FKA] saveProduct failed:", e);
+    adminToast(`Save failed: ${e.message}`, "error");
+    return;
   }
 
   adminCloseModal("modal-product");

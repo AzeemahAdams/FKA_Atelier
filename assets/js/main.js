@@ -285,11 +285,13 @@ function initAskFka() {
      index.html        → data-root=""
      pages/html/*.html → data-root="../../"
      admin/*.html      → data-root="../"
-   This avoids fragile pathname depth-counting and works
-   regardless of how the server serves the files.
+
+   _productUrl builds a link to pages/html/product.html from
+   wherever we currently are, using data-root as the base.
+   _shopUrl builds a link to pages/html/shop.html similarly.
    ============================================================ */
 function _siteRoot() {
-  return document.body.getAttribute("data-root") || "";
+  return document.body.getAttribute("data-root") ?? "";
 }
 function _productUrl(id) {
   return `${_siteRoot()}pages/html/product.html?id=${encodeURIComponent(id)}`;
@@ -467,9 +469,18 @@ async function initProductPage() {
 
   container.innerHTML = `<div style="text-align:center;padding:5rem 1.5rem;"><i class="fa-regular fa-spinner fa-spin" style="font-size:2rem;color:var(--taupe);"></i></div>`;
 
-  const product = await getProductById(productId).catch(()=>null);
+  const product = await getProductById(productId).catch((e) => {
+    console.error("[FKA] getProductById threw:", e);
+    return null;
+  });
 
   if (!product) {
+    console.warn("[FKA] Product not found for id:", JSON.stringify(productId), "— checking FKA_PRODUCTS directly");
+    // Last resort: check if id exists in FKA_PRODUCTS at all
+    if (typeof FKA_PRODUCTS !== "undefined") {
+      const ids = FKA_PRODUCTS.map(p => p.id);
+      console.log("[FKA] Available product IDs:", ids);
+    }
     container.innerHTML = `
       <div style="text-align:center;padding:5rem 1.5rem;">
         <h2 style="font-family:var(--font-serif);font-weight:300;margin-bottom:1rem;">Product Not Found</h2>
