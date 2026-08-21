@@ -455,9 +455,17 @@ async function getProductById(id) {
     try {
       const { data } = await fkaDB().from("products").select("*").eq("id", id).single();
       if (data) return _normaliseProduct(data);
-    } catch {}
+    } catch(e) { console.warn("[FKA] getProductById Supabase failed:", e.message); }
   }
-  return _getMergedProducts().find(p => p.id === id) || null;
+  // Primary: merged products (localStorage overrides + FKA_PRODUCTS)
+  try {
+    const merged = _getMergedProducts();
+    const found = merged.find(p => p.id === id);
+    if (found) return found;
+  } catch(e) { console.warn("[FKA] getProductById merge failed:", e.message); }
+  // Last resort: search base FKA_PRODUCTS directly
+  const base = typeof FKA_PRODUCTS !== "undefined" ? FKA_PRODUCTS : [];
+  return base.find(p => p.id === id) || null;
 }
 
 /**

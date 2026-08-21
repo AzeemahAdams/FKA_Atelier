@@ -280,27 +280,22 @@ function initAskFka() {
 
 /* ============================================================
    PATH HELPERS
-   Product cards are rendered from multiple page depths:
-     depth 0  → root/index.html
-     depth 1  → admin/*.html
-     depth 2  → pages/html/*.html
-   We compute the correct relative path at runtime so every
-   product link resolves to pages/html/product.html correctly.
+   Each HTML file sets data-root on <body> to the relative path
+   back to the site root:
+     index.html        → data-root=""
+     pages/html/*.html → data-root="../../"
+     admin/*.html      → data-root="../"
+   This avoids fragile pathname depth-counting and works
+   regardless of how the server serves the files.
    ============================================================ */
-function _pageDepth() {
-  const parts = window.location.pathname.replace(/\\/g, "/").split("/").filter(p => p && p !== "");
-  // parts is e.g. [] for root, ["admin","products.html"] for admin page
-  return Math.max(parts.length - 1, 0);
+function _siteRoot() {
+  return document.body.getAttribute("data-root") || "";
 }
 function _productUrl(id) {
-  const d = _pageDepth();
-  if (d === 0) return `pages/html/product.html?id=${encodeURIComponent(id)}`;
-  if (d === 1) return `../pages/html/product.html?id=${encodeURIComponent(id)}`;
-  return `product.html?id=${encodeURIComponent(id)}`;
+  return `${_siteRoot()}pages/html/product.html?id=${encodeURIComponent(id)}`;
 }
 function _shopUrl(qs) {
-  const d = _pageDepth();
-  const base = d === 0 ? "pages/html/shop.html" : d === 1 ? "../pages/html/shop.html" : "shop.html";
+  const base = `${_siteRoot()}pages/html/shop.html`;
   return qs ? `${base}?${qs}` : base;
 }
 
@@ -467,7 +462,7 @@ async function initProductPage() {
   if (!container) return;
 
   const params    = new URLSearchParams(window.location.search);
-  const productId = params.get("id");
+  const productId = decodeURIComponent(params.get("id") || "");
   if (!productId) return;
 
   container.innerHTML = `<div style="text-align:center;padding:5rem 1.5rem;"><i class="fa-regular fa-spinner fa-spin" style="font-size:2rem;color:var(--taupe);"></i></div>`;
@@ -479,7 +474,7 @@ async function initProductPage() {
       <div style="text-align:center;padding:5rem 1.5rem;">
         <h2 style="font-family:var(--font-serif);font-weight:300;margin-bottom:1rem;">Product Not Found</h2>
         <p style="color:var(--text-mid);margin-bottom:1.5rem;">We couldn't find that product.</p>
-        <a href="shop.html" class="btn-fka-primary">Browse All Pieces</a>
+        <a href="${_shopUrl()}" class="btn-fka-primary">Browse All Pieces</a>
       </div>`;
     return;
   }
