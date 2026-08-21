@@ -50,15 +50,21 @@ if (!createClient) {
 /* ── Public helpers ────────────────────────────────────── */
 
 /**
- * Returns the Supabase client, or throws if not initialised.
- * Use _isSupabaseReady() before calling fkaDB() in optional code.
+ * Returns the Supabase client, or a no-op proxy if not initialised.
+ * Use _isSupabaseReady() to check before calling in critical paths.
  */
 function fkaDB() {
   if (!_supabase) {
-    throw new Error(
-      "Supabase is not configured. Add your project URL and key to fka-config.js, " +
-      "or run in localStorage-only mode (no Supabase needed for basic admin)."
-    );
+    // Return a no-op proxy so callers that forgot to check _isSupabaseReady()
+    // don't crash the whole page — they just get null data back
+    const noop = () => noop;
+    const proxy = new Proxy({}, {
+      get: () => (...args) => {
+        console.warn("[FKA] fkaDB() called but Supabase is not configured — returning null.");
+        return Promise.resolve({ data: null, error: { message: "Supabase not configured" } });
+      }
+    });
+    return proxy;
   }
   return _supabase;
 }

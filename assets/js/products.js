@@ -437,7 +437,7 @@ function _getMergedProducts() {
  * Tries Supabase first; falls back to merged localStorage + FKA_PRODUCTS.
  */
 async function getAllProducts() {
-  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
     try {
       const { data } = await fkaDB().from("products").select("*")
         .eq("available", true).order("sort_order").order("created_at", { ascending: false });
@@ -451,7 +451,8 @@ async function getAllProducts() {
  * Get a single product by ID.
  */
 async function getProductById(id) {
-  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
+  // Only query Supabase if actually configured
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
     try {
       const { data } = await fkaDB().from("products").select("*").eq("id", id).single();
       if (data) return _normaliseProduct(data);
@@ -562,19 +563,37 @@ async function adminSaveProduct(product) {
     sort_order:     product.sort_order || 0
   };
 
-  if (typeof fkaDB === "function" && typeof _isSupabaseReady === "function" && _isSupabaseReady()) {
-    const { error } = await fkaDB().from("products").upsert(row);
-    if (error) throw new Error(error.message);
+  // Only use Supabase if it's actually configured and ready
+  const useSupabase = typeof _isSupabaseReady === "function" && _isSupabaseReady();
+
+  if (useSupabase) {
+    try {
+      const { error } = await fkaDB().from("products").upsert(row);
+      if (error) throw new Error(error.message);
+    } catch(e) {
+      console.warn("[FKA] adminSaveProduct Supabase upsert failed, falling back to localStorage:", e.message);
+      // Fall through to localStorage
+      _localSaveProduct(row);
+    }
   } else {
-    // localStorage fallback
-    const overrides = _loadAdminOverrides();
-    const idx = overrides.findIndex(o => o.id === row.id);
-    const localRow = { ...row, isNew: row.is_new, isBestseller: row.is_bestseller, categoryLabel: row.category_label, priceFormatted: row.price_formatted };
-    if (idx >= 0) overrides[idx] = localRow;
-    else overrides.push(localRow);
-    _saveAdminOverrides(overrides);
+    _localSaveProduct(row);
   }
   return row;
+}
+
+function _localSaveProduct(row) {
+  const overrides = _loadAdminOverrides();
+  const idx = overrides.findIndex(o => o.id === row.id);
+  const localRow = {
+    ...row,
+    isNew:         row.is_new,
+    isBestseller:  row.is_bestseller,
+    categoryLabel: row.category_label,
+    priceFormatted:row.price_formatted
+  };
+  if (idx >= 0) overrides[idx] = localRow;
+  else overrides.push(localRow);
+  _saveAdminOverrides(overrides);
 }
 
 /**
