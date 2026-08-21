@@ -653,9 +653,13 @@ function initProductSync() {
 }
 
 function _refreshProductGrids() {
-  if (document.getElementById("shop-products-grid"))    initShopPage?.();
-  if (document.getElementById("new-arrivals-grid"))     initHomePage?.();
-  if (document.getElementById("product-detail-container")) initProductPage?.();
-  if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage?.();
+  if (document.getElementById("shop-products-grid") && typeof initShopPage === "function")
+    initShopPage();
+  if (document.getElementById("new-arrivals-grid") && typeof initHomePage === "function")
+    initHomePage();
+  if (document.getElementById("product-detail-container") && typeof initProductPage === "function")
+    initProductPage();
+  if (document.querySelectorAll("[data-collection-grid]").length && typeof initCollectionsPage === "function")
+    initCollectionsPage();
   if (typeof wishlistSyncButtons === "function") wishlistSyncButtons();
 }

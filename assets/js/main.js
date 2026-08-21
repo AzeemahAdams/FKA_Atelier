@@ -761,29 +761,39 @@ function initHeroParallax() {
 
 /* ============================================================
    REAL-TIME PRODUCT SYNC
-   Listens for admin product changes via both BroadcastChannel
-   (same-device cross-tab) and storage events (different origins),
-   then refreshes visible product grids without a page reload.
+   Delegates to products.js initProductSync() which handles
+   BroadcastChannel (same-browser cross-tab), storage events
+   (other tabs), and Supabase realtime when configured.
+   This function exists so HTML pages can call initProductSync()
+   without knowing which file owns it.
    ============================================================ */
 function initProductSync() {
+  // products.js owns the full sync setup (BroadcastChannel + storage + Supabase)
+  // If it's already been called by products.js auto-init, this is a no-op
+  if (typeof _initProductSyncDone !== "undefined") return;
+  window._initProductSyncDone = true;
+
   // BroadcastChannel — fires when admin saves in any tab on same browser
   try {
     const bc = new BroadcastChannel("fka_products_channel");
-    bc.onmessage = () => _refreshGrids();
+    bc.onmessage = () => {
+      if (document.getElementById("shop-products-grid"))               initShopPage();
+      if (document.getElementById("new-arrivals-grid"))                initHomePage();
+      if (document.getElementById("product-detail-container"))         initProductPage();
+      if (document.querySelectorAll("[data-collection-grid]").length)  initCollectionsPage();
+      if (typeof wishlistSyncButtons === "function")                    wishlistSyncButtons();
+    };
   } catch {}
 
   // storage event — fires in OTHER tabs when localStorage changes
   window.addEventListener("storage", e => {
-    if (e.key === "fka_admin_products_overrides") _refreshGrids();
+    if (e.key !== "fka_admin_products_overrides") return;
+    if (document.getElementById("shop-products-grid"))               initShopPage();
+    if (document.getElementById("new-arrivals-grid"))                initHomePage();
+    if (document.getElementById("product-detail-container"))         initProductPage();
+    if (document.querySelectorAll("[data-collection-grid]").length)  initCollectionsPage();
+    if (typeof wishlistSyncButtons === "function")                    wishlistSyncButtons();
   });
-}
-
-function _refreshGrids() {
-  if (document.getElementById("shop-products-grid"))           initShopPage();
-  if (document.getElementById("new-arrivals-grid"))            initHomePage();
-  if (document.getElementById("product-detail-container"))     initProductPage();
-  if (document.querySelectorAll("[data-collection-grid]").length) initCollectionsPage();
-  if (typeof wishlistSyncButtons === "function")               wishlistSyncButtons();
 }
 
 /* ============================================================

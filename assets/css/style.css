@@ -1585,9 +1585,9 @@ html, body { overflow-x: hidden; }
 img, video, iframe, embed, object { max-width: 100%; }
 table { max-width: 100%; }
 
-/* ── Fluid font scaling ── */
+/* ── Fluid font scaling — clamp scales from 15px on small screens to 17px on desktop ── */
 html {
-  font-size: clamp(14px, 1.5vw, 16px);
+  font-size: clamp(15px, 1.6vw, 17px);
 }
 
 /* ── Input zoom prevention on iOS (min 16px stops auto-zoom) ── */
