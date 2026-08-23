@@ -323,7 +323,7 @@ function buildProductCard(product) {
         ${img}
         ${badge}
         <button class="product-wishlist-btn" data-wishlist-id="${product.id}"
-          onclick="event.preventDefault(); wishlistToggle('${product.id}'); wishlistSyncButtons();"
+          onclick="event.preventDefault(); event.stopPropagation(); wishlistToggle('${product.id}').then(wishlistSyncButtons);"
           title="Add to wishlist" aria-label="Add ${product.name} to wishlist">
           <i class="fa-regular fa-heart"></i>
         </button>
@@ -598,7 +598,7 @@ async function initProductPage() {
           <div class="product-accordion-item">
             <button class="product-accordion-btn">Delivery & Returns <i class="fa-solid fa-chevron-down"></i></button>
             <div class="product-accordion-content">
-              <p>Free delivery on orders over ₦70,000. Standard delivery ₦4,500.
+              <p>Free delivery on orders over ₦85,000. Standard delivery ₦4,500.
               Custom orders may require additional processing time.
               <a href="shipping.html" style="color:var(--warm-brown);">Delivery info</a> &nbsp;|&nbsp;
               <a href="returns.html" style="color:var(--warm-brown);">Returns policy</a></p>
@@ -653,10 +653,17 @@ async function initProductPage() {
     if (qty < 10) { qty++; if (qtyVal) qtyVal.textContent = qty; }
   });
 
-  // Add to bag
-  document.getElementById("btn-add-to-bag")?.addEventListener("click", () => {
-    cartAdd(product.id, qty, selectedSize, selectedColour);
-  });
+  // Add to bag — stopPropagation defensively so this can never be picked up
+  // by a parent click handler (e.g. a wrapping link) or double-fire the
+  // wishlist toggle beside it.
+  const bagBtn = document.getElementById("btn-add-to-bag");
+  if (bagBtn) {
+    bagBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await cartAdd(product.id, qty, selectedSize, selectedColour);
+    });
+  }
 
   // Wishlist
   const wishBtn = document.getElementById("btn-wishlist-detail");
@@ -670,8 +677,10 @@ async function initProductPage() {
       }
     };
     syncWishBtn();
-    wishBtn.addEventListener("click", () => {
-      wishlistToggle(product.id);
+    wishBtn.addEventListener("click", async (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      await wishlistToggle(product.id);
       syncWishBtn();
     });
   }
@@ -772,6 +781,11 @@ function initProductSync() {
   // If it's already been called by products.js auto-init, this is a no-op
   if (typeof _initProductSyncDone !== "undefined") return;
   window._initProductSyncDone = true;
+
+  // Supabase realtime (cross-device). See the QA note in products.js next to
+  // _initSupabaseProductRealtime() for why this is a separate call instead
+  // of a same-named function.
+  if (typeof _initSupabaseProductRealtime === "function") _initSupabaseProductRealtime();
 
   // BroadcastChannel — fires when admin saves in any tab on same browser
   try {

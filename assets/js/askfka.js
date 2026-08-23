@@ -76,14 +76,15 @@ CUSTOM MEASUREMENTS:
 - Custom orders require additional production time. Timeline confirmed after measurements received.
 
 DELIVERY:
-- Free delivery on orders over ₦85,00.
-- Ogun:₦2,000 | 1–2 business days 
-- Lagos Island: ₦3,500 | 3–5 business days
-- Lagos Mainland: ₦4,000 | 3–5 business days
+- Free delivery on orders over ₦85,000 (₦100,000 for Abuja/PH/Ibadan/South West/South East/South South, ₦150,000 for Northern Nigeria).
+- Ogun State (Ijebu Ode, Abeokuta, Sagamu, Ota, etc): ₦3,500 | 1–3 business days
+- Lagos Island: ₦2,500 | 1–2 business days
+- Lagos Mainland: ₦3,000 | 1–2 business days
 - Lagos Outskirts (Ajah, Ikorodu, etc): ₦4,000 | 2–3 business days
 - Abuja (FCT): ₦5,500 | 3–5 business days
 - Port Harcourt: ₦6,000 | 3–5 business days
-- Ibadan/South West: ₦5,000–5,500 | 3–6 business days
+- Ibadan: ₦5,000 | 3–5 business days
+- South West Other (Osun, Ekiti, Ondo, Kwara): ₦5,500 | 4–6 business days
 - South East/South South: ₦6,500 | 4–7 business days
 - Northern Nigeria: ₦7,500 | 5–8 business days
 

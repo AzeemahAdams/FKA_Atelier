@@ -628,8 +628,8 @@ async function adminGetAllProducts() {
  * Listen for product changes (Supabase realtime or localStorage broadcast).
  * Call once on storefront pages to auto-refresh product grids.
  */
-function initProductSync() {
-  // Supabase realtime
+function _initSupabaseProductRealtime() {
+  // Supabase realtime (cross-device live updates)
   if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
     try {
       fkaDB().channel("rt_products_storefront")
@@ -639,17 +639,28 @@ function initProductSync() {
         .subscribe();
     } catch {}
   }
+}
 
-  // localStorage broadcast (fallback / same-device cross-tab)
-  try {
-    const bc = new BroadcastChannel("fka_products_channel");
-    bc.onmessage = () => _refreshProductGrids();
-  } catch {}
-
-  // Also listen for storage events (different tab, same device)
-  window.addEventListener("storage", e => {
-    if (e.key === _ADMIN_PROD_KEY) _refreshProductGrids();
-  });
+/* QA fix (Aug 2026): this function used to be named initProductSync(), but
+   main.js also declares an initProductSync() (BroadcastChannel + storage
+   events, for same-device sync) and main.js loads AFTER this file on every
+   page -- so its version always overwrote this one and the Supabase
+   realtime subscription above never ran. Renamed to
+   _initSupabaseProductRealtime() and main.js's initProductSync() now calls
+   it directly, so cross-device live updates work again alongside the
+   same-device sync. Kept as a fallback below in case a page loads this
+   file without main.js. */
+if (typeof initProductSync !== "function") {
+  function initProductSync() {
+    _initSupabaseProductRealtime();
+    try {
+      const bc = new BroadcastChannel("fka_products_channel");
+      bc.onmessage = () => _refreshProductGrids();
+    } catch {}
+    window.addEventListener("storage", e => {
+      if (e.key === _ADMIN_PROD_KEY) _refreshProductGrids();
+    });
+  }
 }
 
 function _refreshProductGrids() {

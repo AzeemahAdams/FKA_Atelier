@@ -35,8 +35,12 @@ function wishlistHas(productId) {
  * Add product to wishlist.
  * @param {string} productId
  */
-function wishlistAdd(productId) {
-  const product = getProductById(productId);
+async function wishlistAdd(productId) {
+  // QA FIX (Aug 2026): same async/await bug as cartAdd() in cart.js —
+  // getProductById() is async, this used to call it without `await`,
+  // so `product` was a Promise and `product.images[0]` threw. That
+  // uncaught error is why "Add to Wishlist" looked unresponsive.
+  const product = await getProductById(productId);
   if (!product) return;
   if (wishlistHas(productId)) return;
 
@@ -68,14 +72,14 @@ function wishlistRemove(productId) {
 /**
  * Toggle product in/out of wishlist.
  * @param {string} productId
- * @returns {boolean} true = now in wishlist
+ * @returns {Promise<boolean>} true = now in wishlist
  */
-function wishlistToggle(productId) {
+async function wishlistToggle(productId) {
   if (wishlistHas(productId)) {
     wishlistRemove(productId);
     return false;
   } else {
-    wishlistAdd(productId);
+    await wishlistAdd(productId);
     return true;
   }
 }

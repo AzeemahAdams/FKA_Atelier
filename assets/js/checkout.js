@@ -301,25 +301,26 @@ function checkoutPlaceOrder() {
     const refEl = document.getElementById("success-order-id");
     if (refEl) refEl.textContent = bookingRef;
 
-    // Payment instructions block
+    // Payment instructions block — pulled from admin-configured bank details
     const payInstructEl = document.getElementById("success-payment-instructions");
     if (payInstructEl) {
+      const bank = (typeof getStoreBankDetails === "function") ? getStoreBankDetails() : {};
       payInstructEl.innerHTML = `
         <div style="background:var(--cream);border:1px solid var(--border);padding:1.25rem 1.5rem;margin-bottom:1.25rem;text-align:left;">
           <div style="font-size:0.68rem;font-weight:700;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dark);margin-bottom:0.75rem;">
             How to complete your order
           </div>
           <ol style="font-size:0.85rem;color:var(--text-mid);line-height:1.9;padding-left:1.2rem;margin:0;">
-            <li>Send your payment of <strong>₦${total.toLocaleString("en-NG")}</strong> to our bank account.</li>
+            <li>Send your payment of <strong>₦${total.toLocaleString("en-NG")}</strong> to our bank account below.</li>
             <li>Take a screenshot of your payment receipt.</li>
             <li>Send the screenshot + your booking reference <strong>${bookingRef}</strong> to us via WhatsApp or email.</li>
             <li>Once we verify your payment, you will receive your <strong>Order ID</strong> — your order is then confirmed.</li>
           </ol>
           <div style="margin-top:1rem;padding:0.75rem 1rem;background:var(--white);border:1px solid var(--border);font-size:0.82rem;">
             <strong>Bank Details</strong><br>
-            <span style="color:var(--text-mid);">Bank: <strong>[Your Bank Name]</strong></span><br>
-            <span style="color:var(--text-mid);">Account Number: <strong>[Your Account Number]</strong></span><br>
-            <span style="color:var(--text-mid);">Account Name: <strong>[Your Account Name]</strong></span>
+            <span style="color:var(--text-mid);">Bank: <strong>${bank.bankName || "[Add bank name in Admin → Settings]"}</strong></span><br>
+            <span style="color:var(--text-mid);">Account Number: <strong>${bank.accountNumber || "[Add account number in Admin → Settings]"}</strong></span><br>
+            <span style="color:var(--text-mid);">Account Name: <strong>${bank.accountName || "[Add account name in Admin → Settings]"}</strong></span>
           </div>
         </div>`;
     }
@@ -349,13 +350,6 @@ function checkoutPlaceOrder() {
         `Hi FKA Atelier,\n\nI'd like to complete my order.\n\nBooking Reference: ${bookingRef}\nItems: ${itemsList}\nTotal: ₦${total.toLocaleString("en-NG")}\n\nPlease send me your bank details. Thank you.`
       );
       emailBtn.href = `mailto:hello@fkaatelier.com?subject=${subject}&body=${body}`;
-    }
-
-  } catch (err) {
-    if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-regular fa-check"></i> Place Order'; }
-    alert(err.message || "Something went wrong. Please try again.");
-  }
-}
     }
 
   } catch (err) {

@@ -51,7 +51,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title">Orders</h1>
+          <h1 class="adm-page-title"><i class="fa-regular fa-bag-shopping"></i> Orders</h1>
           <p class="adm-page-subtitle" id="orders-count-label"
             style="display:flex;align-items:center;gap:0.75rem;">
             Loading… <span class="adm-live-dot">Live</span>
@@ -108,9 +108,9 @@
               <table class="adm-table">
                 <thead>
                   <tr>
-                    <th>Booking Ref</th><th>Customer</th><th>Phone</th>
-                    <th>Items</th><th>Total</th><th>Status</th>
-                    <th>Date</th><th>Actions</th>
+                    <th><i class="fa-regular fa-ticket"></i> Booking Ref</th><th><i class="fa-regular fa-user"></i> Customer</th><th><i class="fa-regular fa-phone"></i> Phone</th>
+                    <th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-money-bill"></i> Total</th><th><i class="fa-regular fa-circle-dot"></i> Status</th>
+                    <th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-regular fa-sliders"></i> Actions</th>
                   </tr>
                 </thead>
                 <tbody id="bookings-tbody"></tbody>
@@ -153,9 +153,9 @@
               <table class="adm-table">
                 <thead>
                   <tr>
-                    <th>Order ID</th><th>Customer</th><th>Phone</th>
-                    <th>Items</th><th>Zone</th><th>Total</th>
-                    <th>Status</th><th>Date</th><th>Actions</th>
+                    <th><i class="fa-regular fa-hashtag"></i> Order ID</th><th><i class="fa-regular fa-user"></i> Customer</th><th><i class="fa-regular fa-phone"></i> Phone</th>
+                    <th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-map-location-dot"></i> Zone</th><th><i class="fa-regular fa-money-bill"></i> Total</th>
+                    <th><i class="fa-regular fa-circle-dot"></i> Status</th><th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-regular fa-sliders"></i> Actions</th>
                   </tr>
                 </thead>
                 <tbody id="orders-tbody"></tbody>
@@ -189,7 +189,7 @@
       </div>
       <!-- Payment note -->
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Payment Verification Note</label>
+        <label class="adm-label"><i class="fa-regular fa-money-check-dollar"></i> Payment Verification Note</label>
         <input class="adm-input" type="text" id="modal-cp-note"
           placeholder="e.g. Bank transfer confirmed — ₦65,000 received from Amina Hassan">
         <span class="adm-field-hint">This note will be saved to the order history.</span>
@@ -240,7 +240,7 @@
       <div class="adm-section-label">Items</div>
       <div class="adm-table-wrap" style="margin-bottom:1.25rem;">
         <table class="adm-table">
-          <thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>Qty</th><th>Total</th></tr></thead>
+          <thead><tr><th><i class="fa-regular fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
           <tbody id="modal-bd-items"></tbody>
         </table>
       </div>
@@ -279,7 +279,7 @@
       <!-- Status update -->
       <div style="display:flex;gap:0.75rem;align-items:flex-end;margin-bottom:1.5rem;flex-wrap:wrap;">
         <div class="adm-field" style="flex:1;min-width:160px;">
-          <label class="adm-label">Update Status</label>
+          <label class="adm-label"><i class="fa-regular fa-rotate"></i> Update Status</label>
           <select class="adm-select" id="modal-status-select">
             <option value="confirmed">Confirmed</option>
             <option value="processing">Processing</option>
@@ -290,7 +290,7 @@
           </select>
         </div>
         <div class="adm-field" style="flex:2;min-width:200px;">
-          <label class="adm-label">Status Note (optional)</label>
+          <label class="adm-label"><i class="fa-regular fa-note-sticky"></i> Status Note (optional)</label>
           <input class="adm-input" type="text" id="modal-status-note"
             placeholder="e.g. Dispatched via GIG Logistics">
         </div>
@@ -312,7 +312,7 @@
         <div class="adm-section-label">Items Ordered</div>
         <div class="adm-table-wrap">
           <table class="adm-table">
-            <thead><tr><th>Product</th><th>Size</th><th>Colour</th><th>Qty</th><th>Unit</th><th>Total</th></tr></thead>
+            <thead><tr><th><i class="fa-regular fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-regular fa-tag"></i> Unit</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
             <tbody id="modal-items-tbody"></tbody>
           </table>
         </div>
@@ -356,6 +356,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/orders.js"></script>
+<script src="../assets/js/local-orders.js"></script>
 <script src="../assets/js/admin.js"></script>
 <script>
 "use strict";

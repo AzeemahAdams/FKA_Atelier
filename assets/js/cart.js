@@ -4,7 +4,7 @@
    ============================================================ */
 
 const CART_KEY = "fka_cart";
-const DELIVERY_THRESHOLD = 70000;
+const DELIVERY_THRESHOLD = 85000;
 const DELIVERY_FEE = 4500;
 
 /* ── Storage helpers ───────────────────────────────────── */
@@ -31,8 +31,15 @@ function cartSave(cart) {
  * @param {string} size
  * @param {string} colour
  */
-function cartAdd(productId, qty = 1, size = "", colour = "") {
-  const product = getProductById(productId);
+async function cartAdd(productId, qty = 1, size = "", colour = "") {
+  // QA FIX (Aug 2026): getProductById() in products.js is an async
+  // function (it may need to check Supabase). This used to be called
+  // without `await`, so `product` was a Promise, not the actual
+  // product — `product.images[0]` then threw a TypeError, which
+  // aborted the click handler silently. This is why "Add to Bag"
+  // looked completely unresponsive: the button's click listener threw
+  // before cartSave()/showToast() ever ran.
+  const product = await getProductById(productId);
   if (!product) return;
 
   const cart = cartLoad();

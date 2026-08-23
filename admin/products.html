@@ -19,7 +19,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title">Products</h1>
+          <h1 class="adm-page-title"><i class="fa-regular fa-shirt"></i> Products</h1>
           <p class="adm-page-subtitle" id="prod-count-label">Loading…</p>
         </div>
         <button class="adm-btn adm-btn-primary" onclick="openProductModal(null)">
@@ -59,14 +59,14 @@
             <table class="adm-table">
               <thead>
                 <tr>
-                  <th>Image</th>
-                  <th>Name</th>
-                  <th>Category</th>
-                  <th>Price</th>
-                  <th>Fabric</th>
-                  <th>Tags</th>
-                  <th>Status</th>
-                  <th>Actions</th>
+                  <th><i class="fa-regular fa-image"></i> Image</th>
+                  <th><i class="fa-regular fa-user"></i> Name</th>
+                  <th><i class="fa-regular fa-list"></i> Category</th>
+                  <th><i class="fa-regular fa-tag"></i> Price</th>
+                  <th><i class="fa-regular fa-scroll"></i> Fabric</th>
+                  <th><i class="fa-regular fa-tags"></i> Tags</th>
+                  <th><i class="fa-regular fa-circle-dot"></i> Status</th>
+                  <th><i class="fa-regular fa-sliders"></i> Actions</th>
                 </tr>
               </thead>
               <tbody id="prod-tbody"></tbody>
@@ -93,11 +93,11 @@
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
         <div class="adm-field">
-          <label class="adm-label">Product ID <span style="color:var(--adm-text-light);font-weight:400;">(auto on new)</span></label>
+          <label class="adm-label"><i class="fa-regular fa-hashtag"></i> Product ID <span style="color:var(--adm-text-light);font-weight:400;">(auto on new)</span></label>
           <input class="adm-input" type="text" id="prod-id" placeholder="fka-015">
         </div>
         <div class="adm-field">
-          <label class="adm-label">Category *</label>
+          <label class="adm-label"><i class="fa-regular fa-list"></i> Category *</label>
           <select class="adm-select" id="prod-category">
             <option value="abayas">Abayas</option>
             <option value="dresses">Dresses</option>
@@ -110,37 +110,37 @@
       </div>
 
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Product Name *</label>
+        <label class="adm-label"><i class="fa-regular fa-shirt"></i> Product Name *</label>
         <input class="adm-input" type="text" id="prod-name" placeholder="Ivory Linen Abaya">
         <span class="adm-field-err" id="err-prod-name"></span>
       </div>
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
         <div class="adm-field">
-          <label class="adm-label">Price (₦) *</label>
+          <label class="adm-label"><i class="fa-regular fa-tag"></i> Price (₦) *</label>
           <input class="adm-input" type="number" id="prod-price" placeholder="65000" min="0">
           <span class="adm-field-err" id="err-prod-price"></span>
         </div>
         <div class="adm-field">
-          <label class="adm-label">Fabric</label>
+          <label class="adm-label"><i class="fa-regular fa-scroll"></i> Fabric</label>
           <input class="adm-input" type="text" id="prod-fabric" placeholder="100% natural linen">
         </div>
       </div>
 
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Description *</label>
+        <label class="adm-label"><i class="fa-regular fa-align-left"></i> Description *</label>
         <textarea class="adm-textarea" id="prod-description" rows="3" placeholder="Product description…"></textarea>
         <span class="adm-field-err" id="err-prod-description"></span>
       </div>
 
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Care Instructions</label>
+        <label class="adm-label"><i class="fa-regular fa-hand-sparkles"></i> Care Instructions</label>
         <input class="adm-input" type="text" id="prod-care" placeholder="Hand wash cold. Do not tumble dry.">
       </div>
 
       <!-- ── IMAGE UPLOAD ── -->
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label">Product Images</label>
+        <label class="adm-label"><i class="fa-regular fa-image"></i> Product Images</label>
 
         <!-- Tab switcher -->
         <div style="display:flex;border:1px solid var(--adm-border);border-radius:var(--adm-radius);overflow:hidden;margin-bottom:0.85rem;width:fit-content;">
@@ -184,27 +184,27 @@
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
         <div class="adm-field">
-          <label class="adm-label">Available Sizes</label>
+          <label class="adm-label"><i class="fa-regular fa-ruler"></i> Available Sizes</label>
           <div style="display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:0.25rem;" id="prod-sizes-wrap">
             <!-- Generated by JS -->
           </div>
         </div>
         <div class="adm-field">
-          <label class="adm-label">Collections <span style="color:var(--adm-text-light);font-weight:400;">(comma-separated slugs)</span></label>
+          <label class="adm-label"><i class="fa-regular fa-layer-group"></i> Collections <span style="color:var(--adm-text-light);font-weight:400;">(comma-separated slugs)</span></label>
           <input class="adm-input" type="text" id="prod-collections" placeholder="new-collection,everyday-elegance">
         </div>
       </div>
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
         <div class="adm-field">
-          <label class="adm-label">Colours <span style="color:var(--adm-text-light);font-weight:400;">(name:hex, one per line)</span></label>
+          <label class="adm-label"><i class="fa-regular fa-palette"></i> Colours <span style="color:var(--adm-text-light);font-weight:400;">(name:hex, one per line)</span></label>
           <textarea class="adm-textarea" id="prod-colours" rows="3"
             placeholder="Ivory:#FAF7F2&#10;Sand:#C4A882&#10;Black:#1A1A1A"></textarea>
         </div>
         <div>
           <!-- Flags -->
           <div class="adm-field" style="margin-bottom:1rem;">
-            <label class="adm-label">Flags</label>
+            <label class="adm-label"><i class="fa-regular fa-flag"></i> Flags</label>
             <div style="display:flex;flex-direction:column;gap:0.75rem;margin-top:0.35rem;">
               <label class="adm-toggle-wrap">
                 <input type="checkbox" class="adm-toggle-input" id="prod-available">

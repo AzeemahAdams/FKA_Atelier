@@ -317,6 +317,7 @@
   padding-bottom: 0.75rem;
   border-bottom: 1px solid var(--border);
 }
+.acc-tab-title i { color: var(--warm-brown); font-size: 0.8em; margin-right: 0.5rem; }
 .acc-tab-panel { animation: authFadeIn 0.2s ease; }
 
 /* Order cards */

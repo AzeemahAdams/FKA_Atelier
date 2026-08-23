@@ -106,6 +106,7 @@
   color: var(--black);
   margin-bottom: 0.3rem;
 }
+.co-panel-title i { color: var(--warm-brown); font-size: 0.75em; margin-right: 0.5rem; }
 .co-panel-sub { font-size: 0.85rem; color: var(--text-mid); }
 
 .co-section-label {

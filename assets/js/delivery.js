@@ -17,7 +17,7 @@ const DEFAULT_DELIVERY_ZONES = [
     keywords: ["lagos island","victoria island","vi","ikoyi","lekki phase 1","lekki 1","oniru","eti-osa"],
     state: "Lagos",
     fee: 2500,
-    freeThreshold: 70000,
+    freeThreshold: 85000,
     estimatedDays: "1–2 business days",
     active: true
   },
@@ -28,7 +28,7 @@ const DEFAULT_DELIVERY_ZONES = [
     keywords: ["yaba","surulere","ikeja","ojota","agege","maryland","mushin","oshodi","palmgrove","fadeyi","gbagada","pedro","bariga"],
     state: "Lagos",
     fee: 3000,
-    freeThreshold: 70000,
+    freeThreshold: 85000,
     estimatedDays: "1–2 business days",
     active: true
   },
@@ -39,7 +39,7 @@ const DEFAULT_DELIVERY_ZONES = [
     keywords: ["ajah","sangotedo","ibeju","ibeju-lekki","epe","badagry","ikorodu","lekki phase 2","lekki 2","chevron","jakande","ilaje","igbo-efon","ogombo","abraham adesanya","orchid"],
     state: "Lagos",
     fee: 4000,
-    freeThreshold: 70000,
+    freeThreshold: 85000,
     estimatedDays: "2–3 business days",
     active: true
   },
@@ -77,10 +77,26 @@ const DEFAULT_DELIVERY_ZONES = [
     active: true
   },
   {
+    id: "zone-ogun",
+    name: "Ogun State",
+    description: "Ijebu Ode, Abeokuta, Sagamu, Ota, Mowe, Ofada, Ilaro",
+    // NOTE (QA fix, Aug 2026): Ogun State used to be lumped into the generic
+    // "South West (Other)" zone (state:"South West"), so an address like
+    // "Ijebu Ode, Ogun State" never resolved to an explicit Ogun/Ijebu Ode
+    // zone. Split out as its own zone per request — this is also now the
+    // store's default/primary delivery zone.
+    keywords: ["ijebu ode","ijebu-ode","ijebu igbo","ijebu","ogun","ogun state","abeokuta","ota","sango ota","sagamu","mowe","ofada","ilaro","aiyetoro","ijebu-ife"],
+    state: "Ogun",
+    fee: 3500,
+    freeThreshold: 85000,
+    estimatedDays: "1–3 business days",
+    active: true
+  },
+  {
     id: "zone-south-west",
     name: "South West (Other)",
-    description: "Abeokuta, Osogbo, Ado-Ekiti, Akure, Ile-Ife, Ilorin",
-    keywords: ["abeokuta","ogun","osogbo","osun","ado ekiti","ekiti","akure","ondo","ile-ife","ife","ilorin","kwara","sagamu","ota","mowe","ofada","ijebu"],
+    description: "Osogbo, Ado-Ekiti, Akure, Ile-Ife, Ilorin",
+    keywords: ["osogbo","osun","ado ekiti","ekiti","akure","ondo","ile-ife","ife","ilorin","kwara"],
     state: "South West",
     fee: 5500,
     freeThreshold: 100000,

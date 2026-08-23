@@ -19,7 +19,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title">Settings</h1>
+          <h1 class="adm-page-title"><i class="fa-regular fa-gear"></i> Settings</h1>
           <p class="adm-page-subtitle">Store configuration, admin credentials and data management.</p>
         </div>
         <button class="adm-btn adm-btn-outline adm-btn-sm" onclick="loadSettings()">
@@ -40,32 +40,32 @@
           <div class="adm-card-body">
             <div class="adm-form-grid" style="gap:1.1rem;">
               <div class="adm-field">
-                <label class="adm-label">Store Name</label>
+                <label class="adm-label"><i class="fa-regular fa-store"></i> Store Name</label>
                 <input class="adm-input" type="text" id="s-store-name" placeholder="FKA Atelier">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Tagline</label>
+                <label class="adm-label"><i class="fa-regular fa-quote-left"></i> Tagline</label>
                 <input class="adm-input" type="text" id="s-tagline" placeholder="Timeless. Modest. Elegant.">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Contact Email</label>
+                <label class="adm-label"><i class="fa-regular fa-envelope"></i> Contact Email</label>
                 <input class="adm-input" type="email" id="s-email" placeholder="hello@fkaatelier.com">
               </div>
               <div class="adm-field">
-                <label class="adm-label">WhatsApp Number</label>
+                <label class="adm-label"><i class="fa-brands fa-whatsapp"></i> WhatsApp Number</label>
                 <input class="adm-input" type="tel" id="s-whatsapp" placeholder="+2347019243312">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Instagram Handle</label>
+                <label class="adm-label"><i class="fa-brands fa-instagram"></i> Instagram Handle</label>
                 <input class="adm-input" type="text" id="s-instagram" placeholder="@fkaatelier">
               </div>
               <div class="adm-field">
-                <label class="adm-label">TikTok Handle</label>
+                <label class="adm-label"><i class="fa-brands fa-tiktok"></i> TikTok Handle</label>
                 <input class="adm-input" type="text" id="s-tiktok" placeholder="@fkaatelier">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Location</label>
-                <input class="adm-input" type="text" id="s-location" placeholder="Lagos, Nigeria">
+                <label class="adm-label"><i class="fa-regular fa-location-dot"></i> Location</label>
+                <input class="adm-input" type="text" id="s-location" placeholder="Ijebu Ode, Ogun State, Nigeria">
               </div>
             </div>
             <div id="store-saved" style="display:none;background:#D1FAE5;color:#065F46;padding:0.5rem 0.85rem;font-size:0.78rem;margin-top:0.75rem;border-radius:var(--adm-radius);">
@@ -90,9 +90,9 @@
             </div>
             <div class="adm-card-body">
               <div class="adm-field" style="margin-bottom:1rem;">
-                <label class="adm-label">Announcement Text</label>
+                <label class="adm-label"><i class="fa-regular fa-bullhorn"></i> Announcement Text</label>
                 <input class="adm-input" type="text" id="s-announcement"
-                  placeholder="FREE DELIVERY ON ORDERS OVER ₦70,000 | CUSTOM MEASUREMENTS ACCEPTED">
+                  placeholder="FREE DELIVERY ON ORDERS OVER ₦85,000 | CUSTOM MEASUREMENTS ACCEPTED">
                 <span class="adm-field-hint">Shown in the top bar across the website.</span>
               </div>
               <label class="adm-toggle-wrap" style="margin-bottom:1rem;">
@@ -116,7 +116,7 @@
             </div>
             <div class="adm-card-body">
               <div class="adm-field" style="margin-bottom:1.1rem;">
-                <label class="adm-label">Groq API Key</label>
+                <label class="adm-label"><i class="fa-regular fa-key"></i> Groq API Key</label>
                 <div style="position:relative;">
                   <input class="adm-input" type="password" id="s-groq-key"
                     placeholder="Paste your gsk_ key here…"
@@ -134,7 +134,7 @@
               </div>
 
               <div class="adm-field" style="margin-bottom:1rem;">
-                <label class="adm-label">AI Model</label>
+                <label class="adm-label"><i class="fa-regular fa-robot"></i> AI Model</label>
                 <select class="adm-select" id="s-groq-model">
                   <option value="llama-3.3-70b-versatile">llama-3.3-70b-versatile — Best quality (default)</option>
                   <option value="llama-3.1-8b-instant">llama-3.1-8b-instant — Fastest</option>
@@ -171,19 +171,19 @@
             <div class="adm-card-body">
               <div class="adm-form-grid" style="gap:1.1rem;">
                 <div class="adm-field">
-                  <label class="adm-label">Admin Username</label>
+                  <label class="adm-label"><i class="fa-regular fa-user-shield"></i> Admin Username</label>
                   <input class="adm-input" type="text" id="s-admin-username" placeholder="admin" autocomplete="username">
                 </div>
                 <div class="adm-field">
-                  <label class="adm-label">Current Password <span style="font-weight:400;color:var(--adm-text-light);font-size:0.65rem;">(required to change)</span></label>
+                  <label class="adm-label"><i class="fa-regular fa-lock"></i> Current Password <span style="font-weight:400;color:var(--adm-text-light);font-size:0.65rem;">(required to change)</span></label>
                   <input class="adm-input" type="password" id="s-current-password" placeholder="Enter your current password" autocomplete="current-password">
                 </div>
                 <div class="adm-field">
-                  <label class="adm-label">New Password <span style="font-weight:400;color:var(--adm-text-light);font-size:0.65rem;">(min 6 chars)</span></label>
+                  <label class="adm-label"><i class="fa-regular fa-lock"></i> New Password <span style="font-weight:400;color:var(--adm-text-light);font-size:0.65rem;">(min 6 chars)</span></label>
                   <input class="adm-input" type="password" id="s-new-password" placeholder="Leave blank to keep current" autocomplete="new-password">
                 </div>
                 <div class="adm-field">
-                  <label class="adm-label">Confirm New Password</label>
+                  <label class="adm-label"><i class="fa-regular fa-lock"></i> Confirm New Password</label>
                   <input class="adm-input" type="password" id="s-confirm-password" placeholder="Repeat new password" autocomplete="new-password">
                 </div>
               </div>
@@ -208,28 +208,28 @@
           <div class="adm-card-body">
             <div class="adm-form-grid" style="gap:1.1rem;">
               <div class="adm-field">
-                <label class="adm-label">Free Delivery Threshold (₦)</label>
-                <input class="adm-input" type="number" id="s-free-threshold" placeholder="70000" min="0">
+                <label class="adm-label"><i class="fa-regular fa-gift"></i> Free Delivery Threshold (₦)</label>
+                <input class="adm-input" type="number" id="s-free-threshold" placeholder="85000" min="0">
                 <span class="adm-field-hint">Orders above this value get free delivery.</span>
               </div>
               <div class="adm-field">
-                <label class="adm-label">Default Delivery Fee (₦)</label>
+                <label class="adm-label"><i class="fa-regular fa-truck"></i> Default Delivery Fee (₦)</label>
                 <input class="adm-input" type="number" id="s-default-fee" placeholder="4500" min="0">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Bank Name</label>
+                <label class="adm-label"><i class="fa-regular fa-building-columns"></i> Bank Name</label>
                 <input class="adm-input" type="text" id="s-bank-name" placeholder="e.g. First Bank">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Account Number</label>
+                <label class="adm-label"><i class="fa-regular fa-hashtag"></i> Account Number</label>
                 <input class="adm-input" type="text" id="s-account-number" placeholder="e.g. 0123456789">
               </div>
               <div class="adm-field">
-                <label class="adm-label">Account Name</label>
+                <label class="adm-label"><i class="fa-regular fa-user"></i> Account Name</label>
                 <input class="adm-input" type="text" id="s-account-name" placeholder="e.g. FKA Atelier Limited">
               </div>
               <div class="adm-field" style="grid-column:1/-1;">
-                <label class="adm-label">Order Confirmation Message</label>
+                <label class="adm-label"><i class="fa-regular fa-comment-dots"></i> Order Confirmation Message</label>
                 <textarea class="adm-textarea" id="s-order-message" rows="3"
                   placeholder="Thank you for your order! We'll be in touch shortly."></textarea>
               </div>
@@ -322,14 +322,14 @@ function loadSettings() {
   _set("s-whatsapp",    s.whatsapp      || "+2347019243312");
   _set("s-instagram",   s.instagram     || "@fkaatelier");
   _set("s-tiktok",      s.tiktok        || "@fkaatelier");
-  _set("s-location",    s.location      || "Lagos, Nigeria");
+  _set("s-location",    s.location      || "Ijebu Ode, Ogun State, Nigeria");
 
   // Announcement
-  _set("s-announcement", s.announcement || "FREE DELIVERY ON ORDERS OVER ₦70,000  |  CUSTOM MEASUREMENTS ACCEPTED");
+  _set("s-announcement", s.announcement || "FREE DELIVERY ON ORDERS OVER ₦85,000  |  CUSTOM MEASUREMENTS ACCEPTED");
   _check("s-announcement-active", s.announcementActive !== false);
 
   // Order settings
-  _set("s-free-threshold",  s.freeThreshold  || 70000);
+  _set("s-free-threshold",  s.freeThreshold  || 85000);
   _set("s-default-fee",     s.defaultFee     || 4500);
   _set("s-bank-name",       s.bankName       || "");
   _set("s-account-number",  s.accountNumber  || "");
@@ -407,7 +407,7 @@ function saveAnnouncementSettings() {
 /* ── Order settings ──────────────────────────────────── */
 function saveOrderSettings() {
   adminSettingsSave({
-    freeThreshold: parseFloat(document.getElementById("s-free-threshold").value) || 70000,
+    freeThreshold: parseFloat(document.getElementById("s-free-threshold").value) || 85000,
     defaultFee:    parseFloat(document.getElementById("s-default-fee").value)    || 4500,
     bankName:      document.getElementById("s-bank-name").value.trim(),
     accountNumber: document.getElementById("s-account-number").value.trim(),

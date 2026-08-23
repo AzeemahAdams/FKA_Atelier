@@ -530,8 +530,10 @@ function adminNotify(title, body, type = "info", href = "") {
 
 /* ── Pending orders badge updater ── */
 function adminUpdatePendingBadge() {
-  const count = typeof ordersLoad === "function"
-    ? ordersLoad().filter(o => o.status === "pending").length
+  // Counts bookings awaiting payment verification — the thing that
+  // most urgently needs admin attention in the manual bank-transfer flow.
+  const count = typeof bookingsGetAll === "function"
+    ? bookingsGetAll().filter(b => b.status === "awaiting_payment").length
     : 0;
   document.querySelectorAll(".adm-nav-item[href='orders.html'] .adm-nav-badge").forEach(el => {
     el.textContent = count;

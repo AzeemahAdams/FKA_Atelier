@@ -29,7 +29,7 @@
 
 /* ---- Reset & Base ---- */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; font-size: 17px; }
+html { scroll-behavior: smooth; font-size: 18px; }
 body {
   font-family: var(--font-sans);
   background-color: var(--ivory);
@@ -887,8 +887,12 @@ p { color: var(--text-mid); line-height: 1.8; }
   margin-bottom: 1.2rem;
 }
 .footer-links { display: flex; flex-direction: column; gap: 0.6rem; }
-.footer-links a { font-size: 0.82rem; color: rgba(196,181,165,0.7); transition: color var(--transition); }
+.footer-links a { font-size: 0.82rem; color: rgba(196,181,165,0.7); transition: color var(--transition); display: inline-flex; align-items: center; gap: 0.55rem; }
+.footer-links a i { font-size: 0.75em; width: 1em; text-align: center; color: var(--warm-brown); opacity: 0.85; flex-shrink: 0; }
 .footer-links a:hover { color: var(--taupe); }
+.footer-links a:hover i { color: var(--taupe); }
+.footer-col-title { display: flex; align-items: center; gap: 0.5rem; }
+.footer-col-title i { color: var(--warm-brown); font-size: 0.85em; }
 .footer-bottom {
   max-width: 1340px;
   margin: 0 auto;
@@ -1545,8 +1549,9 @@ p { color: var(--text-mid); line-height: 1.8; }
   .footer-brand-col { grid-column: 1 / -1; }
   .newsletter-form { flex-direction: column; }
   .newsletter-input { border-right: 1px solid rgba(196,181,165,0.3); }
-  .product-add-actions { flex-direction: column; }
+  .product-add-actions { flex-direction: column; gap: 0.85rem; }
   .btn-add-to-bag { flex: none; width: 100%; }
+  .btn-add-to-wishlist-detail { width: 100%; }
   .about-values-grid { grid-template-columns: 1fr; }
   .measure-guide-grid { grid-template-columns: 1fr; }
   .cart-item { grid-template-columns: 75px 1fr auto; gap: 0.75rem; }
@@ -1585,9 +1590,13 @@ html, body { overflow-x: hidden; }
 img, video, iframe, embed, object { max-width: 100%; }
 table { max-width: 100%; }
 
-/* ── Fluid font scaling — clamp scales from 15px on small screens to 17px on desktop ── */
+/* ── Fluid font scaling — clamp scales from 16px on small screens to 18.5px on desktop ──
+   (Bumped up from 15–17px per the requested global font-size increase. Since every
+   component size in this file is defined in rem/clamp() relative to this root value,
+   raising it scales all text proportionally without any component-by-component edits,
+   and the clamp() keeps small screens from overflowing.) ── */
 html {
-  font-size: clamp(15px, 1.6vw, 17px);
+  font-size: clamp(16px, 1.7vw, 18.5px);
 }
 
 /* ── Input zoom prevention on iOS (min 16px stops auto-zoom) ── */

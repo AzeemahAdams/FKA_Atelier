@@ -1,13 +1,62 @@
 /* ============================================================
-   FKA ATELIER — Customer Auth (Supabase)
-   Replaces localStorage account management with Supabase Auth.
-   Supabase handles passwords, JWTs and session persistence.
+   FKA ATELIER — Customer Auth
+   ------------------------------------------------------------
+   QA FIX (Aug 2026): This file used to be Supabase-only (async,
+   no localStorage fallback), while every page that actually
+   calls it — account.html, checkout.js — calls authGetSession(),
+   authLogin(), authRegister(), authUpdateProfile() and
+   authGetAccount() SYNCHRONOUSLY (no `await`), and account.html
+   already reads/writes a "fka_accounts" localStorage array
+   directly (see accDeleteAddress). In other words, the rest of
+   the app was already built against a synchronous, localStorage-
+   backed auth API — this file just never implemented it, which
+   is why the profile page and checkout (which gates on login)
+   were inaccessible with Supabase unconfigured (the default
+   state of this project).
+
+   This rewrite makes the localStorage-backed flow the primary,
+   synchronous implementation (matching every real call site), and
+   best-effort mirrors register/login to Supabase in the background
+   when it's configured, so accounts still show up there too.
+
+   SECURITY NOTE: passwords in local-fallback mode are hashed with
+   a small non-cryptographic hash and stored in localStorage. This
+   is fine for local development/demo use but is NOT secure for a
+   real production deployment — configure Supabase (which handles
+   real password hashing + JWTs) before taking real customer
+   passwords in production.
    ============================================================ */
 "use strict";
 
+const FKA_ACCOUNTS_KEY      = "fka_accounts";
+const FKA_SESSION_KEY       = "fka_session";        // sessionStorage (tab-only)
+const FKA_SESSION_KEY_LS    = "fka_session_persist"; // localStorage (remember me)
+
+/* ── tiny non-cryptographic hash (see security note above) ──── */
+function _hashPw(pw) {
+  let h = 0;
+  const s = String(pw);
+  for (let i = 0; i < s.length; i++) { h = (h << 5) - h + s.charCodeAt(i); h |= 0; }
+  return "h" + h.toString(36) + s.length;
+}
+
+function _loadAccounts()     { try { return JSON.parse(localStorage.getItem(FKA_ACCOUNTS_KEY)) || []; } catch { return []; } }
+function _saveAccounts(list) { localStorage.setItem(FKA_ACCOUNTS_KEY, JSON.stringify(list)); }
+
+function _accountToFlat(acc) {
+  if (!acc) return null;
+  return {
+    accountId: acc.id,
+    email: acc.email,
+    firstName: acc.firstName,
+    lastName: acc.lastName,
+    fullName: `${acc.firstName} ${acc.lastName}`.trim(),
+    phone: acc.phone
+  };
+}
+
 /* ── Register ─────────────────────────────────────────────── */
-async function authRegister({ firstName, lastName, email, phone, password }) {
-  // Validate client-side first for fast feedback
+function authRegister({ firstName, lastName, email, phone, password }) {
   if (!firstName || firstName.trim().length < 2) return { ok:false, error:"First name must be at least 2 characters." };
   if (!lastName  || lastName.trim().length  < 2) return { ok:false, error:"Last name must be at least 2 characters." };
   if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) return { ok:false, error:"Please enter a valid email address." };
@@ -15,114 +64,100 @@ async function authRegister({ firstName, lastName, email, phone, password }) {
   if (!phoneClean || !/^(\+234|0)[789][01]\d{8}$/.test(phoneClean)) return { ok:false, error:"Please enter a valid Nigerian phone number." };
   if (!password || password.length < 6) return { ok:false, error:"Password must be at least 6 characters." };
 
-  try {
-    const db = fkaDB();
-    const emailLow = email.trim().toLowerCase();
-
-    const { data, error } = await db.auth.signUp({
-      email:    emailLow,
-      password,
-      options:  {
-        data: {
-          first_name: firstName.trim(),
-          last_name:  lastName.trim(),
-          phone:      phoneClean
-        }
-      }
-    });
-
-    if (error) return { ok:false, error: fkaErrorMsg(error) };
-
-    // Log activity
-    await _authActivity("new_account", {
-      id:       data.user?.id,
-      fullName: `${firstName.trim()} ${lastName.trim()}`,
-      email:    emailLow,
-      phone:    phoneClean
-    });
-
-    return { ok:true, user: data.user };
-  } catch (err) {
-    return { ok:false, error: err.message };
+  const emailLow = email.trim().toLowerCase();
+  const accounts = _loadAccounts();
+  if (accounts.find(a => a.email === emailLow)) {
+    return { ok:false, error:"An account with this email already exists. Try signing in instead." };
   }
+
+  const account = {
+    id: "acc_" + Date.now().toString(36) + Math.random().toString(36).slice(2, 7),
+    firstName: firstName.trim(),
+    lastName:  lastName.trim(),
+    email:     emailLow,
+    phone:     phoneClean,
+    passwordHash: _hashPw(password),
+    addresses: [],
+    createdAt: new Date().toISOString()
+  };
+  accounts.push(account);
+  _saveAccounts(accounts);
+
+  // Best-effort mirror to Supabase in the background if configured —
+  // doesn't block or affect the local result either way.
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
+    fkaDB().auth.signUp({
+      email: emailLow, password,
+      options: { data: { first_name: account.firstName, last_name: account.lastName, phone: phoneClean } }
+    }).catch(() => {});
+  }
+
+  return { ok:true, account: _accountToFlat(account) };
 }
 
 /* ── Login ─────────────────────────────────────────────────── */
-async function authLogin(email, password) {
-  // Guard: Supabase not configured — caller handles fallback
-  if (!_isSupabaseReady()) {
-    return { ok:false, error:"Supabase not configured." };
+function authLogin(email, password, remember = true) {
+  const emailLow = (email||"").trim().toLowerCase();
+  const accounts = _loadAccounts();
+  const account  = accounts.find(a => a.email === emailLow);
+  if (!account || account.passwordHash !== _hashPw(password)) {
+    return { ok:false, error:"Incorrect email or password." };
   }
-  try {
-    const db = fkaDB();
-    const { data, error } = await db.auth.signInWithPassword({
-      email:    (email||"").trim().toLowerCase(),
-      password
-    });
-    if (error) {
-      const msg = error.message?.includes("Invalid login") ? "Incorrect email or password." : fkaErrorMsg(error);
-      return { ok:false, error: msg };
-    }
-    await _authActivity("login", { email: data.user?.email });
-    return { ok:true, user: data.user, session: data.session };
-  } catch (err) {
-    return { ok:false, error: err.message };
+
+  const payload = JSON.stringify({ accountId: account.id });
+  sessionStorage.setItem(FKA_SESSION_KEY, payload);
+  if (remember) localStorage.setItem(FKA_SESSION_KEY_LS, payload);
+  else localStorage.removeItem(FKA_SESSION_KEY_LS);
+
+  _cachedSession = _accountToFlat(account);
+
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
+    fkaDB().auth.signInWithPassword({ email: emailLow, password }).catch(() => {});
   }
+
+  return { ok:true, account: _cachedSession };
 }
 
 /* ── Logout ─────────────────────────────────────────────────── */
-async function authLogout() {
-  try {
-    const db = fkaDB();
-    await db.auth.signOut();
-  } catch {}
+function authLogout() {
+  sessionStorage.removeItem(FKA_SESSION_KEY);
+  localStorage.removeItem(FKA_SESSION_KEY_LS);
+  _cachedSession = null;
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof fkaDB === "function") {
+    try { fkaDB().auth.signOut(); } catch {}
+  }
   window.location.href = "index.html";
 }
 
 /* ── Session helpers ─────────────────────────────────────────── */
-/**
- * Returns the Supabase session (includes user) or null.
- * Cached synchronously once loaded via initAuthListener.
- */
 let _cachedSession = null;
-let _sessionLoaded = false;
 
-async function _loadSession() {
-  if (_sessionLoaded) return _cachedSession;
+/**
+ * Returns the current session as a flat object
+ * { accountId, email, firstName, lastName, fullName, phone } or null.
+ * Synchronous — safe to call anywhere, any time.
+ */
+function authGetSession() {
+  if (_cachedSession) return _cachedSession;
   try {
-    const db = fkaDB();
-    const { data } = await db.auth.getSession();
-    _cachedSession  = data?.session || null;
-    _sessionLoaded  = true;
-  } catch { _cachedSession = null; _sessionLoaded = true; }
-  return _cachedSession;
+    const raw = sessionStorage.getItem(FKA_SESSION_KEY) || localStorage.getItem(FKA_SESSION_KEY_LS);
+    if (!raw) return null;
+    const { accountId } = JSON.parse(raw);
+    const account = _loadAccounts().find(a => a.id === accountId);
+    _cachedSession = _accountToFlat(account);
+    return _cachedSession;
+  } catch { return null; }
 }
 
-/**
- * Returns active session object or null.
- * Use `await authGetSession()` — async because first call loads from Supabase.
- */
-async function authGetSession() {
-  return _loadSession();
-}
+function authGetSessionSync() { return authGetSession(); }
 
-/**
- * Synchronous version — only safe after page has fully initialised.
- * Use authGetSession() in async contexts.
- */
-function authGetSessionSync() {
-  return _cachedSession;
-}
-
-function authIsLoggedIn() {
-  return !!_cachedSession;
-}
+function authIsLoggedIn() { return !!authGetSession(); }
 
 /**
  * Require login — redirect to account page if not signed in.
  */
-async function authRequireLogin(returnUrl) {
-  const session = await authGetSession();
+function authRequireLogin(returnUrl) {
+  const session = authGetSession();
   if (!session) {
     sessionStorage.setItem("fka_auth_return", returnUrl || window.location.href);
     window.location.href = "account.html?mode=login";
@@ -131,140 +166,98 @@ async function authRequireLogin(returnUrl) {
   return true;
 }
 
-/* ── Profile operations ─────────────────────────────────────── */
+/* ── Profile / Account operations ─────────────────────────────── */
 /**
- * Get profile for the currently signed-in user.
+ * Full account record (incl. addresses) for a given accountId.
+ * Synchronous — used by account.html and checkout.js.
  */
-async function authGetProfile() {
-  const session = await authGetSession();
-  if (!session) return null;
-  try {
-    const { data, error } = await fkaDB()
-      .from("profiles")
-      .select("*")
-      .eq("id", session.user.id)
-      .single();
-    if (error) return null;
-    return data;
-  } catch { return null; }
+function authGetAccount(accountId) {
+  if (!accountId) return null;
+  const account = _loadAccounts().find(a => a.id === accountId);
+  if (!account) return null;
+  const { passwordHash, ...safe } = account;
+  return safe;
+}
+
+function authGetProfile() {
+  const session = authGetSession();
+  return session ? authGetAccount(session.accountId) : null;
 }
 
 /**
- * Update the signed-in user's profile.
+ * Update the signed-in user's profile: name/phone, password change,
+ * or append a new saved address.
  */
-async function authUpdateProfile(updates) {
-  const session = await authGetSession();
+function authUpdateProfile(updates) {
+  const session = authGetSession();
   if (!session) return { ok:false, error:"Not signed in." };
-  try {
-    const db = fkaDB();
-    // Update Supabase auth metadata
-    if (updates.firstName || updates.lastName) {
-      await db.auth.updateUser({ data: {
-        first_name: updates.firstName,
-        last_name:  updates.lastName,
-        phone:      updates.phone
-      }});
+
+  const accounts = _loadAccounts();
+  const account  = accounts.find(a => a.id === session.accountId);
+  if (!account) return { ok:false, error:"Account not found." };
+
+  if (updates.newPassword) {
+    if (!updates.currentPassword || account.passwordHash !== _hashPw(updates.currentPassword)) {
+      return { ok:false, error:"Current password is incorrect." };
     }
-    // Update password if provided
-    if (updates.newPassword) {
-      const { error: pwErr } = await db.auth.updateUser({ password: updates.newPassword });
-      if (pwErr) return { ok:false, error: fkaErrorMsg(pwErr) };
-    }
-    // Update profiles table
-    const profileUpdate = {};
-    if (updates.firstName)  profileUpdate.first_name = updates.firstName.trim();
-    if (updates.lastName)   profileUpdate.last_name  = updates.lastName.trim();
-    if (updates.phone)      profileUpdate.phone      = updates.phone.replace(/[\s\-()]/g,"");
-    if (updates.address) {
-      // Append address to jsonb array
-      const { data: prof } = await db.from("profiles").select("addresses").eq("id", session.user.id).single();
-      const addrs   = prof?.addresses || [];
-      const key     = `${updates.address.line1}|${updates.address.city}`.toLowerCase();
-      if (!addrs.find(a => `${a.line1}|${a.city}`.toLowerCase() === key)) {
-        addrs.unshift({ ...updates.address, addedAt: new Date().toISOString() });
-        if (addrs.length > 5) addrs.pop();
-        profileUpdate.addresses = addrs;
-      }
-    }
-    if (Object.keys(profileUpdate).length > 0) {
-      const { error: profErr } = await db.from("profiles").update(profileUpdate).eq("id", session.user.id);
-      if (profErr) return { ok:false, error: fkaErrorMsg(profErr) };
-    }
-    return { ok:true };
-  } catch (err) {
-    return { ok:false, error: err.message };
+    account.passwordHash = _hashPw(updates.newPassword);
   }
+  if (updates.firstName) account.firstName = updates.firstName.trim();
+  if (updates.lastName)  account.lastName  = updates.lastName.trim();
+  if (updates.phone)     account.phone     = updates.phone.replace(/[\s\-()]/g,"");
+  if (updates.address) {
+    account.addresses = account.addresses || [];
+    const key = `${updates.address.line1}|${updates.address.city}`.toLowerCase();
+    if (!account.addresses.find(a => `${a.line1}|${a.city}`.toLowerCase() === key)) {
+      account.addresses.unshift({ ...updates.address, addedAt: new Date().toISOString() });
+      if (account.addresses.length > 5) account.addresses.pop();
+    }
+  }
+
+  _saveAccounts(accounts);
+  _cachedSession = _accountToFlat(account);
+  const { passwordHash, ...safe } = account;
+  return { ok:true, account: safe };
 }
 
 /**
- * Get order history for signed-in user.
+ * Order / booking history for the signed-in user.
+ * Relies on assets/js/local-orders.js (loaded on account.html) for
+ * ordersGetByCustomer / bookingsGetAll — falls back to [] if that
+ * script isn't present on the current page.
  */
-async function authGetOrders() {
-  const session = await authGetSession();
-  if (!session) return [];
-  try {
-    const { data } = await fkaDB()
-      .from("orders")
-      .select("*")
-      .eq("account_id", session.user.id)
-      .order("created_at", { ascending: false });
-    return data || [];
-  } catch { return []; }
+function authGetOrders() {
+  const session = authGetSession();
+  if (!session || typeof ordersGetByCustomer !== "function") return [];
+  return ordersGetByCustomer(session.accountId);
 }
 
-/**
- * Get bookings (pre-payment) for signed-in user.
- */
-async function authGetBookings() {
-  const session = await authGetSession();
-  if (!session) return [];
-  try {
-    const { data } = await fkaDB()
-      .from("bookings")
-      .select("*")
-      .eq("account_id", session.user.id)
-      .order("created_at", { ascending: false });
-    return data || [];
-  } catch { return []; }
+function authGetBookings() {
+  const session = authGetSession();
+  if (!session || typeof bookingsGetAll !== "function") return [];
+  return bookingsGetAll().filter(b =>
+    b.orderData.customer.accountId === session.accountId || b.orderData.customer.email === session.email);
 }
 
 /* ── Auth state listener ─────────────────────────────────────── */
 /**
- * Set up auth state change listener.
- * Call once on page load — updates cached session and syncs navbar.
+ * Call once on page load — syncs the navbar account icon to the
+ * current session. Works whether or not Supabase is configured.
  */
 function initAuthListener() {
-  if (!_supabase) return;
-  // Load initial session
-  _loadSession().then(() => {
-    authSyncNavbar();
-  });
-  // Listen for changes (login, logout, token refresh)
-  _supabase.auth.onAuthStateChange(async (event, session) => {
-    _cachedSession = session;
-    _sessionLoaded = true;
-    authSyncNavbar();
-    if (event === "SIGNED_IN") {
-      // If there's a pending redirect (e.g. from checkout auth gate)
-      const ret = sessionStorage.getItem("fka_auth_return");
-      if (ret && window.location.href.includes("account.html")) {
-        sessionStorage.removeItem("fka_auth_return");
-        window.location.href = ret;
-      }
-    }
-  });
+  authSyncNavbar();
+  if (typeof _isSupabaseReady === "function" && _isSupabaseReady() && typeof _supabase !== "undefined" && _supabase) {
+    _supabase.auth.onAuthStateChange(() => { /* local session is the source of truth for UI */ });
+  }
 }
 
 /* ── Navbar Sync ─────────────────────────────────────────────── */
 function authSyncNavbar() {
-  const session = authGetSessionSync();
-  const user    = session?.user;
-  const meta    = user?.user_metadata || {};
-  const name    = meta.first_name || user?.email?.split("@")[0] || "";
+  const session = authGetSession();
 
   document.querySelectorAll(".auth-account-btn").forEach(el => {
-    if (user) {
-      el.title       = `My Account (${name})`;
+    if (session) {
+      el.title       = `My Account (${session.firstName})`;
       el.href        = "account.html";
       el.style.color = "var(--warm-brown)";
       const ico = el.querySelector("i");
@@ -278,9 +271,8 @@ function authSyncNavbar() {
   });
 }
 
-/* ── Activity log ─────────────────────────────────────────────── */
+/* ── Activity log (best-effort, Supabase only) ─────────────────── */
 async function _authActivity(type, payload) {
-  try {
-    await fkaDB().from("activity_log").insert({ type, payload });
-  } catch {}
+  if (typeof _isSupabaseReady !== "function" || !_isSupabaseReady()) return;
+  try { await fkaDB().from("activity_log").insert({ type, payload }); } catch {}
 }

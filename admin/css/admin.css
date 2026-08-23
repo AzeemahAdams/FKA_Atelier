@@ -29,7 +29,9 @@
 
 /* ── Reset ── */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-html { font-size: 15px; }
+/* Fluid base size — bumped up slightly for legibility, still safe on the
+   admin panel's mobile breakpoint (sidebar collapses to an off-canvas drawer). */
+html { font-size: clamp(15px, 1.3vw, 16.5px); }
 body {
   font-family: var(--adm-font);
   background: var(--adm-bg);
@@ -367,6 +369,9 @@ ul { list-style: none; }
   text-transform: uppercase;
   color: var(--adm-text);
 }
+.adm-label i { color: var(--adm-accent); margin-right: 0.35rem; letter-spacing: 0; }
+.adm-page-title i { color: var(--adm-accent); margin-right: 0.55rem; font-size: 0.8em; }
+.adm-table th i { color: var(--adm-text-light); margin-right: 0.4rem; }
 .adm-input, .adm-select, .adm-textarea {
   padding: 0.65rem 0.9rem;
   border: 1.5px solid var(--adm-border);

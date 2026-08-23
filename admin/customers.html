@@ -19,7 +19,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title">Customers</h1>
+          <h1 class="adm-page-title"><i class="fa-regular fa-users"></i> Customers</h1>
           <p class="adm-page-subtitle" id="cust-count-label">Loading…
             <span class="adm-live-dot" style="margin-left:0.75rem;">Live</span>
           </p>
@@ -56,14 +56,14 @@
             <table class="adm-table">
               <thead>
                 <tr>
-                  <th>Customer</th>
-                  <th>Phone</th>
-                  <th>Orders</th>
-                  <th>Total Spend</th>
-                  <th>Last Order</th>
-                  <th>Joined</th>
-                  <th>Contact</th>
-                  <th>Actions</th>
+                  <th><i class="fa-regular fa-user"></i> Customer</th>
+                  <th><i class="fa-regular fa-phone"></i> Phone</th>
+                  <th><i class="fa-regular fa-bag-shopping"></i> Orders</th>
+                  <th><i class="fa-regular fa-wallet"></i> Total Spend</th>
+                  <th><i class="fa-regular fa-clock-rotate-left"></i> Last Order</th>
+                  <th><i class="fa-regular fa-calendar-plus"></i> Joined</th>
+                  <th><i class="fa-regular fa-address-book"></i> Contact</th>
+                  <th><i class="fa-regular fa-sliders"></i> Actions</th>
                 </tr>
               </thead>
               <tbody id="cust-tbody"></tbody>
@@ -139,7 +139,7 @@
         <div class="adm-table-wrap">
           <table class="adm-table">
             <thead>
-              <tr><th>Order ID</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th><th>Contact</th></tr>
+              <tr><th><i class="fa-regular fa-hashtag"></i> Order ID</th><th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-money-bill"></i> Total</th><th><i class="fa-regular fa-circle-dot"></i> Status</th><th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-regular fa-address-book"></i> Contact</th></tr>
             </thead>
             <tbody id="modal-cust-orders"></tbody>
           </table>
@@ -161,6 +161,7 @@
 <script src="../assets/js/supabase.js"></script>
 <script src="../assets/js/auth.js"></script>
 <script src="../assets/js/orders.js"></script>
+<script src="../assets/js/local-orders.js"></script>
 <script src="../assets/js/admin.js"></script>
 <script>
 "use strict";
