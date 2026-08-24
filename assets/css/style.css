@@ -2701,3 +2701,107 @@ body.fka-panel-open {
     justify-content: center;
   }
 }
+
+
+/* ============================================================
+   PHASE 6 — CONTACT INFO ITEMS + FOOTER MOBILE FIX
+   ============================================================ */
+
+/* ── Contact info items — always horizontal row, never column ── */
+.contact-info-item {
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  gap: 1rem;
+  margin-bottom: 1.25rem;
+  padding: 1rem 1.1rem;
+  background: var(--cream);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+}
+.contact-icon {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--border-dark);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--warm-brown);
+  font-size: 1rem;
+  flex-shrink: 0;
+  background: var(--white);
+}
+.contact-info-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dark);
+  margin-bottom: 0.15rem;
+}
+.contact-info-value {
+  font-size: 0.88rem;
+  color: var(--text-mid);
+  word-break: break-word;      /* long email won't overflow */
+}
+.contact-info-value a { color: var(--warm-brown); }
+
+/* Keep row on ALL screen sizes */
+@media (max-width: 600px) {
+  .contact-info-item {
+    flex-direction: row !important;
+    align-items: center !important;
+    padding: 0.9rem 1rem;
+    margin-bottom: 0.85rem;
+  }
+  .contact-info-value { font-size: 0.85rem !important; }
+}
+
+/* ── Footer — clean mobile layout ──────────────────────────── */
+@media (max-width: 900px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr 1fr !important;
+    gap: 2rem;
+  }
+  .footer-brand-col {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+@media (max-width: 600px) {
+  .footer-grid {
+    grid-template-columns: 1fr 1fr !important;
+    gap: 1.75rem 1.25rem;
+  }
+  .footer-brand-col {
+    grid-column: 1 / -1;
+    margin-bottom: 0.5rem;
+  }
+  .fka-footer { padding: 3rem 1.25rem 2rem; }
+  .footer-brand { font-size: 1.1rem; }
+  .footer-tagline { font-size: 0.68rem; margin-bottom: 1rem; }
+  .footer-social { gap: 0.6rem; }
+  .footer-social-link { width: 34px; height: 34px; font-size: 0.85rem; }
+  .footer-col-title {
+    font-size: 0.68rem;
+    margin-bottom: 0.85rem;
+  }
+  .footer-links a { font-size: 0.78rem; }
+  .footer-bottom {
+    flex-direction: column;
+    text-align: center;
+    gap: 0.35rem;
+    padding-top: 1.25rem;
+    font-size: 0.68rem;
+  }
+}
+@media (max-width: 400px) {
+  .footer-grid { grid-template-columns: 1fr 1fr !important; gap: 1.5rem 1rem; }
+  .fka-footer { padding: 2.5rem 1rem 1.5rem; }
+}
+@media (max-width: 340px) {
+  .footer-grid { grid-template-columns: 1fr !important; }
+}
