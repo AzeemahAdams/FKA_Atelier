@@ -2086,3 +2086,345 @@ button:focus-visible { border-radius: 2px; }
 
 /* Suggestion chips — hide after first message */
 .ask-fka-suggestions { transition: opacity 0.2s; }
+
+
+/* ============================================================
+   PHASE 3 — UI/UX MOBILE POLISH
+   Fixes: mobile nav, measurements, contact, shop filter,
+   navbar alignment, Ask FKA, global readability.
+   ============================================================ */
+
+/* ── 1. MOBILE NAV DRAWER — dark premium aesthetic ────────── */
+.mobile-nav-drawer {
+  background: #1A1A1A;                          /* deep charcoal */
+  border-right: none;
+}
+.mobile-nav-close {
+  color: var(--taupe);
+  font-size: 1.6rem;
+  padding: 0.25rem;
+  min-width: 44px;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+.mobile-nav-close:hover { color: var(--cream); }
+.mobile-nav-brand {
+  color: var(--cream);
+  border-bottom: 1px solid rgba(196,181,165,0.2);
+  padding-bottom: 1.25rem;
+  margin-bottom: 1.25rem;
+}
+.mobile-nav-links a {
+  color: rgba(245,239,230,0.8);                 /* soft cream */
+  border-bottom-color: rgba(196,181,165,0.12);
+  padding: 1rem 0;                              /* bigger tap target */
+  font-size: 0.88rem;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+.mobile-nav-links a:hover,
+.mobile-nav-links a:focus { color: var(--warm-brown); }
+/* Overlay — slightly darker so drawer stands out */
+.mobile-nav-overlay { background: rgba(0,0,0,0.55); }
+
+/* ── 2. NAVBAR — consistent alignment at all sizes ─────────── */
+@media (max-width: 900px) {
+  .navbar-inner {
+    height: 60px;
+    padding: 0 1rem;
+  }
+  .navbar-brand {
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+  }
+  /* Keep actions on the right, toggler on the left */
+  .navbar-toggler {
+    order: -1;
+    font-size: 1.2rem;
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 0;
+  }
+  .navbar-actions {
+    gap: 0.5rem;
+  }
+  .navbar-icon-btn {
+    min-width: 40px;
+    min-height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+}
+@media (max-width: 400px) {
+  .navbar-inner { padding: 0 0.75rem; height: 56px; }
+  .navbar-brand { font-size: 1rem; }
+  .navbar-actions { gap: 0.25rem; }
+}
+
+/* ── 3. ANNOUNCEMENT BAR — readable on all sizes ───────────── */
+@media (max-width: 480px) {
+  .announcement-bar {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.75rem;
+    letter-spacing: 0.08em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+@media (max-width: 360px) {
+  .announcement-bar span { display: none; } /* hide separator */
+}
+
+/* ── 4. SHOP PAGE — category filter chips ──────────────────── */
+@media (max-width: 900px) {
+  /* Wrap the filter area in a sticky strip */
+  .shop-sidebar {
+    position: sticky;
+    top: 60px;
+    z-index: 100;
+    background: var(--ivory);
+    padding: 0.6rem 0 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+  .shop-sidebar .filter-group:has(.filter-category-btn) {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 0.4rem;
+    padding-bottom: 0.6rem;
+    scrollbar-width: none;
+  }
+  .shop-sidebar .filter-group:has(.filter-category-btn)::-webkit-scrollbar {
+    display: none;
+  }
+  .filter-category-btn {
+    flex: 0 0 auto;          /* never shrink — scroll instead */
+    white-space: nowrap;
+    padding: 0.45rem 0.85rem;
+    font-size: 0.75rem;
+    min-height: 36px;
+    border-radius: 2px;
+    border: 1px solid var(--border-dark);
+    background: transparent;
+    letter-spacing: 0.08em;
+  }
+  .filter-category-btn.active {
+    background: var(--black);
+    color: var(--white);
+    border-color: var(--black);
+  }
+}
+@media (max-width: 480px) {
+  .filter-category-btn {
+    font-size: 0.7rem;
+    padding: 0.4rem 0.7rem;
+  }
+}
+
+/* ── 5. MEASUREMENTS PAGE — stacked steps ──────────────────── */
+@media (max-width: 600px) {
+  .measure-guide-grid {
+    grid-template-columns: 1fr;
+    gap: 1.25rem;
+    padding: 1.5rem 1rem;
+  }
+  .measure-step {
+    gap: 0.75rem;
+    padding: 1rem;
+    background: var(--cream);
+    border-radius: 4px;
+    align-items: flex-start;
+  }
+  .measure-step-num {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    font-size: 0.75rem;
+  }
+  /* "Personalised service" section — prevent text overlap */
+  .custom-measure-banner {
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 1.25rem 1rem;
+    align-items: flex-start;
+  }
+  .custom-measure-banner i {
+    font-size: 1.5rem;
+    margin-bottom: 0;
+  }
+  .custom-measure-banner-text {
+    font-size: 0.88rem;
+    line-height: 1.65;
+  }
+  /* Step cards on measurements page */
+  .measure-card {
+    padding: 1.25rem 1rem;
+  }
+  .measure-card-desc {
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
+  .measure-steps-list {
+    gap: 0.75rem;
+  }
+}
+
+/* ── 6. CONTACT PAGE — touch-friendly spacing ──────────────── */
+@media (max-width: 900px) {
+  .contact-grid {
+    gap: 2rem;
+    padding: 2.5rem 1.25rem;
+  }
+}
+@media (max-width: 600px) {
+  .contact-info-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    margin-bottom: 2rem;       /* more breathing room between items */
+    padding: 1.25rem 1rem;
+    background: var(--cream);
+    border-radius: 4px;
+  }
+  .contact-info-icon {
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--beige);
+  }
+  .contact-info-value {
+    font-size: 1rem;
+  }
+  /* WhatsApp / Email CTA buttons */
+  .contact-cta-btn,
+  a[href^="https://wa.me"],
+  a[href^="mailto:"] {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 52px;
+    padding: 0.9rem 1.25rem;
+    font-size: 0.9rem;
+    width: 100%;
+    margin-top: 0.5rem;
+    gap: 0.5rem;
+  }
+  .contact-form-wrap {
+    padding: 1.5rem 1rem;
+  }
+}
+
+/* ── 7. ASK FKA FAB — non-intrusive on mobile ──────────────── */
+@media (max-width: 600px) {
+  .ask-fka-fab {
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+    right: 1rem;
+  }
+  .ask-fka-btn {
+    padding: 0.65rem 1rem;
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+  }
+  .ask-fka-panel {
+    bottom: 4.5rem;
+    right: 0.75rem;
+    left: 0.75rem;
+    width: auto;
+    max-height: 75vh;
+    border-radius: 4px;
+  }
+  .ask-fka-panel-body {
+    max-height: calc(75vh - 140px);
+  }
+}
+/* Prevent FAB from overlapping content — add body padding when open */
+body.fka-panel-open {
+  padding-bottom: 0;            /* panel is fixed, no layout push needed */
+}
+
+/* ── 8. GLOBAL MOBILE READABILITY ───────────────────────────── */
+@media (max-width: 600px) {
+  /* More line height and paragraph spacing for small screens */
+  p { line-height: 1.85; }
+  .section-label { letter-spacing: 0.15em; }
+
+  /* Buttons — full width in stacked layouts */
+  .btn-fka-primary,
+  .btn-fka-outline,
+  .btn-fka-ghost {
+    min-height: 48px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Product detail — more padding on name/price */
+  .product-detail-name  { font-size: 1.55rem; line-height: 1.2; }
+  .product-detail-price { font-size: 1.15rem; margin-bottom: 1.25rem; }
+  .product-detail-desc  { font-size: 0.88rem; line-height: 1.85; }
+
+  /* Accordion — bigger tap targets */
+  .product-accordion-btn {
+    padding: 1rem 0;
+    font-size: 0.88rem;
+    min-height: 48px;
+  }
+
+  /* Cart items */
+  .cart-item-name { font-size: 0.9rem; }
+  .cart-item-meta { font-size: 0.8rem; }
+
+  /* Checkout inputs */
+  .checkout-field input,
+  .checkout-field select,
+  .checkout-field textarea {
+    font-size: 1rem;
+    padding: 0.85rem 0.9rem;
+    min-height: 48px;
+  }
+
+  /* Section headers */
+  .section-title { font-size: clamp(1.5rem, 6vw, 2.2rem); }
+
+  /* Toasts — full width on mobile */
+  .toast-container {
+    left: 1rem;
+    right: 1rem;
+    bottom: calc(1rem + env(safe-area-inset-bottom, 0px));
+  }
+  .toast {
+    width: 100%;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 400px) {
+  /* Very small phones — tighten up more */
+  .fka-container { padding: 0 0.75rem; }
+  .product-card-name { font-size: 0.82rem; }
+  .product-card-price { font-size: 0.78rem; }
+  .section-pad { padding: 2.5rem 0; }
+}
+
+/* ── 9. SAFE AREA — notched phone support ───────────────────── */
+@supports (padding: max(0px)) {
+  .fka-footer {
+    padding-bottom: max(2rem, env(safe-area-inset-bottom));
+  }
+  .ask-fka-fab {
+    bottom: max(1.5rem, calc(env(safe-area-inset-bottom) + 0.75rem));
+  }
+}
