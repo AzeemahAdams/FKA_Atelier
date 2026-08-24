@@ -409,16 +409,69 @@
         Your Order ID will be sent to you once payment is verified.
       </p>
 
+      <!-- ── ORDER ID VERIFICATION ─────────────────────────────── -->
+      <div id="order-id-verify-section" style="
+        width:100%;
+        margin-top:2rem;
+        border-top:1px solid var(--border);
+        padding-top:1.5rem;
+        text-align:left;
+      ">
+        <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.16em;text-transform:uppercase;color:var(--text-dark);margin-bottom:0.5rem;">
+          Already received your Order ID?
+        </div>
+        <p style="font-size:0.82rem;color:var(--text-mid);margin-bottom:1rem;line-height:1.6;">
+          Once we've verified your payment, we'll send you an Order ID. Paste it below to confirm your order is active.
+        </p>
+        <div style="display:flex;gap:0.5rem;flex-wrap:wrap;">
+          <input
+            type="text"
+            id="order-id-input"
+            placeholder="e.g. ORD-ABC123"
+            autocomplete="off"
+            spellcheck="false"
+            style="
+              flex:1;
+              min-width:0;
+              padding:0.8rem 1rem;
+              border:1px solid var(--border-dark);
+              background:var(--white);
+              font-family:var(--font-sans);
+              font-size:0.9rem;
+              color:var(--text-dark);
+              outline:none;
+              letter-spacing:0.05em;
+            "
+          >
+          <button
+            onclick="verifyOrderId()"
+            style="
+              padding:0.8rem 1.4rem;
+              background:var(--black);
+              color:var(--cream);
+              font-family:var(--font-sans);
+              font-size:0.82rem;
+              font-weight:500;
+              letter-spacing:0.12em;
+              text-transform:uppercase;
+              border:none;
+              cursor:pointer;
+              white-space:nowrap;
+              transition:background 0.2s;
+            "
+            onmouseover="this.style.background='var(--warm-brown)'"
+            onmouseout="this.style.background='var(--black)'"
+          >
+            Verify Order
+          </button>
+        </div>
+        <div id="order-id-result" style="margin-top:0.85rem;font-size:0.85rem;display:none;"></div>
+      </div>
+
       <a href="shop.html" class="co-success-continue" style="margin-top:1.5rem;">
         Continue Shopping <i class="fa-regular fa-arrow-right"></i>
       </a>
 
-    </div>
-  </div>telier.com" class="btn-email">
-          <i class="fa-regular fa-envelope"></i> Confirm by Email
-        </a>
-      </div>
-      <a href="shop.html" class="co-success-continue">Continue Shopping <i class="fa-regular fa-arrow-right"></i></a>
     </div>
   </div>
 

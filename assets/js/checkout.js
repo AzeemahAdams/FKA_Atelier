@@ -434,3 +434,91 @@ document.addEventListener("DOMContentLoaded", () => {
   checkoutGoToStep(1);
   checkoutPrefillFromSession();
 });
+
+
+/* ============================================================
+   ORDER ID VERIFICATION
+   Called from the checkout success screen when the customer
+   pastes the Order ID they received after payment confirmation.
+   ============================================================ */
+function verifyOrderId() {
+  const input  = document.getElementById("order-id-input");
+  const result = document.getElementById("order-id-result");
+  if (!input || !result) return;
+
+  const id = input.value.trim().toUpperCase();
+  result.style.display = "block";
+
+  if (!id) {
+    result.innerHTML = `<span style="color:#991B1B;">
+      <i class="fa-regular fa-triangle-exclamation"></i>
+      Please enter your Order ID.
+    </span>`;
+    return;
+  }
+
+  // Look up the order in localStorage
+  const order = (typeof orderGetById === "function") ? orderGetById(id) : null;
+
+  if (!order) {
+    // Also check if it's a booking ref that hasn't been converted yet
+    const booking = (typeof bookingGetByRef === "function") ? bookingGetByRef(id) : null;
+
+    if (booking && booking.status === "awaiting_payment") {
+      result.innerHTML = `
+        <div style="
+          background:#FEF3C7;border:1px solid #FCD34D;
+          padding:0.9rem 1rem;border-radius:2px;
+          font-size:0.82rem;color:#92400E;line-height:1.6;
+        ">
+          <strong><i class="fa-regular fa-clock"></i> Payment Pending</strong><br>
+          We've received your booking (<strong>${booking.ref}</strong>) but payment has not been verified yet.
+          Please send your payment proof via WhatsApp or email and we'll confirm within 24 hours.
+        </div>`;
+      return;
+    }
+
+    result.innerHTML = `
+      <div style="
+        background:#FEE2E2;border:1px solid #FCA5A5;
+        padding:0.9rem 1rem;border-radius:2px;
+        font-size:0.82rem;color:#991B1B;line-height:1.6;
+      ">
+        <strong><i class="fa-regular fa-circle-xmark"></i> Order Not Found</strong><br>
+        We couldn't find an order with ID <strong>${id}</strong>.
+        Double-check the ID we sent you, or
+        <a href="https://wa.me/2347019243312" style="color:#991B1B;text-decoration:underline;">contact us on WhatsApp</a>.
+      </div>`;
+    return;
+  }
+
+  // Order found — show status
+  const statusLabels = {
+    processing:  { label: "Processing",   color: "#1D4ED8", bg: "#EFF6FF", icon: "fa-gear" },
+    shipped:     { label: "Shipped",      color: "#065F46", bg: "#D1FAE5", icon: "fa-truck" },
+    delivered:   { label: "Delivered",    color: "#065F46", bg: "#D1FAE5", icon: "fa-circle-check" },
+    cancelled:   { label: "Cancelled",    color: "#991B1B", bg: "#FEE2E2", icon: "fa-circle-xmark" },
+    ready:       { label: "Ready",        color: "#92400E", bg: "#FEF3C7", icon: "fa-box" }
+  };
+  const s = statusLabels[order.status] || { label: order.status, color: "#374151", bg: "#F3F4F6", icon: "fa-circle-info" };
+  const itemsList = (order.items || []).map(i => `${i.qty}× ${i.name}`).join(", ");
+  const date = order.confirmedAt ? new Date(order.confirmedAt).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" }) : "—";
+
+  result.innerHTML = `
+    <div style="
+      background:${s.bg};border:1px solid ${s.color}33;
+      padding:1rem 1.1rem;border-radius:2px;
+      font-size:0.85rem;color:var(--text-dark);line-height:1.7;
+    ">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+        <i class="fa-regular ${s.icon}" style="color:${s.color};font-size:1rem;"></i>
+        <strong style="color:${s.color};font-size:0.9rem;">Order ${id} — ${s.label}</strong>
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-mid);">
+        ${order.customer?.fullName ? `<div>Customer: <strong>${order.customer.fullName}</strong></div>` : ""}
+        ${itemsList ? `<div>Items: ${itemsList}</div>` : ""}
+        ${order.total ? `<div>Total: <strong>₦${Number(order.total).toLocaleString("en-NG")}</strong></div>` : ""}
+        <div>Confirmed: ${date}</div>
+      </div>
+    </div>`;
+}

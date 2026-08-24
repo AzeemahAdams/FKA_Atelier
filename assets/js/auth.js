@@ -276,3 +276,72 @@ async function _authActivity(type, payload) {
   if (typeof _isSupabaseReady !== "function" || !_isSupabaseReady()) return;
   try { await fkaDB().from("activity_log").insert({ type, payload }); } catch {}
 }
+
+
+/* ============================================================
+   ACCOUNT — ORDER ID LOOKUP
+   Used in the My Orders tab on account.html.
+   Mirrors the logic in checkout.js verifyOrderId().
+   ============================================================ */
+function accVerifyOrderId() {
+  const input  = document.getElementById("acc-order-id-input");
+  const result = document.getElementById("acc-order-id-result");
+  if (!input || !result) return;
+
+  const id = input.value.trim().toUpperCase();
+  result.style.display = "block";
+
+  if (!id) {
+    result.innerHTML = `<span style="color:#991B1B;"><i class="fa-regular fa-triangle-exclamation"></i> Please enter your Order ID.</span>`;
+    return;
+  }
+
+  const order = (typeof orderGetById === "function") ? orderGetById(id) : null;
+
+  if (!order) {
+    const booking = (typeof bookingGetByRef === "function") ? bookingGetByRef(id) : null;
+    if (booking && booking.status === "awaiting_payment") {
+      result.innerHTML = `
+        <div style="background:#FEF3C7;border:1px solid #FCD34D;padding:0.9rem 1rem;font-size:0.82rem;color:#92400E;line-height:1.6;">
+          <strong><i class="fa-regular fa-clock"></i> Awaiting Payment Verification</strong><br>
+          Booking <strong>${booking.ref}</strong> has been received. Payment has not been verified yet.
+          Send your payment proof via <a href="https://wa.me/2347019243312" style="color:#92400E;text-decoration:underline;">WhatsApp</a> and we'll confirm within 24 hours.
+        </div>`;
+      return;
+    }
+    result.innerHTML = `
+      <div style="background:#FEE2E2;border:1px solid #FCA5A5;padding:0.9rem 1rem;font-size:0.82rem;color:#991B1B;line-height:1.6;">
+        <strong><i class="fa-regular fa-circle-xmark"></i> Order Not Found</strong><br>
+        No order found for <strong>${id}</strong>. Check the ID or
+        <a href="https://wa.me/2347019243312" style="color:#991B1B;text-decoration:underline;">contact us on WhatsApp</a>.
+      </div>`;
+    return;
+  }
+
+  const statusLabels = {
+    processing: { label:"Processing",  color:"#1D4ED8", bg:"#EFF6FF", icon:"fa-gear" },
+    shipped:    { label:"Shipped",     color:"#065F46", bg:"#D1FAE5", icon:"fa-truck" },
+    delivered:  { label:"Delivered",   color:"#065F46", bg:"#D1FAE5", icon:"fa-circle-check" },
+    cancelled:  { label:"Cancelled",   color:"#991B1B", bg:"#FEE2E2", icon:"fa-circle-xmark" },
+    ready:      { label:"Ready",       color:"#92400E", bg:"#FEF3C7", icon:"fa-box" }
+  };
+  const s = statusLabels[order.status] || { label: order.status, color:"#374151", bg:"#F3F4F6", icon:"fa-circle-info" };
+  const itemsList = (order.items || []).map(i => `${i.qty}× ${i.name}`).join(", ");
+  const date = order.confirmedAt
+    ? new Date(order.confirmedAt).toLocaleDateString("en-GB", { day:"numeric", month:"short", year:"numeric" })
+    : "—";
+
+  result.innerHTML = `
+    <div style="background:${s.bg};border:1px solid ${s.color}33;padding:1rem 1.1rem;font-size:0.85rem;color:var(--text-dark);line-height:1.7;">
+      <div style="display:flex;align-items:center;gap:0.5rem;margin-bottom:0.6rem;">
+        <i class="fa-regular ${s.icon}" style="color:${s.color};font-size:1rem;"></i>
+        <strong style="color:${s.color};">Order ${id} — ${s.label}</strong>
+      </div>
+      <div style="font-size:0.8rem;color:var(--text-mid);">
+        ${order.customer?.fullName ? `<div>Customer: <strong>${order.customer.fullName}</strong></div>` : ""}
+        ${itemsList ? `<div>Items: ${itemsList}</div>` : ""}
+        ${order.total ? `<div>Total: <strong>₦${Number(order.total).toLocaleString("en-NG")}</strong></div>` : ""}
+        <div>Confirmed: ${date}</div>
+      </div>
+    </div>`;
+}
