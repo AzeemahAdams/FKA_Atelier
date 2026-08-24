@@ -2805,3 +2805,121 @@ body.fka-panel-open {
 @media (max-width: 340px) {
   .footer-grid { grid-template-columns: 1fr !important; }
 }
+
+
+/* ============================================================
+   PHASE 7 — ASK FKA SUGGESTIONS + FOOTER ICON ALIGNMENT
+   ============================================================ */
+
+/* ── Ask FKA suggestions — never overflow panel width ──────── */
+.ask-fka-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.ask-fka-suggestion-btn {
+  width: 100%;
+  box-sizing: border-box;
+  white-space: normal;          /* allow text to wrap within button */
+  word-break: break-word;
+  text-align: left;
+  padding: 0.6rem 0.85rem;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  flex-shrink: 0;
+  overflow: hidden;
+}
+.ask-fka-suggestion-btn i {
+  flex-shrink: 0;
+  margin-top: 2px;              /* vertically align icon with first text line */
+}
+
+/* Panel body — constrain so suggestions never push outside */
+.ask-fka-panel-body {
+  overflow-y: auto;
+  overflow-x: hidden;           /* clip anything that tries to escape */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Panel itself — never wider than screen */
+.ask-fka-panel {
+  max-width: min(380px, calc(100vw - 1.5rem));
+  box-sizing: border-box;
+  overflow: hidden;
+}
+
+@media (max-width: 480px) {
+  .ask-fka-panel {
+    left: 0.75rem;
+    right: 0.75rem;
+    width: auto;
+    max-width: 100%;
+  }
+  .ask-fka-suggestion-btn {
+    font-size: 0.78rem;
+    padding: 0.55rem 0.75rem;
+  }
+}
+
+/* ── Footer social icons — perfect alignment ───────────────── */
+.footer-social {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+.footer-social-link {
+  width: 36px;
+  height: 36px;
+  border: 1px solid rgba(196,181,165,0.3);
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--taupe);
+  font-size: 0.9rem;
+  flex-shrink: 0;
+  transition: all var(--transition);
+  line-height: 1;
+}
+.footer-social-link i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 1em;
+  height: 1em;
+  line-height: 1;
+}
+
+/* Footer nav links — icon + text always vertically centred */
+.footer-links a {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  line-height: 1.4;
+}
+.footer-links a i {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  font-size: 0.78em;
+  flex-shrink: 0;
+  color: var(--warm-brown);
+  opacity: 0.85;
+}
+
+@media (max-width: 600px) {
+  .footer-social { gap: 0.5rem; }
+  .footer-social-link { width: 34px; height: 34px; font-size: 0.85rem; }
+}
