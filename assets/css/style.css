@@ -2620,3 +2620,84 @@ body.fka-panel-open {
   .navbar-inner { padding: 0 0.5rem; }
   .navbar-brand { font-size: 0.9rem; }
 }
+
+
+/* ============================================================
+   PHASE 5 — CONTACT PAGE + MEASUREMENTS PAGE + ANNOUNCEMENT BAR
+   ============================================================ */
+
+/* ── Announcement bar — allow text to wrap, never clip ─────── */
+.announcement-bar {
+  white-space: normal !important;      /* override Phase 3/4 nowrap */
+  overflow: visible !important;
+  text-overflow: unset !important;
+  line-height: 1.5;
+  padding: 0.5rem 1rem;
+}
+@media (max-width: 600px) {
+  .announcement-bar {
+    font-size: 0.7rem;
+    padding: 0.45rem 0.75rem;
+    letter-spacing: 0.07em;
+    line-height: 1.55;
+  }
+  /* Keep separator visible so text stays readable on 2 lines */
+  .announcement-bar span { display: inline; margin: 0 0.4rem; }
+}
+
+/* ── Contact quick-contact cards — stack on mobile ──────────── */
+.contact-quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+}
+@media (max-width: 600px) {
+  .contact-quick-grid {
+    grid-template-columns: 1fr !important;
+    gap: 1rem;
+  }
+  /* Each card — full width, comfortable height */
+  .contact-quick-grid > a {
+    padding: 1.25rem 1rem !important;
+    min-height: 72px;
+  }
+  /* Email address — allow it to break so it doesn't overflow */
+  .contact-quick-grid > a div div:last-child {
+    word-break: break-all;
+    font-size: 0.78rem !important;
+  }
+}
+
+/* ── Measurements — "How Custom Measurements Work" grid ─────── */
+.measure-custom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 4rem;
+  align-items: center;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+@media (max-width: 800px) {
+  .measure-custom-grid {
+    grid-template-columns: 1fr !important;
+    gap: 2.5rem !important;
+  }
+  /* The measurements card — full width */
+  .measure-custom-grid > div:last-child {
+    padding: 1.75rem 1.25rem !important;
+  }
+}
+@media (max-width: 480px) {
+  .measure-custom-grid > div:last-child {
+    padding: 1.25rem 1rem !important;
+  }
+  /* WhatsApp / Email buttons below steps — stack */
+  .measure-custom-grid > div:first-child > div:last-child {
+    flex-direction: column;
+  }
+  .measure-custom-grid > div:first-child > div:last-child a {
+    width: 100%;
+    text-align: center;
+    justify-content: center;
+  }
+}
