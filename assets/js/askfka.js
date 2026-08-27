@@ -10,19 +10,25 @@
 "use strict";
 
 /* ── Configuration ───────────────────────────────────── */
-// Key is loaded from localStorage (set once via admin/settings.html).
-// Nothing sensitive is ever stored in this file.
+// Priority order for API key:
+//   1. localStorage "fka_groq_api_key"  (admin override via settings page)
+//   2. window.FKA_CONFIG.groqApiKey     (hardcoded in fka-config.js, gitignored)
+// This means Ask FKA works out of the box with zero admin setup.
 const FKA_AI_CONFIG = {
   get apiKey() {
-    return localStorage.getItem("fka_groq_api_key") || "";
+    return localStorage.getItem("fka_groq_api_key")
+      || (window.FKA_CONFIG && window.FKA_CONFIG.groqApiKey)
+      || "";
   },
   get model() {
-    return localStorage.getItem("fka_groq_model") || "llama-3.3-70b-versatile";
+    return localStorage.getItem("fka_groq_model")
+      || (window.FKA_CONFIG && window.FKA_CONFIG.groqModel)
+      || "llama-3.3-70b-versatile";
   },
-  apiUrl: "https://api.groq.com/openai/v1/chat/completions",
-  maxTokens: 500,
+  apiUrl:      "https://api.groq.com/openai/v1/chat/completions",
+  maxTokens:   500,
   temperature: 0.7,
-  maxHistory: 12
+  maxHistory:  12
 };
 
 /* ── Brand knowledge base — injected as system prompt ─── */
@@ -207,14 +213,12 @@ function initAskFkaAI() {
   });
 
   /* ── API key check ── */
-  // Don't return early — always wire buttons so panel is functional.
-  // The no_key error shows when user actually tries to send.
+  // Key comes from fka-config.js (pre-configured) — no admin setup needed.
+  // Only show a message if somehow the key is missing entirely.
   if (!FKA_AI_CONFIG.apiKey) {
     if (_thread) fkaAppendMessage("bot",
-      "⚙️ Ask FKA needs a Groq API key. " +
-      "Go to <strong><a href='../admin/settings.html' style='color:var(--warm-brown)'>Admin → Settings</a></strong> " +
-      "and add your key under <em>Ask FKA Configuration</em>. " +
-      "Get a free key at <a href='https://console.groq.com' target='_blank' rel='noopener'>console.groq.com</a>.");
+      "Ask FKA is temporarily unavailable. " +
+      "Please <a href='https://wa.me/2347019243312' target='_blank'>chat with us on WhatsApp</a> instead.");
   }
 }
 
