@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    FKA ATELIER — Admin Shared Utilities
    Auth guard, session management, shared UI helpers.
    ============================================================ */
@@ -214,7 +214,7 @@ function adminRenderShell(activeNav) {
         <i class="fa-regular fa-arrow-up-right-from-square"></i> View Store
       </a>
       <button class="adm-sidebar-footer-link" onclick="adminLogout()">
-        <i class="fa-regular fa-right-from-bracket"></i> Logout
+        <i class="fa-solid fa-right-from-bracket"></i> Logout
       </button>
     </div>`;
 
@@ -233,7 +233,7 @@ function adminRenderShell(activeNav) {
         <span class="adm-user-name">${session?.username || "Admin"}</span>
       </div>
       <button class="adm-topbar-btn adm-logout-btn" onclick="adminLogout()" title="Logout">
-        <i class="fa-regular fa-right-from-bracket"></i>
+        <i class="fa-solid fa-right-from-bracket"></i>
       </button>
     </div>`;
 
@@ -562,7 +562,7 @@ function adminRenderActivityFeed(containerId, limit = 20) {
 
   container.innerHTML = items.map(entry => {
     const label = typeof activityGetLabel === "function" ? activityGetLabel(entry) : entry.type;
-    const icon  = typeof activityGetIcon  === "function" ? activityGetIcon(entry.type)  : "fa-regular fa-circle-dot";
+    const icon  = typeof activityGetIcon  === "function" ? activityGetIcon(entry.type)  : "fa-solid fa-circle-dot";
     const time  = adminFormatDateTime(entry.ts);
     return `
       <div class="adm-activity-item" data-type="${entry.type}">

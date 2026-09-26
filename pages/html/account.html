@@ -34,7 +34,7 @@
         <i class="fa-regular fa-heart"></i><span class="wishlist-count" style="display:none;">0</span>
       </a>
       <a href="cart.html" class="navbar-icon-btn" aria-label="Shopping bag" style="position:relative;">
-        <i class="fa-regular fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
+        <i class="fa-solid fa-bag-shopping"></i><span class="cart-count" style="display:none;">0</span>
       </a>
       <a href="account.html" class="navbar-icon-btn auth-account-btn" aria-label="My account" style="position:relative;color:var(--warm-brown);">
         <i class="fa-solid fa-circle-user"></i>
@@ -240,14 +240,14 @@
         </div>
 
         <button class="auth-submit-btn" onclick="forgotGoToStep3()" type="button">
-          <i class="fa-regular fa-keyboard"></i> I Have My Code — Enter It Now
+          <i class="fa-solid fa-keyboard"></i> I Have My Code — Enter It Now
         </button>
       </div>
 
       <!-- STEP 3: Code + new password -->
       <div id="forgot-step-3" style="display:none;">
         <div style="background:var(--cream);border:1px solid var(--border);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--text-mid);line-height:1.6;">
-          <i class="fa-regular fa-message" style="color:var(--warm-brown);margin-right:0.4rem;"></i>
+          <i class="fa-solid fa-message" style="color:var(--warm-brown);margin-right:0.4rem;"></i>
           Check your <strong>WhatsApp or email</strong> for the 6-digit code we sent you, then enter it below to set your new password.
         </div>
         <form id="form-reset" novalidate>
@@ -311,7 +311,7 @@
           <p class="acc-email-display" id="acc-email-display"></p>
         </div>
         <button class="acc-logout-btn" onclick="authLogout()">
-          <i class="fa-regular fa-right-from-bracket"></i> Sign Out
+          <i class="fa-solid fa-right-from-bracket"></i> Sign Out
         </button>
       </div>
     </div>
@@ -323,13 +323,13 @@
       <!-- LEFT: TAB NAV -->
       <nav class="acc-sidenav">
         <button class="acc-sidenav-btn active" onclick="accShowTab('orders')" id="acc-nav-orders">
-          <i class="fa-regular fa-bag-shopping"></i> My Orders
+          <i class="fa-solid fa-bag-shopping"></i> My Orders
         </button>
         <button class="acc-sidenav-btn" onclick="accShowTab('profile')" id="acc-nav-profile">
           <i class="fa-regular fa-user"></i> Profile
         </button>
         <button class="acc-sidenav-btn" onclick="accShowTab('addresses')" id="acc-nav-addresses">
-          <i class="fa-regular fa-location-dot"></i> Addresses
+          <i class="fa-solid fa-location-dot"></i> Addresses
         </button>
         <button class="acc-sidenav-btn" onclick="accShowTab('password')" id="acc-nav-password">
           <i class="fa-regular fa-lock"></i> Password
@@ -341,7 +341,7 @@
 
         <!-- ORDERS TAB -->
         <div id="acc-tab-orders" class="acc-tab-panel">
-          <h2 class="acc-tab-title"><i class="fa-regular fa-bag-shopping"></i> My Orders</h2>
+          <h2 class="acc-tab-title"><i class="fa-solid fa-bag-shopping"></i> My Orders</h2>
           <div id="acc-orders-list"></div>
         </div>
 
@@ -383,7 +383,7 @@
 
         <!-- ADDRESSES TAB -->
         <div id="acc-tab-addresses" class="acc-tab-panel" style="display:none;">
-          <h2 class="acc-tab-title"><i class="fa-regular fa-location-dot"></i> Saved Addresses</h2>
+          <h2 class="acc-tab-title"><i class="fa-solid fa-location-dot"></i> Saved Addresses</h2>
           <div id="acc-addresses-list"></div>
           <div style="margin-top:1.5rem;">
             <button class="acc-add-addr-btn" onclick="accToggleAddAddr()">
@@ -582,10 +582,10 @@
         </div>
         <div style="display:flex;gap:0.75rem;flex-wrap:wrap;align-items:center;">
           <a href="shop.html" class="btn-fka-outline" style="font-size:0.72rem;padding:0.6rem 1.4rem;">
-            <i class="fa-regular fa-shirt"></i> Browse Shop
+            <i class="fa-solid fa-shirt"></i> Browse Shop
           </a>
           <button class="acc-logout-btn" onclick="authLogout()">
-            <i class="fa-regular fa-right-from-bracket"></i> Sign Out
+            <i class="fa-solid fa-right-from-bracket"></i> Sign Out
           </button>
         </div>
       </div>
@@ -595,16 +595,16 @@
   <div class="fka-container" style="padding-top:2.5rem;padding-bottom:5rem;">
     <div class="acc-layout">
       <nav class="acc-sidenav">
-        <button class="acc-sidenav-btn active" onclick="accShowTab('orders')"    id="acc-nav-orders"><i class="fa-regular fa-bag-shopping"></i> My Orders</button>
+        <button class="acc-sidenav-btn active" onclick="accShowTab('orders')"    id="acc-nav-orders"><i class="fa-solid fa-bag-shopping"></i> My Orders</button>
         <button class="acc-sidenav-btn"         onclick="accShowTab('profile')"   id="acc-nav-profile"><i class="fa-regular fa-user"></i> Profile</button>
-        <button class="acc-sidenav-btn"         onclick="accShowTab('addresses')" id="acc-nav-addresses"><i class="fa-regular fa-location-dot"></i> Addresses</button>
+        <button class="acc-sidenav-btn"         onclick="accShowTab('addresses')" id="acc-nav-addresses"><i class="fa-solid fa-location-dot"></i> Addresses</button>
         <button class="acc-sidenav-btn"         onclick="accShowTab('password')"  id="acc-nav-password"><i class="fa-regular fa-lock"></i> Password</button>
       </nav>
 
       <div class="acc-content">
         <!-- ORDERS -->
         <div id="acc-tab-orders" class="acc-tab-panel">
-          <h2 class="acc-tab-title"><i class="fa-regular fa-bag-shopping"></i> My Orders</h2>
+          <h2 class="acc-tab-title"><i class="fa-solid fa-bag-shopping"></i> My Orders</h2>
 
           <!-- ORDER ID LOOKUP -->
           <div style="background:var(--cream);border:1px solid var(--border);padding:1.25rem 1.5rem;margin-bottom:2rem;">
@@ -662,7 +662,7 @@
 
         <!-- ADDRESSES -->
         <div id="acc-tab-addresses" class="acc-tab-panel" style="display:none;">
-          <h2 class="acc-tab-title"><i class="fa-regular fa-location-dot"></i> Saved Addresses</h2>
+          <h2 class="acc-tab-title"><i class="fa-solid fa-location-dot"></i> Saved Addresses</h2>
           <div id="acc-addresses-list"></div>
           <div style="margin-top:1.5rem;">
             <button class="acc-add-addr-btn" onclick="accToggleAddAddr()"><i class="fa-regular fa-plus"></i> Add New Address</button>
@@ -744,10 +744,10 @@
         <a href="mailto:hello@fkaatelier.com" class="footer-social-link" aria-label="Email"><i class="fa-regular fa-envelope"></i></a>
       </div>
     </div>
-    <div><div class="footer-col-title"><i class="fa-regular fa-bag-shopping"></i> Shop</div><ul class="footer-links"><li><a href="shop.html"><i class="fa-regular fa-shirt"></i> All Pieces</a></li><li><a href="shop.html?cat=abayas"><i class="fa-regular fa-moon"></i> Abayas</a></li><li><a href="shop.html?cat=dresses"><i class="fa-regular fa-person-dress"></i> Dresses</a></li></ul></div>
-    <div><div class="footer-col-title"><i class="fa-regular fa-headset"></i> Customer Care</div><ul class="footer-links"><li><a href="measurements.html"><i class="fa-regular fa-ruler-combined"></i> Measurements</a></li><li><a href="shipping.html"><i class="fa-regular fa-truck"></i> Shipping</a></li><li><a href="returns.html"><i class="fa-regular fa-rotate-left"></i> Returns</a></li><li><a href="faq.html"><i class="fa-regular fa-circle-question"></i> FAQ</a></li></ul></div>
+    <div><div class="footer-col-title"><i class="fa-solid fa-bag-shopping"></i> Shop</div><ul class="footer-links"><li><a href="shop.html"><i class="fa-solid fa-shirt"></i> All Pieces</a></li><li><a href="shop.html?cat=abayas"><i class="fa-regular fa-moon"></i> Abayas</a></li><li><a href="shop.html?cat=dresses"><i class="fa-regular fa-person-dress"></i> Dresses</a></li></ul></div>
+    <div><div class="footer-col-title"><i class="fa-solid fa-headset"></i> Customer Care</div><ul class="footer-links"><li><a href="measurements.html"><i class="fa-solid fa-ruler-combined"></i> Measurements</a></li><li><a href="shipping.html"><i class="fa-solid fa-truck"></i> Shipping</a></li><li><a href="returns.html"><i class="fa-solid fa-rotate-left"></i> Returns</a></li><li><a href="faq.html"><i class="fa-regular fa-circle-question"></i> FAQ</a></li></ul></div>
     <div><div class="footer-col-title"><i class="fa-regular fa-circle-info"></i> About</div><ul class="footer-links"><li><a href="about.html"><i class="fa-regular fa-book-open"></i> Our Story</a></li><li><a href="collections.html"><i class="fa-regular fa-layer-group"></i> Collections</a></li></ul></div>
-    <div><div class="footer-col-title"><i class="fa-regular fa-share-nodes"></i> Connect</div><ul class="footer-links"><li><a href="https://www.instagram.com/justzee_xo/" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a></li><li><a href="https://www.tiktok.com/justzee_1/" target="_blank"><i class="fa-brands fa-tiktok"></i> TikTok</a></li><li><a href="https://wa.me/2347019243312"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li></ul></div>
+    <div><div class="footer-col-title"><i class="fa-solid fa-share-nodes"></i> Connect</div><ul class="footer-links"><li><a href="https://www.instagram.com/justzee_xo/" target="_blank"><i class="fa-brands fa-instagram"></i> Instagram</a></li><li><a href="https://www.tiktok.com/justzee_1/" target="_blank"><i class="fa-brands fa-tiktok"></i> TikTok</a></li><li><a href="https://wa.me/2347019243312"><i class="fa-brands fa-whatsapp"></i> WhatsApp</a></li></ul></div>
   </div>
   <div class="footer-bottom"><span class="footer-copy">&copy; FKA Atelier. All rights reserved.</span></div>
 </footer>
@@ -1059,7 +1059,7 @@ function accLoadOrders(session) {
   if (orders.length === 0) {
     el.innerHTML = `
       <div class="acc-empty-state">
-        <i class="fa-regular fa-bag-shopping"></i>
+        <i class="fa-solid fa-bag-shopping"></i>
         <h3>No orders yet</h3>
         <p>Your orders will appear here once you've placed one.</p>
         <a href="shop.html" class="btn-fka-primary" style="font-size:0.75rem;">Browse All Pieces</a>

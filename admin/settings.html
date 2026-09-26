@@ -64,7 +64,7 @@
                 <input class="adm-input" type="text" id="s-tiktok" placeholder="@fkaatelier">
               </div>
               <div class="adm-field">
-                <label class="adm-label"><i class="fa-regular fa-location-dot"></i> Location</label>
+                <label class="adm-label"><i class="fa-solid fa-location-dot"></i> Location</label>
                 <input class="adm-input" type="text" id="s-location" placeholder="Ijebu Ode, Ogun State, Nigeria">
               </div>
             </div>
@@ -201,7 +201,7 @@
         <div class="adm-card">
           <div class="adm-card-header">
             <span class="adm-card-title">
-              <i class="fa-regular fa-bag-shopping" style="color:var(--adm-accent);margin-right:0.5rem;"></i>
+              <i class="fa-solid fa-bag-shopping" style="color:var(--adm-accent);margin-right:0.5rem;"></i>
               Order Settings
             </span>
           </div>
@@ -213,7 +213,7 @@
                 <span class="adm-field-hint">Orders above this value get free delivery.</span>
               </div>
               <div class="adm-field">
-                <label class="adm-label"><i class="fa-regular fa-truck"></i> Default Delivery Fee (₦)</label>
+                <label class="adm-label"><i class="fa-solid fa-truck"></i> Default Delivery Fee (₦)</label>
                 <input class="adm-input" type="number" id="s-default-fee" placeholder="4500" min="0">
               </div>
               <div class="adm-field">
@@ -515,7 +515,7 @@ async function testGroqKey() {
   showGroqKeyStatus("testing");
   const btn = event.currentTarget;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Testing…';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Testing…';
 
   try {
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
@@ -567,7 +567,7 @@ function showGroqKeyStatus(state, msg = "") {
 async function exportAllData() {
   const btn = event.currentTarget;
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Exporting…';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Exporting…';
   try {
     const [orders, customers, zones] = await Promise.all([
       typeof ordersGetAll === "function"     ? ordersGetAll()         : Promise.resolve([]),

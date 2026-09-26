@@ -51,7 +51,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title"><i class="fa-regular fa-bag-shopping"></i> Orders</h1>
+          <h1 class="adm-page-title"><i class="fa-solid fa-bag-shopping"></i> Orders</h1>
           <p class="adm-page-subtitle" id="orders-count-label"
             style="display:flex;align-items:center;gap:0.75rem;">
             Loading… <span class="adm-live-dot">Live</span>
@@ -69,7 +69,7 @@
           <span class="adm-tab-badge" id="bookings-badge" style="display:none;">0</span>
         </button>
         <button class="adm-tab-btn" id="tab-btn-orders" onclick="switchTab('orders')">
-          <i class="fa-regular fa-bag-shopping"></i> Confirmed Orders
+          <i class="fa-solid fa-bag-shopping"></i> Confirmed Orders
         </button>
       </div>
 
@@ -109,8 +109,8 @@
                 <thead>
                   <tr>
                     <th><i class="fa-regular fa-ticket"></i> Booking Ref</th><th><i class="fa-regular fa-user"></i> Customer</th><th><i class="fa-regular fa-phone"></i> Phone</th>
-                    <th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-money-bill"></i> Total</th><th><i class="fa-regular fa-circle-dot"></i> Status</th>
-                    <th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-regular fa-sliders"></i> Actions</th>
+                    <th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-money-bill"></i> Total</th><th><i class="fa-solid fa-circle-dot"></i> Status</th>
+                    <th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-solid fa-sliders"></i> Actions</th>
                   </tr>
                 </thead>
                 <tbody id="bookings-tbody"></tbody>
@@ -155,7 +155,7 @@
                   <tr>
                     <th><i class="fa-regular fa-hashtag"></i> Order ID</th><th><i class="fa-regular fa-user"></i> Customer</th><th><i class="fa-regular fa-phone"></i> Phone</th>
                     <th><i class="fa-regular fa-boxes-stacked"></i> Items</th><th><i class="fa-regular fa-map-location-dot"></i> Zone</th><th><i class="fa-regular fa-money-bill"></i> Total</th>
-                    <th><i class="fa-regular fa-circle-dot"></i> Status</th><th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-regular fa-sliders"></i> Actions</th>
+                    <th><i class="fa-solid fa-circle-dot"></i> Status</th><th><i class="fa-regular fa-calendar"></i> Date</th><th><i class="fa-solid fa-sliders"></i> Actions</th>
                   </tr>
                 </thead>
                 <tbody id="orders-tbody"></tbody>
@@ -240,7 +240,7 @@
       <div class="adm-section-label">Items</div>
       <div class="adm-table-wrap" style="margin-bottom:1.25rem;">
         <table class="adm-table">
-          <thead><tr><th><i class="fa-regular fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
+          <thead><tr><th><i class="fa-solid fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
           <tbody id="modal-bd-items"></tbody>
         </table>
       </div>
@@ -312,7 +312,7 @@
         <div class="adm-section-label">Items Ordered</div>
         <div class="adm-table-wrap">
           <table class="adm-table">
-            <thead><tr><th><i class="fa-regular fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-regular fa-tag"></i> Unit</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
+            <thead><tr><th><i class="fa-solid fa-shirt"></i> Product</th><th><i class="fa-regular fa-ruler"></i> Size</th><th><i class="fa-regular fa-palette"></i> Colour</th><th><i class="fa-regular fa-cubes"></i> Qty</th><th><i class="fa-solid fa-tag"></i> Unit</th><th><i class="fa-regular fa-money-bill"></i> Total</th></tr></thead>
             <tbody id="modal-items-tbody"></tbody>
           </table>
         </div>
@@ -542,7 +542,7 @@ async function doConfirmPayment() {
   }
   const btn = document.getElementById("btn-do-confirm-payment");
   btn.disabled = true;
-  btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Confirming…';
+  btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Confirming…';
 
   try {
     const order = orderConfirmPayment(pendingConfirmRef, note, "admin");

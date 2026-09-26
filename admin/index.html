@@ -137,7 +137,7 @@ document.getElementById("login-form").addEventListener("submit", async e => {
 
   errEl.style.display = "none";
   btn.disabled    = true;
-  btn.innerHTML   = '<i class="fa-regular fa-spinner fa-spin"></i> Signing in…';
+  btn.innerHTML   = '<i class="fa-solid fa-spinner fa-spin"></i> Signing in…';
 
   try {
     const result = await adminLoginSupabase(email, password);
@@ -161,3 +161,4 @@ document.getElementById("login-form").addEventListener("submit", async e => {
 </script>
 </body>
 </html>
+

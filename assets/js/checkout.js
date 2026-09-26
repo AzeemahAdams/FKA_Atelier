@@ -268,7 +268,7 @@ function checkoutInitReviewStep() {
 /* ── Place Order ───────────────────────────────────────── */
 function checkoutPlaceOrder() {
   const btn = document.getElementById("btn-place-order");
-  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-regular fa-spinner fa-spin"></i> Submitting Order…'; }
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting Order…'; }
 
   try {
     const cartItems = (typeof cartGetItems === "function") ? cartGetItems() : [];
@@ -426,7 +426,7 @@ function checkoutRenderCartSummary() {
     <div class="co-cart-items">
       ${items.map(i => `
         <div class="co-cart-item">
-          <div class="co-cart-item-img">${i.image ? `<img src="${i.image}" alt="${i.name}" onerror="this.style.display='none'">` : `<i class="fa-regular fa-shirt"></i>`}</div>
+          <div class="co-cart-item-img">${i.image ? `<img src="${i.image}" alt="${i.name}" onerror="this.style.display='none'">` : `<i class="fa-solid fa-shirt"></i>`}</div>
           <div class="co-cart-item-info">
             <div class="co-cart-item-name">${i.name}</div>
             <div class="co-cart-item-meta">${[i.size?"Size "+i.size:"", i.colour||""].filter(Boolean).join(" · ")}</div>
@@ -459,7 +459,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const wrapper = document.getElementById("checkout-form-wrapper");
     if (wrapper) wrapper.innerHTML = `
       <div style="text-align:center;padding:4rem 1.5rem;">
-        <i class="fa-regular fa-bag-shopping" style="font-size:2.5rem;color:var(--taupe);display:block;margin-bottom:1rem;"></i>
+        <i class="fa-solid fa-bag-shopping" style="font-size:2.5rem;color:var(--taupe);display:block;margin-bottom:1rem;"></i>
         <h2 style="font-family:var(--font-serif);font-weight:300;margin-bottom:0.75rem;">Your bag is empty</h2>
         <p style="color:var(--text-mid);margin-bottom:1.5rem;">Add some pieces before checking out.</p>
         <a href="shop.html" class="btn-fka-primary">Browse All Pieces</a>

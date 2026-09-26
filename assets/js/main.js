@@ -314,8 +314,8 @@ function buildProductCard(product) {
 
   const img = product.images && product.images[0]
     ? `<img src="${product.images[0]}" alt="${product.name}" loading="lazy"
-         onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i><span>${product.categoryLabel}</span></div>'">`
-    : `<div class="product-img-placeholder"><i class="fa-regular fa-shirt"></i><span>${product.categoryLabel}</span></div>`;
+         onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-solid fa-shirt\\'></i><span>${product.categoryLabel}</span></div>'">`
+    : `<div class="product-img-placeholder"><i class="fa-solid fa-shirt"></i><span>${product.categoryLabel}</span></div>`;
 
   return `
     <div class="product-card fade-in" data-id="${product.id}" data-category="${product.category}" data-price="${product.price}">
@@ -386,7 +386,7 @@ function initShopPage() {
   }
 
   async function applyFilters() {
-    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light);font-size:0.85rem;"><i class="fa-regular fa-spinner fa-spin"></i> Loading pieces…</div>`;
+    grid.innerHTML = `<div style="grid-column:1/-1;text-align:center;padding:2rem;color:var(--text-light);font-size:0.85rem;"><i class="fa-solid fa-spinner fa-spin"></i> Loading pieces…</div>`;
 
     let products = await getAllProducts().catch(() => FKA_PRODUCTS || []);
 
@@ -467,7 +467,7 @@ async function initProductPage() {
   const productId = decodeURIComponent(params.get("id") || "");
   if (!productId) return;
 
-  container.innerHTML = `<div style="text-align:center;padding:5rem 1.5rem;"><i class="fa-regular fa-spinner fa-spin" style="font-size:2rem;color:var(--taupe);"></i></div>`;
+  container.innerHTML = `<div style="text-align:center;padding:5rem 1.5rem;"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;color:var(--taupe);"></i></div>`;
 
   const product = await getProductById(productId).catch((e) => {
     console.error("[FKA] getProductById threw:", e);
@@ -532,7 +532,7 @@ async function initProductPage() {
       <div class="product-gallery">
         <div class="product-main-img" id="product-main-img">
           <img id="product-main-img-el" src="${firstImage}" alt="${product.name}"
-            onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-regular fa-shirt\\'></i></div>'">
+            onerror="this.parentElement.innerHTML='<div class=\\'product-img-placeholder\\'><i class=\\'fa-solid fa-shirt\\'></i></div>'">
         </div>
         ${images.length > 1 ? `<div class="product-thumbnails">${thumbs}</div>` : ""}
       </div>
@@ -567,7 +567,7 @@ async function initProductPage() {
         <!-- Add to bag + wishlist -->
         <div class="product-add-actions">
           <button class="btn-add-to-bag" id="btn-add-to-bag">
-            <i class="fa-regular fa-bag-shopping" style="margin-right:0.5rem;"></i> Add to Bag
+            <i class="fa-solid fa-bag-shopping" style="margin-right:0.5rem;"></i> Add to Bag
           </button>
           <button class="btn-add-to-wishlist-detail" id="btn-wishlist-detail"
             data-wishlist-id="${product.id}" aria-label="Add to wishlist">

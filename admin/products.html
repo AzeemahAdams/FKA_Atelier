@@ -19,7 +19,7 @@
 
       <div class="adm-page-header">
         <div>
-          <h1 class="adm-page-title"><i class="fa-regular fa-shirt"></i> Products</h1>
+          <h1 class="adm-page-title"><i class="fa-solid fa-shirt"></i> Products</h1>
           <p class="adm-page-subtitle" id="prod-count-label">Loading…</p>
         </div>
         <button class="adm-btn adm-btn-primary" onclick="openProductModal(null)">
@@ -62,11 +62,11 @@
                   <th><i class="fa-regular fa-image"></i> Image</th>
                   <th><i class="fa-regular fa-user"></i> Name</th>
                   <th><i class="fa-regular fa-list"></i> Category</th>
-                  <th><i class="fa-regular fa-tag"></i> Price</th>
+                  <th><i class="fa-solid fa-tag"></i> Price</th>
                   <th><i class="fa-regular fa-scroll"></i> Fabric</th>
-                  <th><i class="fa-regular fa-tags"></i> Tags</th>
-                  <th><i class="fa-regular fa-circle-dot"></i> Status</th>
-                  <th><i class="fa-regular fa-sliders"></i> Actions</th>
+                  <th><i class="fa-solid fa-tags"></i> Tags</th>
+                  <th><i class="fa-solid fa-circle-dot"></i> Status</th>
+                  <th><i class="fa-solid fa-sliders"></i> Actions</th>
                 </tr>
               </thead>
               <tbody id="prod-tbody"></tbody>
@@ -110,14 +110,14 @@
       </div>
 
       <div class="adm-field" style="margin-bottom:1.25rem;">
-        <label class="adm-label"><i class="fa-regular fa-shirt"></i> Product Name *</label>
+        <label class="adm-label"><i class="fa-solid fa-shirt"></i> Product Name *</label>
         <input class="adm-input" type="text" id="prod-name" placeholder="Ivory Linen Abaya">
         <span class="adm-field-err" id="err-prod-name"></span>
       </div>
 
       <div class="adm-form-grid adm-form-two" style="margin-bottom:1.25rem;">
         <div class="adm-field">
-          <label class="adm-label"><i class="fa-regular fa-tag"></i> Price (₦) *</label>
+          <label class="adm-label"><i class="fa-solid fa-tag"></i> Price (₦) *</label>
           <input class="adm-input" type="number" id="prod-price" placeholder="65000" min="0">
           <span class="adm-field-err" id="err-prod-price"></span>
         </div>
@@ -313,8 +313,8 @@ function renderProducts() {
           <td>
             <div class="adm-product-thumb">
               ${p.images?.[0]
-                ? `<img src="${p.images[0]}" alt="${p.name}" onerror="this.parentElement.innerHTML='<i class=\\'fa-regular fa-shirt\\'></i>'">`
-                : `<i class="fa-regular fa-shirt"></i>`}
+                ? `<img src="${p.images[0]}" alt="${p.name}" onerror="this.parentElement.innerHTML='<i class=\\'fa-solid fa-shirt\\'></i>'">`
+                : `<i class="fa-solid fa-shirt"></i>`}
             </div>
           </td>
           <td>

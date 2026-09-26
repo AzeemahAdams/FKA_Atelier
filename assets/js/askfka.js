@@ -1,4 +1,4 @@
-/* ============================================================
+﻿/* ============================================================
    FKA ATELIER — Ask FKA AI Chat Engine
    Direct Groq API integration (browser-side)
 
@@ -388,8 +388,8 @@ function fkaSetSendState(disabled) {
     const icon = _sendBtn.querySelector("i");
     if (icon) {
       icon.className = disabled
-        ? "fa-regular fa-spinner fa-spin"
-        : "fa-regular fa-paper-plane-top";
+        ? "fa-solid fa-spinner fa-spin"
+        : "fa-solid fa-paper-plane-top";
     }
   }
   if (_input) _input.disabled = disabled;
