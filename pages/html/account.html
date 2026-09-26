@@ -183,30 +183,116 @@
       </p>
     </div>
 
-    <!-- ── FORGOT PASSWORD (inline) ───────────────────── -->
+    <!-- ── FORGOT PASSWORD — 3-step reset flow ────────── -->
     <div id="panel-forgot" class="auth-panel" style="display:none;">
       <button class="auth-back-link" onclick="authShowTab('login')">
         <i class="fa-regular fa-arrow-left"></i> Back to Sign In
       </button>
       <div class="auth-brand-mark">
-        <span class="auth-brand-name">Forgot Password?</span>
-        <span class="auth-brand-sub">Enter your email and we'll send reset instructions.</span>
+        <span class="auth-brand-name">Reset Password</span>
+        <span class="auth-brand-sub">Enter your email to get a reset code.</span>
       </div>
-      <div class="auth-error" id="forgot-error" role="alert"></div>
-      <div class="auth-success" id="forgot-success" role="status" style="display:none;">
-        <i class="fa-regular fa-circle-check"></i>
-        If that email is registered, you'll receive instructions shortly. For immediate help, <a href="contact.html">contact us</a>.
+
+      <div class="auth-error"   id="forgot-error"   role="alert"></div>
+      <div class="auth-success" id="forgot-success" role="status" style="display:none;"></div>
+
+      <!-- STEP 1: Email entry -->
+      <div id="forgot-step-1">
+        <form id="form-forgot" novalidate>
+          <div class="auth-field">
+            <label class="auth-label" for="forgot-email">Email Address</label>
+            <input class="auth-input" type="email" id="forgot-email"
+              autocomplete="email" placeholder="you@example.com">
+            <span class="auth-field-err" id="err-forgot-email"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn">
+            <i class="fa-regular fa-key"></i> Get Reset Code
+          </button>
+        </form>
       </div>
-      <form id="form-forgot" novalidate>
-        <div class="auth-field">
-          <label class="auth-label" for="forgot-email">Email Address</label>
-          <input class="auth-input" type="email" id="forgot-email" autocomplete="email" placeholder="you@example.com">
-          <span class="auth-field-err" id="err-forgot-email"></span>
+
+      <!-- STEP 2: Code delivery options -->
+      <div id="forgot-step-2" style="display:none;">
+        <div style="background:var(--cream);border:1px solid var(--border);padding:1.25rem 1.25rem;margin-bottom:1.25rem;text-align:center;">
+          <i class="fa-regular fa-circle-check" style="font-size:2rem;color:var(--warm-brown);display:block;margin-bottom:0.75rem;"></i>
+          <strong style="color:var(--black);display:block;margin-bottom:0.35rem;font-size:0.95rem;">Reset code generated!</strong>
+          <p style="font-size:0.82rem;color:var(--text-mid);line-height:1.7;margin:0;">
+            We've prepared your reset code. Choose how you'd like to receive it — we'll send it to you directly.
+          </p>
         </div>
-        <button type="submit" class="auth-submit-btn">
-          <i class="fa-regular fa-envelope"></i> Send Instructions
+
+        <!-- Admin sends code to customer via WhatsApp -->
+        <a id="forgot-wa-link" href="#" target="_blank" rel="noopener"
+          class="btn-whatsapp"
+          style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:0.75rem;padding:1rem 1rem;font-size:0.85rem;text-decoration:none;">
+          <i class="fa-brands fa-whatsapp"></i> Send Code to My WhatsApp
+        </a>
+
+        <a id="forgot-email-link" href="#"
+          class="btn-email"
+          style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:1.5rem;padding:1rem 1rem;font-size:0.85rem;text-decoration:none;">
+          <i class="fa-regular fa-envelope"></i> Send Code to My Email
+        </a>
+
+        <div style="background:#FEF3C7;border:1px solid #FCD34D;padding:0.85rem 1rem;font-size:0.78rem;color:#92400E;line-height:1.6;margin-bottom:1rem;">
+          <i class="fa-regular fa-clock" style="margin-right:0.4rem;"></i>
+          <strong>Code expires in 30 minutes.</strong> Once you receive your code from us, come back here and click below.
+        </div>
+
+        <button class="auth-submit-btn" onclick="forgotGoToStep3()" type="button">
+          <i class="fa-regular fa-keyboard"></i> I Have My Code — Enter It Now
         </button>
-      </form>
+      </div>
+
+      <!-- STEP 3: Code + new password -->
+      <div id="forgot-step-3" style="display:none;">
+        <div style="background:var(--cream);border:1px solid var(--border);padding:1rem 1.25rem;margin-bottom:1.25rem;font-size:0.82rem;color:var(--text-mid);line-height:1.6;">
+          <i class="fa-regular fa-message" style="color:var(--warm-brown);margin-right:0.4rem;"></i>
+          Check your <strong>WhatsApp or email</strong> for the 6-digit code we sent you, then enter it below to set your new password.
+        </div>
+        <form id="form-reset" novalidate>
+          <div class="auth-field">
+            <label class="auth-label" for="reset-code">Reset Code</label>
+            <input class="auth-input" type="text" id="reset-code"
+              autocomplete="one-time-code" placeholder="Enter 6-digit code"
+              maxlength="6" inputmode="numeric"
+              style="letter-spacing:0.25em;font-size:1.2rem;text-align:center;">
+            <span class="auth-field-err" id="err-reset-code"></span>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="reset-new-pw">New Password</label>
+            <div class="auth-pw-wrap">
+              <input class="auth-input" type="password" id="reset-new-pw"
+                autocomplete="new-password" placeholder="At least 6 characters">
+              <button type="button" class="auth-pw-toggle"
+                onclick="authTogglePw('reset-new-pw',this)">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            <span class="auth-field-err" id="err-reset-new-pw"></span>
+          </div>
+          <div class="auth-field">
+            <label class="auth-label" for="reset-confirm-pw">Confirm New Password</label>
+            <div class="auth-pw-wrap">
+              <input class="auth-input" type="password" id="reset-confirm-pw"
+                autocomplete="new-password" placeholder="Repeat new password">
+              <button type="button" class="auth-pw-toggle"
+                onclick="authTogglePw('reset-confirm-pw',this)">
+                <i class="fa-regular fa-eye"></i>
+              </button>
+            </div>
+            <span class="auth-field-err" id="err-reset-confirm-pw"></span>
+          </div>
+          <button type="submit" class="auth-submit-btn">
+            <i class="fa-regular fa-lock"></i> Reset Password
+          </button>
+          <button type="button" class="auth-text-link"
+            onclick="forgotGoToStep2()"
+            style="width:100%;text-align:center;margin-top:0.5rem;">
+            <i class="fa-regular fa-arrow-left"></i> Back
+          </button>
+        </form>
+      </div>
     </div>
 
   </div><!-- /.auth-page-wrap -->
@@ -480,110 +566,7 @@
       <p class="auth-switch-text">Already have an account? <button class="auth-text-link" onclick="authShowTab('login')">Sign in</button></p>
     </div>
 
-    <!-- FORGOT -->
-    <div id="panel-forgot" class="auth-panel" style="display:none;">
-      <button class="auth-back-link" onclick="authShowTab('login')"><i class="fa-regular fa-arrow-left"></i> Back to Sign In</button>
-      <div class="auth-brand-mark">
-        <span class="auth-brand-name">Reset Password</span>
-        <span class="auth-brand-sub">Enter your email to get a reset code.</span>
-      </div>
-
-      <div class="auth-error"   id="forgot-error"   style="display:none;" role="alert"></div>
-      <div class="auth-success" id="forgot-success" style="display:none;" role="status"></div>
-
-      <!-- STEP 1: Email entry -->
-      <div id="forgot-step-1">
-        <form id="form-forgot" novalidate>
-          <div class="auth-field">
-            <label class="auth-label" for="forgot-email">Email Address</label>
-            <input class="auth-input" type="email" id="forgot-email"
-              autocomplete="email" placeholder="you@example.com">
-            <span class="auth-field-err" id="err-forgot-email"></span>
-          </div>
-          <button type="submit" class="auth-submit-btn">
-            <i class="fa-regular fa-key"></i> Get Reset Code
-          </button>
-        </form>
-      </div>
-
-      <!-- STEP 2: Code delivery options -->
-      <div id="forgot-step-2" style="display:none;">
-        <div style="background:var(--cream);border:1px solid var(--border);padding:1.1rem 1.25rem;margin-bottom:1.25rem;font-size:0.85rem;line-height:1.7;color:var(--text-mid);">
-          <strong style="color:var(--black);display:block;margin-bottom:0.35rem;">Your reset code is ready.</strong>
-          Share it with us via WhatsApp or email so we can verify it's you, then use it below to set your new password.
-        </div>
-
-        <!-- Reset code display -->
-        <div style="text-align:center;margin-bottom:1.25rem;">
-          <div style="font-size:0.65rem;font-weight:600;letter-spacing:0.14em;text-transform:uppercase;color:var(--text-mid);margin-bottom:0.5rem;">Your Reset Code</div>
-          <div id="forgot-code-display" style="font-size:2rem;font-weight:700;letter-spacing:0.3em;font-family:var(--font-sans);color:var(--black);background:var(--ivory);border:2px solid var(--warm-brown);padding:0.75rem 1.5rem;display:inline-block;">——————</div>
-          <div style="font-size:0.72rem;color:var(--text-light);margin-top:0.4rem;">Valid for 30 minutes</div>
-        </div>
-
-        <!-- WhatsApp verification -->
-        <a id="forgot-wa-link" href="#" target="_blank" rel="noopener"
-          class="btn-whatsapp"
-          style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:0.75rem;padding:0.9rem 1rem;font-size:0.82rem;">
-          <i class="fa-brands fa-whatsapp"></i> Verify via WhatsApp
-        </a>
-
-        <!-- Email verification -->
-        <a id="forgot-email-link" href="#"
-          class="btn-email"
-          style="display:flex;align-items:center;justify-content:center;gap:0.6rem;width:100%;margin-bottom:1.5rem;padding:0.9rem 1rem;font-size:0.82rem;">
-          <i class="fa-regular fa-envelope"></i> Verify via Email
-        </a>
-
-        <button class="auth-text-link" onclick="forgotGoToStep3()" style="width:100%;text-align:center;">
-          I've sent my code → Set new password <i class="fa-regular fa-arrow-right"></i>
-        </button>
-      </div>
-
-      <!-- STEP 3: Enter code + new password -->
-      <div id="forgot-step-3" style="display:none;">
-        <form id="form-reset" novalidate>
-          <div class="auth-field">
-            <label class="auth-label" for="reset-code">Reset Code</label>
-            <input class="auth-input" type="text" id="reset-code"
-              autocomplete="one-time-code" placeholder="6-digit code"
-              maxlength="6" inputmode="numeric"
-              style="letter-spacing:0.25em;font-size:1.1rem;text-align:center;">
-            <span class="auth-field-err" id="err-reset-code"></span>
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="reset-new-pw">New Password</label>
-            <div class="auth-pw-wrap">
-              <input class="auth-input" type="password" id="reset-new-pw"
-                autocomplete="new-password" placeholder="At least 6 characters">
-              <button type="button" class="auth-pw-toggle"
-                onclick="authTogglePw('reset-new-pw',this)">
-                <i class="fa-regular fa-eye"></i>
-              </button>
-            </div>
-            <span class="auth-field-err" id="err-reset-new-pw"></span>
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="reset-confirm-pw">Confirm New Password</label>
-            <div class="auth-pw-wrap">
-              <input class="auth-input" type="password" id="reset-confirm-pw"
-                autocomplete="new-password" placeholder="Repeat new password">
-              <button type="button" class="auth-pw-toggle"
-                onclick="authTogglePw('reset-confirm-pw',this)">
-                <i class="fa-regular fa-eye"></i>
-              </button>
-            </div>
-            <span class="auth-field-err" id="err-reset-confirm-pw"></span>
-          </div>
-          <button type="submit" class="auth-submit-btn">
-            <i class="fa-regular fa-lock"></i> Reset Password
-          </button>
-          <button type="button" class="auth-text-link"
-            onclick="forgotGoToStep2()" style="width:100%;text-align:center;margin-top:0.5rem;">
-            <i class="fa-regular fa-arrow-left"></i> Back
-          </button>
-        </form>
-      </div>
-    </div>
+    <!-- FORGOT — handled by the panel above in auth-panels -->
   </div>
 </div>
 
@@ -967,27 +950,28 @@ document.getElementById("form-forgot").addEventListener("submit", e => {
 
   _resetEmail = email;
 
-  // Show the code
-  document.getElementById("forgot-code-display").textContent = result.code;
-
-  // Pre-fill WhatsApp link
+  // Build admin-facing notification links
+  // Admin receives these, then sends the code directly to the customer
   const waMsg = encodeURIComponent(
-    `Hi FKA Atelier! 🔑\n\n` +
-    `I'm requesting a password reset for my account.\n\n` +
+    `🔑 *Password Reset Request — FKA Atelier*\n\n` +
+    `Customer: *${result.firstName || email}*\n` +
     `Email: ${email}\n` +
-    `Reset Code: *${result.code}*\n\n` +
-    `Please confirm this is my reset request. Thank you!`
+    (result.phone ? `Phone: ${result.phone}\n` : "") +
+    `\nReset Code: *${result.code}*\n\n` +
+    `Please send this code to the customer so they can reset their password.\n` +
+    `Code expires in 30 minutes.`
   );
   document.getElementById("forgot-wa-link").href = `https://wa.me/2347019243312?text=${waMsg}`;
 
-  // Pre-fill Email link
-  const emailSubj = encodeURIComponent("Password Reset — FKA Atelier");
+  const emailSubj = encodeURIComponent(`Password Reset Request — ${email}`);
   const emailBody = encodeURIComponent(
-    `Hi FKA Atelier,\n\n` +
-    `I am requesting a password reset for my account.\n\n` +
-    `Account Email: ${email}\n` +
+    `Password Reset Request — FKA Atelier\n\n` +
+    `Customer Name: ${result.firstName || "N/A"}\n` +
+    `Account Email: ${email}\n\n` +
     `Reset Code: ${result.code}\n\n` +
-    `Please confirm this is my reset request.\n\nThank you!`
+    `Please send this code to the customer so they can reset their password on the website.\n` +
+    `The code expires in 30 minutes.\n\n` +
+    `— FKA Atelier System`
   );
   document.getElementById("forgot-email-link").href =
     `mailto:omotolaazeemah7@gmail.com?subject=${emailSubj}&body=${emailBody}`;

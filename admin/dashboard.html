@@ -169,22 +169,60 @@ function renderDashboard() {
   const pendingBookings = typeof bookingsGetAll === "function"
     ? bookingsGetAll().filter(b => b.status === "awaiting_payment").length
     : 0;
+
+  // Check pending password resets
+  const pendingResets = (() => {
+    try {
+      const resets = JSON.parse(localStorage.getItem("fka_pw_resets") || "[]");
+      return resets.filter(r => !r.used && Date.now() < r.expiry);
+    } catch { return []; }
+  })();
+
+  const alertBanners = [];
+
   if (pendingBookings > 0) {
-    alertEl.style.display = "block";
-    alertEl.innerHTML = `
+    alertBanners.push(`
       <div style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:0.85rem 1.25rem;
-                  border-radius:var(--adm-radius);display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;">
+                  display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;margin-bottom:0.5rem;">
         <i class="fa-regular fa-clock" style="font-size:1rem;flex-shrink:0;"></i>
         <strong>${pendingBookings} booking${pendingBookings!==1?"s":""}</strong> awaiting payment verification.
         <a href="orders.html" class="adm-btn adm-btn-primary adm-btn-sm" style="margin-left:auto;">
           <i class="fa-regular fa-circle-check"></i> Verify Payments
         </a>
-      </div>`;
+      </div>`);
+  }
+
+  if (pendingResets.length > 0) {
+    const resetList = pendingResets.map(r =>
+      `<div style="margin-top:0.5rem;font-size:0.8rem;">
+        📧 <strong>${r.email}</strong> — Code: <strong style="letter-spacing:0.1em;">${r.code}</strong>
+        <span style="opacity:0.7;margin-left:0.5rem;">(expires ${new Date(r.expiry).toLocaleTimeString()})</span>
+        <a href="https://wa.me/2347019243312?text=${encodeURIComponent("Hi! Your FKA Atelier password reset code is: " + r.code + ". It expires in 30 minutes.")}"
+           target="_blank" style="margin-left:0.75rem;color:#065F46;font-weight:600;text-decoration:underline;">
+          Send via WhatsApp
+        </a>
+      </div>`
+    ).join("");
+    alertBanners.push(`
+      <div style="background:#D1FAE5;border:1px solid #6EE7B7;color:#065F46;padding:0.85rem 1.25rem;
+                  font-size:0.85rem;margin-bottom:0.5rem;">
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+          <i class="fa-regular fa-key" style="font-size:1rem;flex-shrink:0;"></i>
+          <strong>${pendingResets.length} password reset${pendingResets.length!==1?"s":""} pending</strong>
+          <span style="opacity:0.8;font-size:0.78rem;">— Send the code to each customer below</span>
+        </div>
+        ${resetList}
+      </div>`);
+  }
+
+  if (alertBanners.length > 0) {
+    alertEl.style.display = "block";
+    alertEl.innerHTML = alertBanners.join("");
   } else if (S.pendingCount > 0) {
     alertEl.style.display = "block";
     alertEl.innerHTML = `
       <div style="background:#FEF3C7;border:1px solid #FCD34D;color:#92400E;padding:0.85rem 1.25rem;
-                  border-radius:var(--adm-radius);display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;">
+                  display:flex;align-items:center;gap:0.75rem;font-size:0.85rem;">
         <i class="fa-regular fa-triangle-exclamation" style="font-size:1rem;flex-shrink:0;"></i>
         <strong>${S.pendingCount} pending order${S.pendingCount!==1?"s":""}</strong> waiting for processing.
         <a href="orders.html?tab=orders&status=confirmed" class="adm-btn adm-btn-primary adm-btn-sm" style="margin-left:auto;">
