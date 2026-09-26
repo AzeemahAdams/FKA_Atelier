@@ -271,97 +271,285 @@
     }
   });
 
-  /* ── Build cart invoice message for WhatsApp / Email ── */
-  function _buildCartInvoice() {
-    const items    = typeof cartGetItems    === "function" ? cartGetItems()    : [];
-    const subtotal = typeof cartGetSubtotal === "function" ? cartGetSubtotal() : 0;
-    const delivFee = typeof cartGetDeliveryFee === "function" ? cartGetDeliveryFee() : 4500;
-    const total    = subtotal + delivFee;
-    const THRESHOLD = 70000;
-    const freeDelivery = subtotal >= THRESHOLD;
+  /* ============================================================
+     CART — Direct Order via WhatsApp / Email
+     Requires login + collects delivery details before sending.
+     ============================================================ */
 
-    if (items.length === 0) {
-      alert("Your bag is empty. Add items before ordering.");
-      return null;
-    }
+  let _cartOrderChannel = null; // "whatsapp" or "email"
 
-    return { items, subtotal, delivFee: freeDelivery ? 0 : delivFee, total: freeDelivery ? subtotal : total, freeDelivery };
-  }
-
+  /* ── Step 1: button click — check login first ── */
   function cartOrderWhatsApp(e) {
     e.preventDefault();
-    const cart = _buildCartInvoice();
-    if (!cart) return;
-
-    const itemLines = cart.items.map((i, n) =>
-      `  ${n + 1}. *${i.name}*` +
-      (i.size   ? `\n      Size: ${i.size}`     : "") +
-      (i.colour ? `\n      Colour: ${i.colour}` : "") +
-      `\n      Qty: ${i.qty}  ×  ₦${Number(i.price).toLocaleString("en-NG")}` +
-      (i.qty > 1 ? `  =  ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
-    ).join("\n\n");
-
-    const message = encodeURIComponent(
-      `Hello FKA Atelier! 🤍\n\n` +
-      `I'd like to place an order for the following items:\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `🛍️ *MY ORDER*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `${itemLines}\n\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n` +
-      `🧾 *ORDER SUMMARY*\n` +
-      `Subtotal:  ₦${cart.subtotal.toLocaleString("en-NG")}\n` +
-      `Delivery:  ${cart.freeDelivery ? "FREE ✓" : "₦" + cart.delivFee.toLocaleString("en-NG")}\n` +
-      `*TOTAL:    ₦${cart.total.toLocaleString("en-NG")}*\n` +
-      `━━━━━━━━━━━━━━━━━━━━\n\n` +
-      `Please confirm availability and send me payment details.\n` +
-      `Thank you! 🙏`
-    );
-
-    window.open(`https://wa.me/2347019243312?text=${message}`, "_blank");
+    _cartOrderChannel = "whatsapp";
+    _cartOrderStart();
   }
-
   function cartOrderEmail(e) {
     e.preventDefault();
-    const cart = _buildCartInvoice();
-    if (!cart) return;
-
-    const itemLines = cart.items.map((i, n) =>
-      `${n + 1}. ${i.name}` +
-      (i.size   ? ` | Size: ${i.size}`     : "") +
-      (i.colour ? ` | Colour: ${i.colour}` : "") +
-      ` | Qty: ${i.qty}` +
-      ` | ₦${Number(i.price).toLocaleString("en-NG")} each` +
-      (i.qty > 1 ? ` = ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
-    ).join("\n");
-
-    const subject = encodeURIComponent("New Order — FKA Atelier");
-    const body    = encodeURIComponent(
-      `Hello FKA Atelier,\n\n` +
-      `I would like to place an order for the following items:\n\n` +
-      `════════════════════════════\n` +
-      `           MY ORDER\n` +
-      `════════════════════════════\n\n` +
-      `ITEMS:\n` +
-      `${itemLines}\n\n` +
-      `────────────────────────────\n` +
-      `ORDER SUMMARY\n` +
-      `────────────────────────────\n` +
-      `Subtotal:  ₦${cart.subtotal.toLocaleString("en-NG")}\n` +
-      `Delivery:  ${cart.freeDelivery ? "FREE" : "₦" + cart.delivFee.toLocaleString("en-NG")}\n` +
-      `TOTAL:     ₦${cart.total.toLocaleString("en-NG")}\n` +
-      `════════════════════════════\n\n` +
-      `Please confirm availability and send payment details.\n\n` +
-      `My details:\n` +
-      `Name:  \n` +
-      `Phone: \n` +
-      `Delivery Address: \n\n` +
-      `Thank you!`
-    );
-
-    window.location.href = `mailto:omotolaazeemah7@gmail.com?subject=${subject}&body=${body}`;
+    _cartOrderChannel = "email";
+    _cartOrderStart();
   }
+
+  function _cartOrderStart() {
+    // Must have items
+    const items = typeof cartGetItems === "function" ? cartGetItems() : [];
+    if (items.length === 0) {
+      alert("Your bag is empty. Add items before ordering.");
+      return;
+    }
+    // Must be logged in
+    if (typeof authIsLoggedIn === "function" && !authIsLoggedIn()) {
+      sessionStorage.setItem("fka_auth_return", window.location.href);
+      window.location.href = "account.html?mode=login&reason=order";
+      return;
+    }
+    // Pre-fill from profile and open the details modal
+    _cartOrderOpenModal();
+  }
+
+  /* ── Step 2: show details modal ── */
+  function _cartOrderOpenModal() {
+    const profile = typeof authGetProfile === "function" ? authGetProfile() : null;
+    const modal   = document.getElementById("modal-order-details");
+    if (!modal) return;
+
+    // Pre-fill known fields from account
+    document.getElementById("cod-name").value    = profile ? `${profile.firstName || ""} ${profile.lastName || ""}`.trim() : "";
+    document.getElementById("cod-phone").value   = profile?.phone   || "";
+    document.getElementById("cod-email").value   = profile?.email   || "";
+    document.getElementById("cod-address").value = profile?.address?.fullText || profile?.address || "";
+    document.getElementById("cod-notes").value   = "";
+
+    // Clear any previous errors
+    ["cod-name","cod-phone","cod-email","cod-address"].forEach(id => {
+      const err = document.getElementById("err-" + id);
+      if (err) err.textContent = "";
+    });
+
+    modal.style.display = "flex";
+    document.getElementById("cod-name").focus();
+  }
+
+  function _cartOrderCloseModal() {
+    const modal = document.getElementById("modal-order-details");
+    if (modal) modal.style.display = "none";
+  }
+
+  /* ── Step 3: validate + build message + open channel ── */
+  function _cartOrderSubmit() {
+    const name    = document.getElementById("cod-name").value.trim();
+    const phone   = document.getElementById("cod-phone").value.trim();
+    const email   = document.getElementById("cod-email").value.trim();
+    const address = document.getElementById("cod-address").value.trim();
+    const notes   = document.getElementById("cod-notes").value.trim();
+    let   valid   = true;
+
+    function setErr(id, msg) {
+      const el = document.getElementById("err-" + id);
+      if (el) el.textContent = msg;
+      valid = false;
+    }
+    function clearErr(id) {
+      const el = document.getElementById("err-" + id);
+      if (el) el.textContent = "";
+    }
+
+    clearErr("cod-name"); clearErr("cod-phone");
+    clearErr("cod-email"); clearErr("cod-address");
+
+    if (!name)    setErr("cod-name",    "Full name is required.");
+    if (!phone)   setErr("cod-phone",   "Phone number is required.");
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+                  setErr("cod-email",   "Valid email is required.");
+    if (!address) setErr("cod-address", "Delivery address is required.");
+    if (!valid) return;
+
+    // Save address back to profile for next time
+    if (typeof authUpdateProfile === "function") {
+      authUpdateProfile({ phone, address });
+    }
+
+    const customer = { name, phone, email, address, notes };
+    _cartOrderCloseModal();
+    _cartOrderSend(customer);
+  }
+
+  /* ── Step 4: build invoice + open WhatsApp or email ── */
+  function _cartOrderSend(customer) {
+    const items      = typeof cartGetItems       === "function" ? cartGetItems()       : [];
+    const subtotal   = typeof cartGetSubtotal    === "function" ? cartGetSubtotal()    : 0;
+    const THRESHOLD  = 70000;
+    const freeDeliv  = subtotal >= THRESHOLD;
+    const delivFee   = freeDeliv ? 0 : (typeof cartGetDeliveryFee === "function" ? cartGetDeliveryFee() : 4500);
+    const total      = subtotal + delivFee;
+
+    if (_cartOrderChannel === "whatsapp") {
+      const itemLines = items.map((i, n) =>
+        `  ${n+1}. *${i.name}*` +
+        (i.size   ? `\n      Size: ${i.size}`     : "") +
+        (i.colour ? `\n      Colour: ${i.colour}` : "") +
+        `\n      Qty: ${i.qty}  ×  ₦${Number(i.price).toLocaleString("en-NG")}` +
+        (i.qty > 1 ? `  =  ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
+      ).join("\n\n");
+
+      const msg = encodeURIComponent(
+        `Hello FKA Atelier! 🤍\n\n` +
+        `I would like to place an order.\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `👤 *MY DETAILS*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `Name:    ${customer.name}\n` +
+        `Phone:   ${customer.phone}\n` +
+        `Email:   ${customer.email}\n` +
+        `Address: ${customer.address}\n` +
+        (customer.notes ? `Notes:   ${customer.notes}\n` : "") +
+        `\n━━━━━━━━━━━━━━━━━━━━\n` +
+        `🛍️ *MY ORDER*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `${itemLines}\n\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🧾 *ORDER SUMMARY*\n` +
+        `Subtotal:  ₦${subtotal.toLocaleString("en-NG")}\n` +
+        `Delivery:  ${freeDeliv ? "FREE ✓" : "₦" + delivFee.toLocaleString("en-NG")}\n` +
+        `*TOTAL:    ₦${total.toLocaleString("en-NG")}*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `Please confirm availability and send payment details.\n` +
+        `Thank you! 🙏`
+      );
+      window.open(`https://wa.me/2347019243312?text=${msg}`, "_blank");
+
+    } else {
+      const itemLines = items.map((i, n) =>
+        `${n+1}. ${i.name}` +
+        (i.size   ? ` | Size: ${i.size}`     : "") +
+        (i.colour ? ` | Colour: ${i.colour}` : "") +
+        ` | Qty: ${i.qty} | ₦${Number(i.price).toLocaleString("en-NG")} each` +
+        (i.qty > 1 ? ` = ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
+      ).join("\n");
+
+      const subject = encodeURIComponent("New Order — FKA Atelier");
+      const body    = encodeURIComponent(
+        `Hello FKA Atelier,\n\n` +
+        `I would like to place an order.\n\n` +
+        `════════════════════════\n` +
+        `CUSTOMER DETAILS\n` +
+        `════════════════════════\n` +
+        `Name:     ${customer.name}\n` +
+        `Phone:    ${customer.phone}\n` +
+        `Email:    ${customer.email}\n` +
+        `Address:  ${customer.address}\n` +
+        (customer.notes ? `Notes:    ${customer.notes}\n` : "") +
+        `\n════════════════════════\n` +
+        `ORDER ITEMS\n` +
+        `════════════════════════\n` +
+        `${itemLines}\n\n` +
+        `────────────────────────\n` +
+        `Subtotal:  ₦${subtotal.toLocaleString("en-NG")}\n` +
+        `Delivery:  ${freeDeliv ? "FREE" : "₦" + delivFee.toLocaleString("en-NG")}\n` +
+        `TOTAL:     ₦${total.toLocaleString("en-NG")}\n` +
+        `════════════════════════\n\n` +
+        `Please confirm availability and send payment details.\n\n` +
+        `Thank you!\n${customer.name}`
+      );
+      window.location.href = `mailto:omotolaazeemah7@gmail.com?subject=${subject}&body=${body}`;
+    }
+  }
+
+  // Close modal on overlay click
+  document.getElementById("modal-order-details")?.addEventListener("click", function(e) {
+    if (e.target === this) _cartOrderCloseModal();
+  });
 </script>
+
+<!-- ORDER DETAILS MODAL -->
+<div id="modal-order-details" style="
+  display:none; position:fixed; inset:0; z-index:3000;
+  background:rgba(0,0,0,0.5); align-items:center; justify-content:center;
+  padding:1rem;
+">
+  <div style="
+    background:var(--ivory); width:100%; max-width:480px;
+    padding:2rem 1.75rem; position:relative; max-height:90vh; overflow-y:auto;
+  ">
+    <button onclick="_cartOrderCloseModal()" aria-label="Close" style="
+      position:absolute; top:1rem; right:1rem; background:none; border:none;
+      font-size:1.2rem; cursor:pointer; color:var(--text-mid);
+    "><i class="fa-regular fa-xmark"></i></button>
+
+    <div style="font-size:0.68rem;font-weight:600;letter-spacing:0.18em;text-transform:uppercase;color:var(--warm-brown);margin-bottom:0.4rem;">Your Details</div>
+    <h3 style="font-family:var(--font-serif);font-size:1.4rem;font-weight:400;margin-bottom:0.25rem;color:var(--black);">Complete Your Order</h3>
+    <p style="font-size:0.82rem;color:var(--text-mid);margin-bottom:1.5rem;line-height:1.6;">We need your details to process your order. These will be included in your message to us.</p>
+
+    <!-- Name -->
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dark);display:block;margin-bottom:0.35rem;">
+        Full Name <span style="color:#991B1B;">*</span>
+      </label>
+      <input id="cod-name" type="text" autocomplete="name" placeholder="e.g. Fatimah Azeez"
+        style="width:100%;padding:0.8rem 1rem;border:1px solid var(--border-dark);background:var(--white);font-family:var(--font-sans);font-size:0.9rem;outline:none;">
+      <span id="err-cod-name" style="font-size:0.75rem;color:#991B1B;display:block;margin-top:0.2rem;"></span>
+    </div>
+
+    <!-- Phone -->
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dark);display:block;margin-bottom:0.35rem;">
+        Phone / WhatsApp <span style="color:#991B1B;">*</span>
+      </label>
+      <input id="cod-phone" type="tel" autocomplete="tel" placeholder="e.g. 08012345678"
+        style="width:100%;padding:0.8rem 1rem;border:1px solid var(--border-dark);background:var(--white);font-family:var(--font-sans);font-size:0.9rem;outline:none;">
+      <span id="err-cod-phone" style="font-size:0.75rem;color:#991B1B;display:block;margin-top:0.2rem;"></span>
+    </div>
+
+    <!-- Email -->
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dark);display:block;margin-bottom:0.35rem;">
+        Email Address <span style="color:#991B1B;">*</span>
+      </label>
+      <input id="cod-email" type="email" autocomplete="email" placeholder="e.g. you@email.com"
+        style="width:100%;padding:0.8rem 1rem;border:1px solid var(--border-dark);background:var(--white);font-family:var(--font-sans);font-size:0.9rem;outline:none;">
+      <span id="err-cod-email" style="font-size:0.75rem;color:#991B1B;display:block;margin-top:0.2rem;"></span>
+    </div>
+
+    <!-- Delivery Address -->
+    <div style="margin-bottom:1rem;">
+      <label style="font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dark);display:block;margin-bottom:0.35rem;">
+        Delivery Address <span style="color:#991B1B;">*</span>
+      </label>
+      <textarea id="cod-address" rows="3" autocomplete="street-address" placeholder="Street, City, State"
+        style="width:100%;padding:0.8rem 1rem;border:1px solid var(--border-dark);background:var(--white);font-family:var(--font-sans);font-size:0.9rem;outline:none;resize:vertical;"></textarea>
+      <span id="err-cod-address" style="font-size:0.75rem;color:#991B1B;display:block;margin-top:0.2rem;"></span>
+    </div>
+
+    <!-- Notes (optional) -->
+    <div style="margin-bottom:1.5rem;">
+      <label style="font-size:0.68rem;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--text-dark);display:block;margin-bottom:0.35rem;">
+        Additional Notes <span style="font-weight:400;opacity:0.6;">(optional)</span>
+      </label>
+      <textarea id="cod-notes" rows="2" placeholder="Measurements, colour preferences, special instructions…"
+        style="width:100%;padding:0.8rem 1rem;border:1px solid var(--border-dark);background:var(--white);font-family:var(--font-sans);font-size:0.9rem;outline:none;resize:vertical;"></textarea>
+    </div>
+
+    <button onclick="_cartOrderSubmit()" style="
+      width:100%; padding:1rem 1.5rem;
+      background:var(--black); color:var(--cream);
+      font-family:var(--font-sans); font-size:0.82rem;
+      font-weight:600; letter-spacing:0.16em; text-transform:uppercase;
+      border:none; cursor:pointer; transition:background 0.2s;
+      display:flex; align-items:center; justify-content:center; gap:0.6rem;
+    "
+    onmouseover="this.style.background='var(--warm-brown)'"
+    onmouseout="this.style.background='var(--black)'"
+    id="cod-submit-btn">
+      <i class="fa-regular fa-paper-plane"></i> Send Order
+    </button>
+
+    <p style="font-size:0.72rem;color:var(--text-light);text-align:center;margin-top:0.85rem;line-height:1.5;">
+      <i class="fa-regular fa-lock" style="margin-right:0.3rem;"></i>
+      Your details are only sent to FKA Atelier and never stored on external servers.
+    </p>
+  </div>
+</div>
+
 <script src="../../assets/js/askfka.js"></script>
 </body>
 </html>
