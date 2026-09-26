@@ -334,10 +334,11 @@ function checkoutPlaceOrder() {
     // Formatted items list (WhatsApp — plain text)
     const itemsWA = itemsArr.map((i, n) =>
       `  ${n+1}. ${i.name}` +
-      (i.size   ? ` | Size: ${i.size}`   : "") +
+      (i.size   ? ` | Size: ${i.size}`     : "") +
       (i.colour ? ` | Colour: ${i.colour}` : "") +
       ` | Qty: ${i.qty}` +
-      (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")}` : "")
+      (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")} each` : "") +
+      (i.qty > 1 && i.price ? ` (₦${(i.price * i.qty).toLocaleString("en-NG")} total)` : "")
     ).join("\n");
 
     // WhatsApp link — full order details
@@ -375,7 +376,8 @@ function checkoutPlaceOrder() {
         (i.size   ? ` | Size: ${i.size}`     : "") +
         (i.colour ? ` | Colour: ${i.colour}` : "") +
         ` | Qty: ${i.qty}` +
-        (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")}` : "")
+        (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")} each` : "") +
+        (i.qty > 1 && i.price ? ` = ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
       ).join("\n");
 
       const subject = encodeURIComponent(`New Order — Booking Ref: ${bookingRef}`);
