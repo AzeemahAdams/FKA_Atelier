@@ -140,13 +140,13 @@
         <span id="cart-zone-preview-msg">Delivery fee calculated at checkout based on your address.</span>
       </div>
 
-      <!-- WhatsApp / Email fallback -->
+      <!-- WhatsApp / Email fallback — pre-filled with full cart contents -->
       <div style="margin-top:1rem;display:flex;flex-direction:column;gap:0.5rem;">
         <div style="text-align:center;font-size:0.7rem;color:var(--text-light);letter-spacing:0.06em;text-transform:uppercase;margin-bottom:0.25rem;">Or order directly</div>
-        <a href="https://wa.me/2347019243312" class="btn-whatsapp" style="display:flex;justify-content:center;">
+        <a id="btn-cart-whatsapp" href="#" onclick="cartOrderWhatsApp(event)" class="btn-whatsapp" style="display:flex;justify-content:center;align-items:center;gap:0.5rem;">
           <i class="fa-brands fa-whatsapp"></i> Order via WhatsApp
         </a>
-        <a href="mailto:omotolaazeemah7@gmail.com" class="btn-email" style="display:flex;justify-content:center;">
+        <a id="btn-cart-email" href="#" onclick="cartOrderEmail(event)" class="btn-email" style="display:flex;justify-content:center;align-items:center;gap:0.5rem;">
           <i class="fa-regular fa-envelope"></i> Order via Email
         </a>
       </div>
@@ -270,6 +270,97 @@
       }
     }
   });
+
+  /* ── Build cart invoice message for WhatsApp / Email ── */
+  function _buildCartInvoice() {
+    const items    = typeof cartGetItems    === "function" ? cartGetItems()    : [];
+    const subtotal = typeof cartGetSubtotal === "function" ? cartGetSubtotal() : 0;
+    const delivFee = typeof cartGetDeliveryFee === "function" ? cartGetDeliveryFee() : 4500;
+    const total    = subtotal + delivFee;
+    const THRESHOLD = 70000;
+    const freeDelivery = subtotal >= THRESHOLD;
+
+    if (items.length === 0) {
+      alert("Your bag is empty. Add items before ordering.");
+      return null;
+    }
+
+    return { items, subtotal, delivFee: freeDelivery ? 0 : delivFee, total: freeDelivery ? subtotal : total, freeDelivery };
+  }
+
+  function cartOrderWhatsApp(e) {
+    e.preventDefault();
+    const cart = _buildCartInvoice();
+    if (!cart) return;
+
+    const itemLines = cart.items.map((i, n) =>
+      `  ${n + 1}. *${i.name}*` +
+      (i.size   ? `\n      Size: ${i.size}`     : "") +
+      (i.colour ? `\n      Colour: ${i.colour}` : "") +
+      `\n      Qty: ${i.qty}  ×  ₦${Number(i.price).toLocaleString("en-NG")}` +
+      (i.qty > 1 ? `  =  ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
+    ).join("\n\n");
+
+    const message = encodeURIComponent(
+      `Hello FKA Atelier! 🤍\n\n` +
+      `I'd like to place an order for the following items:\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `🛍️ *MY ORDER*\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `${itemLines}\n\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n` +
+      `🧾 *ORDER SUMMARY*\n` +
+      `Subtotal:  ₦${cart.subtotal.toLocaleString("en-NG")}\n` +
+      `Delivery:  ${cart.freeDelivery ? "FREE ✓" : "₦" + cart.delivFee.toLocaleString("en-NG")}\n` +
+      `*TOTAL:    ₦${cart.total.toLocaleString("en-NG")}*\n` +
+      `━━━━━━━━━━━━━━━━━━━━\n\n` +
+      `Please confirm availability and send me payment details.\n` +
+      `Thank you! 🙏`
+    );
+
+    window.open(`https://wa.me/2347019243312?text=${message}`, "_blank");
+  }
+
+  function cartOrderEmail(e) {
+    e.preventDefault();
+    const cart = _buildCartInvoice();
+    if (!cart) return;
+
+    const itemLines = cart.items.map((i, n) =>
+      `${n + 1}. ${i.name}` +
+      (i.size   ? ` | Size: ${i.size}`     : "") +
+      (i.colour ? ` | Colour: ${i.colour}` : "") +
+      ` | Qty: ${i.qty}` +
+      ` | ₦${Number(i.price).toLocaleString("en-NG")} each` +
+      (i.qty > 1 ? ` = ₦${(i.price * i.qty).toLocaleString("en-NG")}` : "")
+    ).join("\n");
+
+    const subject = encodeURIComponent("New Order — FKA Atelier");
+    const body    = encodeURIComponent(
+      `Hello FKA Atelier,\n\n` +
+      `I would like to place an order for the following items:\n\n` +
+      `════════════════════════════\n` +
+      `           MY ORDER\n` +
+      `════════════════════════════\n\n` +
+      `ITEMS:\n` +
+      `${itemLines}\n\n` +
+      `────────────────────────────\n` +
+      `ORDER SUMMARY\n` +
+      `────────────────────────────\n` +
+      `Subtotal:  ₦${cart.subtotal.toLocaleString("en-NG")}\n` +
+      `Delivery:  ${cart.freeDelivery ? "FREE" : "₦" + cart.delivFee.toLocaleString("en-NG")}\n` +
+      `TOTAL:     ₦${cart.total.toLocaleString("en-NG")}\n` +
+      `════════════════════════════\n\n` +
+      `Please confirm availability and send payment details.\n\n` +
+      `My details:\n` +
+      `Name:  \n` +
+      `Phone: \n` +
+      `Delivery Address: \n\n` +
+      `Thank you!`
+    );
+
+    window.location.href = `mailto:omotolaazeemah7@gmail.com?subject=${subject}&body=${body}`;
+  }
 </script>
 <script src="../../assets/js/askfka.js"></script>
 </body>
