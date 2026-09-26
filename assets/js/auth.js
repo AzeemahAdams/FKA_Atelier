@@ -31,6 +31,72 @@
 const FKA_ACCOUNTS_KEY      = "fka_accounts";
 const FKA_SESSION_KEY       = "fka_session";        // sessionStorage (tab-only)
 const FKA_SESSION_KEY_LS    = "fka_session_persist"; // localStorage (remember me)
+const FKA_RESET_KEY         = "fka_pw_resets";      // password reset tokens
+
+/* ── Password reset helpers ─────────────────────────────────── */
+function _genResetCode() {
+  // 6-digit numeric code
+  return String(Math.floor(100000 + Math.random() * 900000));
+}
+
+/**
+ * Step 1: Request a password reset for the given email.
+ * Generates a 6-digit code valid for 30 minutes.
+ * Returns { ok, code, firstName, phone } on success so the caller
+ * can show the code and pre-fill a WhatsApp/email message.
+ */
+function authRequestReset(email) {
+  const emailLow = (email || "").trim().toLowerCase();
+  if (!emailLow) return { ok: false, error: "Please enter your email address." };
+
+  const accounts = _loadAccounts();
+  const account  = accounts.find(a => a.email === emailLow);
+  if (!account) return { ok: false, error: "No account found with that email address." };
+
+  const code    = _genResetCode();
+  const expiry  = Date.now() + 30 * 60 * 1000; // 30 minutes
+
+  // Store reset record
+  const resets  = _loadResets().filter(r => r.email !== emailLow); // clear old ones
+  resets.push({ email: emailLow, code, expiry, used: false });
+  localStorage.setItem(FKA_RESET_KEY, JSON.stringify(resets));
+
+  return { ok: true, code, firstName: account.firstName, phone: account.phone || "" };
+}
+
+/**
+ * Step 2: Verify code + set new password.
+ */
+function authConfirmReset(email, code, newPassword) {
+  const emailLow = (email || "").trim().toLowerCase();
+  if (!newPassword || newPassword.length < 6)
+    return { ok: false, error: "Password must be at least 6 characters." };
+
+  const resets = _loadResets();
+  const record = resets.find(r => r.email === emailLow && !r.used);
+
+  if (!record) return { ok: false, error: "No active reset request found. Please request a new code." };
+  if (Date.now() > record.expiry) return { ok: false, error: "Reset code has expired. Please request a new one." };
+  if (record.code !== String(code).trim()) return { ok: false, error: "Incorrect code. Please check and try again." };
+
+  // Mark code as used
+  record.used = true;
+  localStorage.setItem(FKA_RESET_KEY, JSON.stringify(resets));
+
+  // Update password
+  const accounts = _loadAccounts();
+  const account  = accounts.find(a => a.email === emailLow);
+  if (!account) return { ok: false, error: "Account not found." };
+  account.passwordHash = _hashPw(newPassword);
+  _saveAccounts(accounts);
+
+  return { ok: true };
+}
+
+function _loadResets() {
+  try { return JSON.parse(localStorage.getItem(FKA_RESET_KEY)) || []; }
+  catch { return []; }
+}
 
 /* ── tiny non-cryptographic hash (see security note above) ──── */
 function _hashPw(pw) {
