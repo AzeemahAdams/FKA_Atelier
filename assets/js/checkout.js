@@ -325,31 +325,82 @@ function checkoutPlaceOrder() {
         </div>`;
     }
 
-    // WhatsApp link — pre-filled with booking reference + total + items
+    // Build full order details for WhatsApp and Email
+    const bank     = (typeof getStoreBankDetails === "function") ? getStoreBankDetails() : {};
+    const itemsArr = booking.orderData.items || [];
+    const sub      = booking.orderData.subtotal || total;
+    const delivFee = booking.orderData.deliveryFee || 0;
+
+    // Formatted items list (WhatsApp — plain text)
+    const itemsWA = itemsArr.map((i, n) =>
+      `  ${n+1}. ${i.name}` +
+      (i.size   ? ` | Size: ${i.size}`   : "") +
+      (i.colour ? ` | Colour: ${i.colour}` : "") +
+      ` | Qty: ${i.qty}` +
+      (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")}` : "")
+    ).join("\n");
+
+    // WhatsApp link — full order details
     const waBtn = document.getElementById("btn-whatsapp-order");
     if (waBtn) {
-      const itemsList = booking.orderData.items.map(i => `${i.name} ×${i.qty}${i.size ? " ("+i.size+")" : ""}`).join(", ");
-      const message   = encodeURIComponent(
-        `Hi FKA Atelier! 🤍\n\n` +
-        `I'd like to complete my order.\n` +
-        `Booking Reference: *${bookingRef}*\n` +
-        `Items: ${itemsList}\n` +
-        `Total: ₦${total.toLocaleString("en-NG")}\n` +
-        `Delivers to: ${shippingAddress.fullText}\n\n` +
-        `Please send me your bank details so I can make payment. Thank you!`
+      const waMessage = encodeURIComponent(
+        `Hi FKA Atelier! 🤍\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n` +
+        `🛍️ *NEW ORDER*\n` +
+        `━━━━━━━━━━━━━━━━━━━━\n\n` +
+        `📋 *Booking Reference:* ${bookingRef}\n\n` +
+        `👤 *Customer Details*\n` +
+        `Name: ${customer.fullName}\n` +
+        `Phone: ${customer.phone}\n` +
+        `Email: ${customer.email}\n\n` +
+        `📦 *Delivery Address*\n` +
+        `${shippingAddress.fullText}\n\n` +
+        `🧾 *Order Items*\n` +
+        `${itemsWA}\n\n` +
+        `💰 *Order Summary*\n` +
+        `Subtotal: ₦${Number(sub).toLocaleString("en-NG")}\n` +
+        `Delivery: ₦${Number(delivFee).toLocaleString("en-NG")}\n` +
+        `*Total: ₦${Number(total).toLocaleString("en-NG")}*\n\n` +
+        `🏦 *Awaiting bank details to complete payment.*\n` +
+        `Thank you! 🙏`
       );
-      waBtn.href = `https://wa.me/2347019243312?text=${message}`;
+      waBtn.href = `https://wa.me/2347019243312?text=${waMessage}`;
     }
 
-    // Email link — pre-filled
+    // Email link — full order details
     const emailBtn = document.getElementById("btn-email-order");
     if (emailBtn) {
-      const subject = encodeURIComponent(`Payment — Booking ${bookingRef}`);
-      const itemsList = booking.orderData.items.map(i => `${i.name} x${i.qty}`).join(", ");
-      const body = encodeURIComponent(
-        `Hi FKA Atelier,\n\nI'd like to complete my order.\n\nBooking Reference: ${bookingRef}\nItems: ${itemsList}\nTotal: ₦${total.toLocaleString("en-NG")}\n\nPlease send me your bank details. Thank you.`
+      const itemsEmail = itemsArr.map((i, n) =>
+        `${n+1}. ${i.name}` +
+        (i.size   ? ` | Size: ${i.size}`     : "") +
+        (i.colour ? ` | Colour: ${i.colour}` : "") +
+        ` | Qty: ${i.qty}` +
+        (i.price  ? ` | ₦${Number(i.price).toLocaleString("en-NG")}` : "")
+      ).join("\n");
+
+      const subject = encodeURIComponent(`New Order — Booking Ref: ${bookingRef}`);
+      const body    = encodeURIComponent(
+        `Hi FKA Atelier,\n\n` +
+        `I have placed an order and would like to complete payment.\n\n` +
+        `════════════════════════\n` +
+        `BOOKING REFERENCE: ${bookingRef}\n` +
+        `════════════════════════\n\n` +
+        `CUSTOMER DETAILS\n` +
+        `Name:    ${customer.fullName}\n` +
+        `Phone:   ${customer.phone}\n` +
+        `Email:   ${customer.email}\n\n` +
+        `DELIVERY ADDRESS\n` +
+        `${shippingAddress.fullText}\n\n` +
+        `ORDER ITEMS\n` +
+        `${itemsEmail}\n\n` +
+        `ORDER SUMMARY\n` +
+        `Subtotal:  ₦${Number(sub).toLocaleString("en-NG")}\n` +
+        `Delivery:  ₦${Number(delivFee).toLocaleString("en-NG")}\n` +
+        `TOTAL:     ₦${Number(total).toLocaleString("en-NG")}\n\n` +
+        `Please send me your bank transfer details so I can complete payment.\n\n` +
+        `Thank you!\n${customer.fullName}`
       );
-      emailBtn.href = `mailto:hello@fkaatelier.com?subject=${subject}&body=${body}`;
+      emailBtn.href = `mailto:omotolaazeemah7@gmail.com?subject=${subject}&body=${body}`;
     }
 
   } catch (err) {

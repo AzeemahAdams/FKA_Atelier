@@ -10,14 +10,15 @@
 "use strict";
 
 /* ── Configuration ───────────────────────────────────── */
-// Priority order for API key:
-//   1. localStorage "fka_groq_api_key"  (admin override via settings page)
-//   2. window.FKA_CONFIG.groqApiKey     (hardcoded in fka-config.js, gitignored)
-// This means Ask FKA works out of the box with zero admin setup.
+// API key priority:
+//   1. localStorage "fka_groq_api_key"  (admin override)
+//   2. window.FKA_CONFIG.groqApiKey     (fka-config.js, local only)
+//   3. window._fkaK                     (set by inline script in HTML)
 const FKA_AI_CONFIG = {
   get apiKey() {
     return localStorage.getItem("fka_groq_api_key")
       || (window.FKA_CONFIG && window.FKA_CONFIG.groqApiKey)
+      || window._fkaK
       || "";
   },
   get model() {
@@ -26,7 +27,7 @@ const FKA_AI_CONFIG = {
       || "llama-3.3-70b-versatile";
   },
   apiUrl:      "https://api.groq.com/openai/v1/chat/completions",
-  maxTokens:   500,
+  maxTokens:   600,
   temperature: 0.7,
   maxHistory:  12
 };
